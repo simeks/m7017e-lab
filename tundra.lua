@@ -145,7 +145,16 @@ Build {
 				},
 			},
 			Libs = { 
-				{ "kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", "gstreamer-0.10.lib"; Config = { "win32-*-*", "win64-*-*" } },
+				{ "kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
+					"gstreamer-0.10.lib", 
+					"glib-2.0.lib", 
+					"gtk-win32-2.0.lib", 
+					"gdk-win32-2.0.lib", 
+					"cairo.lib", 
+					"gstapp-0.10.lib", 
+					"gstbase-0.10.lib";
+					"gstinterfaces-0.10.lib",
+					"gobject-2.0.lib"; Config = { "win32-*-*", "win64-*-*" } },
 				{ "gstreamer-0.10"; Config = { "macosx-*-*", "macosx-*-*" } }
 			},
 

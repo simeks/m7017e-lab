@@ -3,8 +3,9 @@ native = require "tundra.native"
 
 local win32_config = {
 	Env = {
-		GTKMM_BASEPATH = native.getenv("GTKMM_BASEPATH"),
-
+		GSTREAMER_BASEPATH = native.getenv("GSTREAMER_SDK_ROOT_X86", "."),
+		GSTREAMER_INCLUDE = "$(GSTREAMER_BASEPATH)/include/",
+		GSTREAMER_LIBS = "$(GSTREAMER_BASEPATH)/lib/",
 		CXXOPTS = {
 			"/MD", "/W4", "/EHsc", "/D_CRT_SECURE_NO_WARNINGS",
 			"/wd4250", -- C4250: "inherits '...' via dominance"
@@ -20,12 +21,27 @@ local win32_config = {
 	},
 }
 
+local macosx_config = {
+	Env = {
+		GSTREAMER_INCLUDE = "/Library/Frameworks/GStreamer.framework/Versions/0.10/Headers",
+		GSTREAMER_LIBS = "/Library/Frameworks/GStreamer.framework/Versions/0.10/lib",
+		CXXOPTS = {
+			"-Werror", "-Wall", "-std=c++11",
+			{ "-O0", "-g"; Config = "*-*-debug" },
+			{ "-O2"; Config = {"*-*-release", "*-*-production"} },
+		},
+		LD = { "-lc++" },
+	}
+}
+
+
 Build {
 	Configs = {
 		Config {
 			Name = "macosx-gcc",
 			DefaultOnHost = "macosx",
-			Tools = { "gcc-osx" },
+			Tools = { "clang-osx" },
+			Inherit = macosx_config,
 		},
 		Config {
 			Name = 'win32-vs2012',
@@ -75,71 +91,19 @@ Build {
 			},
 			Env = {
 				CPPPATH = { 
-					"$(GTKMM_BASEPATH)/include",
-					"$(GTKMM_BASEPATH)/include/freetype2",
-					"$(GTKMM_BASEPATH)/include/glib-2.0",
-					"$(GTKMM_BASEPATH)/include/cairo",
-					"$(GTKMM_BASEPATH)/include/pango-1.0",
-					"$(GTKMM_BASEPATH)/include/atk-1.0",
-					"$(GTKMM_BASEPATH)/include/gdk-pixbuf-2.0",
-					"$(GTKMM_BASEPATH)/include/gtk-2.0",
-					"$(GTKMM_BASEPATH)/include/libxml2",
-					"$(GTKMM_BASEPATH)/include/libglade-2.0",
-					"$(GTKMM_BASEPATH)/include/sigc++-2.0",
-					"$(GTKMM_BASEPATH)/include/glibmm-2.4",
-					"$(GTKMM_BASEPATH)/include/giomm-2.4",
-					"$(GTKMM_BASEPATH)/include/cairomm-1.0",
-					"$(GTKMM_BASEPATH)/include/pangomm-1.4",
-					"$(GTKMM_BASEPATH)/include/atkmm-1.6",
-					"$(GTKMM_BASEPATH)/include/gdkmm-2.4",
-					"$(GTKMM_BASEPATH)/include/gtkmm-2.4",
-					"$(GTKMM_BASEPATH)/include/libxml++-2.6",
-					"$(GTKMM_BASEPATH)/include/libglademm-2.4",
-					"$(GTKMM_BASEPATH)/lib/glib-2.0/include",
-					"$(GTKMM_BASEPATH)/lib/gtk-2.0/include",
-					"$(GTKMM_BASEPATH)/lib/sigc++-2.0/include",
-					"$(GTKMM_BASEPATH)/lib/glibmm-2.4/include",
-					"$(GTKMM_BASEPATH)/lib/giomm-2.4/include",
-					"$(GTKMM_BASEPATH)/lib/cairomm-1.0/include",
-					"$(GTKMM_BASEPATH)/lib/pangomm-1.4/include",
-					"$(GTKMM_BASEPATH)/lib/atkmm-1.6/include",
-					"$(GTKMM_BASEPATH)/lib/gdkmm-2.4/include",
-					"$(GTKMM_BASEPATH)/lib/gtkmm-2.4/include",
-					"$(GTKMM_BASEPATH)/lib/libxml++-2.6/include",
-					"$(GTKMM_BASEPATH)/lib/libglademm-2.4/include",
+					"$(GSTREAMER_INCLUDE)",
 				},
 				LIBPATH = {
-					"$(GTKMM_BASEPATH)/lib",
+					"$(GSTREAMER_LIBS)",
 				},
 				LIBS = {
-					"glademm-vc100-d-2_4.lib",
-					"xml++-vc100-d-2_6.lib",
-					"gtkmm-vc100-d-2_4.lib",
-					"gdkmm-vc100-d-2_4.lib",
-					"atkmm-vc100-d-1_6.lib",
-					"pangomm-vc100-d-1_4.lib",
-					"cairomm-vc100-d-1_0.lib",
-					"giomm-vc100-d-2_4.lib",
-					"glibmm-vc100-d-2_4.lib",
-					"sigc-vc100-d-2_0.lib",
-					"glade-2.0.lib",
-					"libxml2.lib",
-					"gtk-win32-2.0.lib",
-					"gdk-win32-2.0.lib",
-					"gdk_pixbuf-2.0.lib",
-					"atk-1.0.lib",
-					"pangowin32-1.0.lib",
-					"pangocairo-1.0.lib",
-					"pango-1.0.lib",
-					"cairo.lib",
-					"gio-2.0.lib",
-					"gobject-2.0.lib",
-					"gmodule-2.0.lib",
-					"glib-2.0.lib",
-					"intl.lib",
 				},
 			},
-			Libs = { { "kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib"; Config = { "win32-*-*", "win64-*-*" } }},
+			Libs = { 
+				{ "kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", "gstreamer-0.10.lib"; Config = { "win32-*-*", "win64-*-*" } },
+				{ "gstreamer-0.10"; Config = { "macosx-*-*", "macosx-*-*" } }
+			},
+
 		}
 		Default "Main"
 	end,

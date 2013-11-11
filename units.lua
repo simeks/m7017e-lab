@@ -76,16 +76,21 @@ Program {
 			"$(QT5)/include/QtWidgets",
 			"$(QT5)/include/QtGui",
 			"$(QT5)/include/QtCore", 
+			"$(QT5)/include/QtANGLE", 
 			"$(QT5)/include",	
 		},
 		LIBPATH = {
 			"$(GSTREAMER_LIBS)",
 			"$(QT5)/lib",
 		},
+		PROGOPTS = {
+			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-*" } },
+		},
 	},
 	Libs = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
-			"gstreamer-0.10.lib"; 
+			"gstreamer-0.10.lib",
+			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib"; 
 			Config = { "win32-*-*" } 
 		},
 		{ 	"gstreamer-0.10"; 

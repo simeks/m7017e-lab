@@ -36,6 +36,23 @@ DefRule {
 	end,
 }
 
+DefRule {
+	Name = "GenerateUI",
+	Pass = "GenerateSources",
+	Command = "$(QT5)/bin/uic $(<) -o $(@)",
+
+	Blueprint = {
+		Input = { Required = true, Type = "string" },
+		Output = { Required = true, Type = "string" },
+	},
+
+	Setup = function (env, data)
+		return {
+			InputFiles    = { data.Input },
+			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. data.Output },
+		}
+	end,
+}
 
 
 
@@ -47,6 +64,14 @@ local function GenerateMocSources(sources)
 	return result
 end
 
+
+local function GenerateUISources(sources)
+	local result = {}
+	for _, src in ipairs(tundra.util.flatten(sources)) do
+		result[#result + 1] = GenerateUI { Input = src, Output = "ui_" .. tundra.path.get_filename_base(src) .. ".h" }
+	end
+	return result
+end
 
 Program {
 	Name = "Main",
@@ -64,6 +89,12 @@ Program {
 				Extensions = { ".h" } 
 			}, 
 		},
+		GenerateUISources {
+			Glob { 
+				Dir = "src", 
+				Extensions = { ".ui" } 
+			}, 
+		},
 		GenerateQRC {
 			Input = "data/application.qrc",
 			Output = "application.cpp"
@@ -77,7 +108,8 @@ Program {
 			"$(QT5)/include/QtGui",
 			"$(QT5)/include/QtCore", 
 			"$(QT5)/include/QtANGLE", 
-			"$(QT5)/include",	
+			"$(QT5)/include",
+			"$(OBJECTDIR)/_generated/",
 		},
 		LIBPATH = {
 			"$(GSTREAMER_LIBS)",

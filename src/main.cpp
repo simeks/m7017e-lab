@@ -1,6 +1,5 @@
+#include "playerwindow.h"
 #include <QApplication>
-
-#include "mainwindow.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -10,18 +9,15 @@ int WINAPI WinMain(HINSTANCE hInstanceIn, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 int main(int argc, char *argv[])
 #endif
 {
-    Q_INIT_RESOURCE(application);
 
 #ifdef _WIN32
-	char* argv[] = { "Main.exe" };
-	int argc = 1;
+        char* argv[] = { "Main.exe" };
+        int argc = 1;
 #endif
 
-    QApplication app(argc, argv);
+    QApplication a(argc, argv);
+    PlayerWindow w;
+    w.show();
 
-    app.setOrganizationName("QtProject");
-    app.setApplicationName("Application Example");
-    MainWindow mainWin;
-    mainWin.show();
-    return app.exec();
+    return a.exec();
 }

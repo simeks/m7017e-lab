@@ -64,6 +64,12 @@ Build {
         },
 	},
 
+	Env = {
+		CPPDEFS = {
+			{ "DEBUG"; Config = "*-*-debug" },
+		},
+	},
+
 	IdeGenerationHints = {
 		Msvc = {
 			-- Remap config names to MSVC platform names (affects things like header scanning & debugging)

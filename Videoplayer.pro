@@ -12,9 +12,8 @@ TARGET = Videoplayer
 TEMPLATE = app
 
 
-SOURCES += src/main.cpp\
-        src/playerwindow.cpp
+SOURCES += src/main.cpp src/qt/playerwindow.cpp
 
-HEADERS  += src/playerwindow.h
+HEADERS  += src/qt/playerwindow.h
 
-FORMS    += src/playerwindow.ui
+FORMS    += src/qt/playerwindow.ui

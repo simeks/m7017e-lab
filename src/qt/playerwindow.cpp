@@ -22,3 +22,39 @@ void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));
 }
+
+void PlayerWindow::on_playButton_clicked()
+{
+    if(playing)
+        {
+            QIcon playIcon(":/../../data/images/playButton.png");
+            playing = false;
+            ui->playButton->setIcon(playIcon);
+        }
+    else
+        {
+            QIcon pauseIcon(":/../../data/images/pauseButton.png");
+            playing = true;
+            ui->playButton->setIcon(pauseIcon);
+        }
+}
+
+void PlayerWindow::on_rewindButton_clicked()
+{
+
+}
+
+void PlayerWindow::on_stopButton_clicked()
+{
+
+}
+
+void PlayerWindow::on_fastForwardButton_clicked()
+{
+
+}
+
+void PlayerWindow::on_fullScreenButton_clicked()
+{
+
+}

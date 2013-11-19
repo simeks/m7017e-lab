@@ -17,3 +17,6 @@ SOURCES += src/main.cpp src/qt/playerwindow.cpp
 HEADERS  += src/qt/playerwindow.h
 
 FORMS    += src/qt/playerwindow.ui
+
+RESOURCES += \
+    application.qrc

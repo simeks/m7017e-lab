@@ -1,4 +1,4 @@
-#include "playerwindow.h"
+#include "qt/playerwindow.h"
 #include <QApplication>
 
 #ifdef _WIN32

@@ -10,6 +10,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 }
 
 PlayerWindow::~PlayerWindow()
@@ -19,5 +20,5 @@ PlayerWindow::~PlayerWindow()
 
 void PlayerWindow::open()
 {
-    fileName = QFileDialog::getOpenFileNames(this, tr("Open Files"));
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));
 }

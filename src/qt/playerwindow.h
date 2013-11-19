@@ -20,7 +20,7 @@ private slots:
 
 private:
     Ui::PlayerWindow *ui;
-    QStringList fileName;
+    QStringList fileNames;
 };
 
 #endif // PLAYERWINDOW_H

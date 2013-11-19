@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
 {
 
 #ifdef _WIN32
-        char* argv[] = { "Main.exe" };
-        int argc = 1;
+    char* argv[] = { "Main.exe" };
+    int argc = 1;
 #endif
 
     QApplication a(argc, argv);

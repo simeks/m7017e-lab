@@ -1,13 +1,37 @@
+#include "common.h"
+
 #include "bus.h"
 
 namespace 
 {
-	void bus_error_callback(GstBus* bus, GstMessage* msg, void* data)
+	/// @brief Callback handling error message coming from the bus.
+	void bus_error_callback(GstBus* gst_bus, GstMessage* msg, void* data)
+	{
+		GError* error;
+		gchar* debug_info;
+
+		gst_message_parse_error(msg, &error, &debug_info);
+		std::cerr << "Error: " << error->message << ", (Element: " << GST_OBJECT_NAME(msg->src) << ")" << std::endl;
+#ifdef DEBUG
+		if(debug_info)
+		{
+			std::cerr << "Debug info: " << debug_info << std::endl;
+		}
+#endif
+		g_clear_error(&error);
+		g_free(debug_info);
+	}
+
+	/// @brief Callback invoked when the pipeline reaches end of stream.
+	void bus_eos_callback(GstBus* gst_bus, GstMessage* msg, void* data)
 	{
 
 	}
 
+	void bus_state_change_callback(GstBus* gst_bus, GstMessage* msg, void* data)
+	{
 
+	}
 };
 
 Bus::Bus(GstBus* bus) : _bus(bus)
@@ -18,6 +42,9 @@ Bus::Bus(GstBus* bus) : _bus(bus)
 	// Register callbacks for signals
 	gst_bus_add_signal_watch(_bus);
 	g_signal_connect(G_OBJECT(_bus), "message::error", (GCallback)bus_error_callback, this);
+	g_signal_connect(G_OBJECT(_bus), "message::eos", (GCallback)bus_eos_callback, this);
+	g_signal_connect(G_OBJECT(_bus), "message::state-changed", (GCallback)bus_eos_callback, this);
+
 }
 Bus::~Bus()
 {

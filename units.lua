@@ -85,13 +85,13 @@ Program {
 		},
 		GenerateMocSources {
 			Glob { 
-				Dir = "src", 
+				Dir = "src/qt", 
 				Extensions = { ".h" } 
 			}, 
 		},
 		GenerateUISources {
 			Glob { 
-				Dir = "src", 
+				Dir = "src/qt", 
 				Extensions = { ".ui" } 
 			}, 
 		},
@@ -104,6 +104,9 @@ Program {
 		CPPPATH = { 
 			"$(GSTREAMER_INCLUDE)",
 			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
 			"$(QT5)/include/QtWidgets",
 			"$(QT5)/include/QtGui",
 			"$(QT5)/include/QtCore", 

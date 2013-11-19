@@ -15,8 +15,12 @@ public:
     explicit PlayerWindow(QWidget *parent = 0);
     ~PlayerWindow();
 
+private slots:
+    void open();
+
 private:
     Ui::PlayerWindow *ui;
+    QStringList fileName;
 };
 
 #endif // PLAYERWINDOW_H

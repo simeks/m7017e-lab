@@ -3,14 +3,22 @@
 
 #include <gst/gst.h>
 
+class Bus;
+
+/// @brief Class representing a gstreamer pipeline.
 class Pipeline
 {
 public:
-	Pipeline();
+	/// @brief Pipeline constructor
+	/// @param pipeline_factory Name of the factory to use when creating the gstreamer pipeline. (E.g. playbin2)
+	Pipeline(const char* pipeline_factory);
 	~Pipeline();
+
+
 
 private:
 	GstElement* _pipeline;
+	Bus* _bus;
 };
 
 

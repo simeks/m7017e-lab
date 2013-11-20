@@ -4,7 +4,10 @@ native = require "tundra.native"
 
 local win32_config = {
 	Env = {
-		QT5 = native.getenv("QT5"),
+		QT5 = native.getenv("QT5", "."),
+		QT5_INCLUDE = "$(QT5)/include/",
+		QT5_LIBS = "$(QT5)/lib/",
+		QT5_BIN = "$(QT5)/bin/",
 		GSTREAMER_BASEPATH = native.getenv("GSTREAMER_SDK_ROOT_X86", "."),
 		GSTREAMER_INCLUDE = "$(GSTREAMER_BASEPATH)/include/",
 		GSTREAMER_LIBS = "$(GSTREAMER_BASEPATH)/lib/",
@@ -25,7 +28,10 @@ local win32_config = {
 
 local macosx_config = {
 	Env = {
-		QT5 = native.getenv("QT5"),
+		QT5 = native.getenv("QT5", "."),
+		QT5_INCLUDE = "$(QT5)/include/",
+		QT5_LIBS = "$(QT5)/lib/",
+		QT5_BIN = "$(QT5)/bin/",
 		GSTREAMER_INCLUDE = "/Library/Frameworks/GStreamer.framework/Versions/0.10/Headers",
 		GSTREAMER_LIBS = "/Library/Frameworks/GStreamer.framework/Versions/0.10/lib",
 		CXXOPTS = {
@@ -38,10 +44,30 @@ local macosx_config = {
 			{ "-O0", "-g"; Config = "*-*-debug" },
 			{ "-O2"; Config = {"*-*-release", "*-*-production"} },
 		},
-		LD = { "-lc++", "-F$(QT5)/lib", },
+		LD = { "-lc++", "-F$(QT5_LIBS)", },
 	}
 }
 
+local linux_config = {
+	Env = {
+		QT5_INCLUDE = "/usr/include/qt5/",
+		QT5_LIBS = "/usr/lib/qt5/",
+		QT5_BIN = "/usr/bin/",
+		GSTREAMER_INCLUDE = "/usr/include/",
+		GSTREAMER_LIBS = "/usr/lib/x86_64-linux-gnu/",
+		CXXOPTS = {
+			"-Wall", "-fPIC",
+			{ "-O0", "-g"; Config = "*-*-debug" },
+			{ "-O2"; Config = {"*-*-release", "*-*-production"} },
+		},
+		COPTS = {
+			"-Wall",
+			{ "-O0", "-g"; Config = "*-*-debug" },
+			{ "-O2"; Config = {"*-*-release", "*-*-production"} },
+		},
+		LD = { "-lstdc++" },
+	}
+}
 
 Build {
 	Configs = {
@@ -57,11 +83,12 @@ Build {
 			DefaultOnHost = "windows",
 			Inherit = win32_config,
 		},
-        Config {
-                Name = "linux-gcc",
-                DefaultOnHost = "linux",
-                Tools = { "gcc" },
-        },
+		Config {
+		        Name = "linux-gcc",
+		        DefaultOnHost = "linux",
+		        Tools = { "gcc" },
+			Inherit = linux_config,
+		},
 	},
 
 	Env = {

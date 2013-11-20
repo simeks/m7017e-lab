@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>data/images/fastForwardButton.png</file>
-        <file>data/images/pauseButton.png</file>
-        <file>data/images/playButton.png</file>
-        <file>data/images/rewindButton.png</file>
-        <file>data/images/stopButton.png</file>
-    </qresource>
-</RCC>

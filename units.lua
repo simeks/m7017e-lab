@@ -3,7 +3,7 @@
 DefRule {
 	Name = "GenerateMoc",
 	Pass = "GenerateSources",
-	Command = "$(QT5)/bin/moc $(<) -o $(@)",
+	Command = "$(QT5_BIN)/moc $(<) -o $(@)",
 
 	Blueprint = {
 		Input = { Required = true, Type = "string" },
@@ -21,7 +21,7 @@ DefRule {
 DefRule {
 	Name = "GenerateQRC",
 	Pass = "GenerateSources",
-	Command = "$(QT5)/bin/rcc $(<) -o $(@) -name application",
+	Command = "$(QT5_BIN)/rcc $(<) -o $(@) -name application",
 
 	Blueprint = {
 		Input = { Required = true, Type = "string" },
@@ -39,7 +39,7 @@ DefRule {
 DefRule {
 	Name = "GenerateUI",
 	Pass = "GenerateSources",
-	Command = "$(QT5)/bin/uic $(<) -o $(@)",
+	Command = "$(QT5_BIN)/uic $(<) -o $(@)",
 
 	Blueprint = {
 		Input = { Required = true, Type = "string" },
@@ -107,16 +107,16 @@ Program {
 			"$(GSTREAMER_INCLUDE)/glib-2.0",
 			"$(GSTREAMER_INCLUDE)/libxml2",
 			"$(GSTREAMER_LIBS)/glib-2.0/include",
-			"$(QT5)/include/QtWidgets",
-			"$(QT5)/include/QtGui",
-			"$(QT5)/include/QtCore", 
-			"$(QT5)/include/QtANGLE", 
-			"$(QT5)/include",
+			"$(QT5_INCLUDE)/QtWidgets",
+			"$(QT5_INCLUDE)/QtGui",
+			"$(QT5_INCLUDE)/QtCore", 
+			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)",
 			"$(OBJECTDIR)/_generated/",
 		},
 		LIBPATH = {
 			"$(GSTREAMER_LIBS)",
-			"$(QT5)/lib",
+			"$(QT5_LIBS)",
 		},
 		PROGOPTS = {
 			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-*" } },
@@ -129,7 +129,11 @@ Program {
 			Config = { "win32-*-*" } 
 		},
 		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0";
-			Config = { "macosx-*-*", "macosx-*-*" } 
+			Config = { "macosx-*-*" } 
+		},
+		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0",
+			"Qt5Core", "Qt5Widgets", "Qt5Gui";
+			Config = { "linux-*-*" } 
 		}
 	},
 

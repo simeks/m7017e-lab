@@ -119,7 +119,8 @@ Program {
 			"$(QT5_LIBS)",
 		},
 		PROGOPTS = {
-			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-*" } },
+			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
+			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
 		},
 	},
 	Libs = { 

@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>PlayerWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>true</bool>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QToolButton" name="playButton">
     <property name="geometry">
@@ -27,8 +30,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../../application.qrc">
-      <normaloff>:/data/images/playButton.png</normaloff>:/data/images/playButton.png</iconset>
+     <iconset resource="../../data/application.qrc">
+      <normaloff>:/images/playButton.png</normaloff>:/images/playButton.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -69,8 +72,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../../application.qrc">
-      <normaloff>:/data/images/rewindButton.png</normaloff>:/data/images/rewindButton.png</iconset>
+     <iconset resource="../../data/application.qrc">
+      <normaloff>:/images/rewindButton.png</normaloff>:/images/rewindButton.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -92,8 +95,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../../application.qrc">
-      <normaloff>:/data/images/stopButton.png</normaloff>:/data/images/stopButton.png</iconset>
+     <iconset resource="../../data/application.qrc">
+      <normaloff>:/images/stopButton.png</normaloff>:/images/stopButton.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -115,8 +118,8 @@
      <string/>
     </property>
     <property name="icon">
-     <iconset resource="../../application.qrc">
-      <normaloff>:/data/images/fastForwardButton.png</normaloff>:/data/images/fastForwardButton.png</iconset>
+     <iconset resource="../../data/application.qrc">
+      <normaloff>:/images/fastForwardButton.png</normaloff>:/images/fastForwardButton.png</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -158,12 +161,90 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>741</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="palette">
+     <palette>
+      <active>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </active>
+      <inactive>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </inactive>
+      <disabled>
+       <colorrole role="Base">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="Window">
+        <brush brushstyle="SolidPattern">
+         <color alpha="255">
+          <red>0</red>
+          <green>0</green>
+          <blue>0</blue>
+         </color>
+        </brush>
+       </colorrole>
+      </disabled>
+     </palette>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>layoutWidget</zorder>
    <zorder>fullScreenButton</zorder>
    <zorder>playButton</zorder>
    <zorder>rewindButton</zorder>
    <zorder>stopButton</zorder>
    <zorder>fastForwardButton</zorder>
+   <zorder>widget</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -199,7 +280,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../../application.qrc"/>
+  <include location="../../data/application.qrc"/>
  </resources>
  <connections/>
 </ui>

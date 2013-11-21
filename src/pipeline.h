@@ -14,6 +14,9 @@ public:
 	Pipeline(const char* pipeline_factory);
 	~Pipeline();
 
+	/// Sets which window the pipeline should output to.
+	/// @param window_handle Window handle for the window that should work as canvas.
+	void SetOutput(guintptr window_handle);
 
 
 private:

@@ -125,14 +125,14 @@ Program {
 	},
 	Libs = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
-			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib",
+			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
 			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib"; 
 			Config = { "win32-*-*" } 
 		},
-		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0";
+		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10";
 			Config = { "macosx-*-*" } 
 		},
-		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0",
+		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10",
 			"Qt5Core", "Qt5Widgets", "Qt5Gui";
 			Config = { "linux-*-*" } 
 		}

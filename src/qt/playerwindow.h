@@ -16,6 +16,9 @@ public:
     explicit PlayerWindow(QWidget *parent = 0);
     ~PlayerWindow();
 
+	/// Returns the window handle for the widget used for outputting video.
+	WId GetOutputHandle() const;
+
 private slots:
     void open();
 

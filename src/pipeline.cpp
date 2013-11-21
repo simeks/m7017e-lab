@@ -3,6 +3,8 @@
 #include "pipeline.h"
 #include "bus.h"
 
+#include <gst/interfaces/xoverlay.h>
+
 Pipeline::Pipeline(const char* pipeline_factory) : _pipeline(NULL), _bus(NULL)
 {
 	// Initialize gstreamer
@@ -13,6 +15,7 @@ Pipeline::Pipeline(const char* pipeline_factory) : _pipeline(NULL), _bus(NULL)
 		pipeline_factory, // Name of the pipeline factory to use
 		NULL // Specifying NULL here means gstreamer will generate an unique name for us.
 	);
+
 	if(!_pipeline)
 	{
 		debug::Printf("[Error] Failed to create pipeline.");
@@ -29,7 +32,7 @@ Pipeline::Pipeline(const char* pipeline_factory) : _pipeline(NULL), _bus(NULL)
 	gst_object_unref(bus);
 
 	g_object_set(_pipeline, "uri", "http://docs.gstreamer.com/media/sintel_trailer-480p.webm", NULL);
-	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
+	gst_element_set_state(_pipeline, GST_STATE_READY);
 }
 Pipeline::~Pipeline()
 {
@@ -44,4 +47,9 @@ Pipeline::~Pipeline()
 	}
 }
 
+void Pipeline::SetOutput(guintptr window_handle)
+{
+	gst_x_overlay_set_window_handle(GST_X_OVERLAY(_pipeline), window_handle);
+	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
+}
 

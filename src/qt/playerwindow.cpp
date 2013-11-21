@@ -19,7 +19,10 @@ PlayerWindow::~PlayerWindow()
 {
     delete ui;
 }
-
+WId PlayerWindow::GetOutputHandle() const
+{
+	return ui->widget->winId();
+}
 void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));

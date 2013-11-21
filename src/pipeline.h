@@ -18,6 +18,9 @@ public:
 	/// @param window_handle Window handle for the window that should work as canvas.
 	void SetOutput(guintptr window_handle);
 
+	/// @brief Sets the pipeline state.
+	void SetState(GstState state);
+	
 
 private:
 	GstElement* _pipeline;

@@ -53,3 +53,8 @@ void Pipeline::SetOutput(guintptr window_handle)
 	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
 }
 
+void Pipeline::SetState(GstState state)
+{
+	g_assert(_pipeline);
+	gst_element_set_state(_pipeline, state);
+}

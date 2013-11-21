@@ -2,6 +2,7 @@
 #define PLAYERWINDOW_H
 
 #include <QMainWindow>
+#include <QPalette>
 
 namespace Ui {
 class PlayerWindow;
@@ -31,6 +32,7 @@ private slots:
 private:
     Ui::PlayerWindow *ui;
     QStringList fileNames;
+    QPalette p;
     bool playing;
 };
 

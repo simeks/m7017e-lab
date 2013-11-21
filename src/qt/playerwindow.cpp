@@ -1,6 +1,7 @@
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
 #include <QFileDialog>
+#include <QPalette>
 
 PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),

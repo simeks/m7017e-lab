@@ -18,5 +18,4 @@ HEADERS  += src/qt/playerwindow.h
 
 FORMS    += src/qt/playerwindow.ui
 
-RESOURCES += \
-    application.qrc
+RESOURCES += data/application.qrc

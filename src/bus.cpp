@@ -11,13 +11,12 @@ namespace
 		gchar* debug_info;
 
 		gst_message_parse_error(msg, &error, &debug_info);
-		std::cerr << "Error: " << error->message << ", (Element: " << GST_OBJECT_NAME(msg->src) << ")" << std::endl;
-#ifdef DEBUG
+		debug::Printf("Error: %s, (Element: %s)", error->message, GST_OBJECT_NAME(msg->src));
 		if(debug_info)
 		{
-			std::cerr << "Debug info: " << debug_info << std::endl;
+			debug::Printf("Debug info: %s", debug_info);
 		}
-#endif
+
 		g_clear_error(&error);
 		g_free(debug_info);
 	}

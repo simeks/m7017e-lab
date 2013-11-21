@@ -10,6 +10,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
+    playing = false;
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 }
@@ -28,13 +29,13 @@ void PlayerWindow::on_playButton_clicked()
 {
     if(playing)
         {
-            QIcon playIcon(":/../../data/images/playButton.png");
+            QIcon playIcon(":images/playButton.png");
             playing = false;
             ui->playButton->setIcon(playIcon);
         }
     else
         {
-            QIcon pauseIcon(":/../../data/images/pauseButton.png");
+            QIcon pauseIcon(":images/pauseButton.png");
             playing = true;
             ui->playButton->setIcon(pauseIcon);
         }

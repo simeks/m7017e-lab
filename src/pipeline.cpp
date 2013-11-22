@@ -58,3 +58,22 @@ void Pipeline::SetState(GstState state)
 	g_assert(_pipeline);
 	gst_element_set_state(_pipeline, state);
 }
+
+bool Pipeline::QueryPosition(int64_t* duration)
+{
+	// GST_FORMAT_TIME gives us the position in nanoseconds.
+	GstFormat fmt = GST_FORMAT_TIME;
+
+	// Query the pipeline for the position
+	return gst_element_query_position(_pipeline, &fmt, duration) == TRUE;
+}
+
+bool Pipeline::QueryDuration(int64_t* duration)
+{
+	// GST_FORMAT_TIME gives us the duration in nanoseconds.
+	GstFormat fmt = GST_FORMAT_TIME;
+
+	// Query the pipeline for the total duration
+	return gst_element_query_duration(_pipeline, &fmt, duration) == TRUE;
+}
+

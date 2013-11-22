@@ -21,6 +21,16 @@ public:
 	/// @brief Sets the pipeline state.
 	void SetState(GstState state);
 	
+	/// @brief Queries the pipeline for the current position in nanoseconds of the current stream.
+	/// @param duration This parameter will hold the resulting position, in nanoseconds.
+	/// @return True if the query were performed successfully.
+	bool QueryPosition(int64_t* duration);
+
+	/// @brief Queries the pipeline for the total duration in nanoseconds of the current stream.
+	/// @param duration This parameter will hold the resulting duration, in nanoseconds.
+	/// @return True if the query were performed successfully.
+	bool QueryDuration(int64_t* duration);
+
 
 private:
 	GstElement* _pipeline;

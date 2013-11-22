@@ -2,7 +2,7 @@
 #define PLAYERWINDOW_H
 
 #include <QMainWindow>
-#include <QPalette>
+#include "../player.h"
 
 namespace Ui {
 class PlayerWindow;
@@ -19,6 +19,7 @@ public:
 	/// Returns the window handle for the widget used for outputting video.
 	WId GetOutputHandle() const;
 
+
 private slots:
     void open();
 
@@ -30,12 +31,12 @@ private slots:
 
     void on_fastForwardButton_clicked();
 
-    void on_fullScreenButton_clicked();
+    void on_fullScreenButton_clicked(bool checked);
 
 private:
     Ui::PlayerWindow *ui;
+	Player* _player;
     QStringList fileNames;
-    QPalette p;
     bool playing;
 };
 

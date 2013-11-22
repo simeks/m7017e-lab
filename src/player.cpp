@@ -31,3 +31,33 @@ int Player::Run(int argc, char *argv[])
 
 	return a.exec();
 }
+
+void Player::Play()
+{
+	_pipeline->SetState(GST_STATE_PLAYING);
+}
+
+void Player::Pause()
+{
+	_pipeline->SetState(GST_STATE_PAUSED);
+}
+
+void Player::Stop()
+{
+	_pipeline->SetState(GST_STATE_NULL);
+}
+
+void Player::ReWind()
+{
+
+}
+
+void Player::FastForward()
+{
+
+}
+
+void Player::FullScreen()
+{
+
+}

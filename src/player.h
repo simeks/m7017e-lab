@@ -12,6 +12,12 @@ public:
 	~Player();
 
 	int Run(int argc, char *argv[]);
+	void Play();
+	void Pause();
+	void Stop();
+	void ReWind();
+	void FastForward();
+	void FullScreen();
 
 private:
 	Pipeline* _pipeline;

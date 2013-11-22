@@ -13,7 +13,7 @@ class PlayerWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit PlayerWindow(QWidget *parent = 0);
+    explicit PlayerWindow(Player* player, QWidget *parent = 0);
     ~PlayerWindow();
 
 	/// Returns the window handle for the widget used for outputting video.

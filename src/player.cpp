@@ -23,7 +23,7 @@ Player::~Player()
 int Player::Run(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-	_window = new PlayerWindow();
+	_window = new PlayerWindow(this);
 	_window->show();
 
 	_pipeline->SetOutput(_window->GetOutputHandle());

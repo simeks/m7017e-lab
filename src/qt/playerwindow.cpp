@@ -3,14 +3,14 @@
 #include <QFileDialog>
 #include "../player.h"
 
-PlayerWindow::PlayerWindow(QWidget *parent) :
+PlayerWindow::PlayerWindow(Player* player, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::PlayerWindow)
+    ui(new Ui::PlayerWindow),
+    _player(player)
 
 {
     ui->setupUi(this);
     playing = false;
-	_player = new Player();
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 }

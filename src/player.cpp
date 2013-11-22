@@ -10,6 +10,8 @@
 Player::Player() : _pipeline(NULL), _window(NULL)
 {
 	_pipeline = new Pipeline("playbin2");
+	
+
 }
 Player::~Player()
 {
@@ -44,12 +46,19 @@ void Player::Pause()
 
 void Player::Stop()
 {
-	_pipeline->SetState(GST_STATE_NULL);
+	_pipeline->SetState(GST_STATE_READY);
 }
 
 void Player::ReWind()
 {
-
+		if(_pipeline->QueryDuration(&duration))
+	{
+		_window->UpdateDurationLabels(duration, duration);
+	} 
+	else
+	{
+		//Failed to query...
+	}
 }
 
 void Player::FastForward()

@@ -15,6 +15,7 @@ class PlayerWindow : public QMainWindow
 public:
     explicit PlayerWindow(Player* player, QWidget *parent = 0);
     ~PlayerWindow();
+    void UpdateDurationLabels(int64_t duration, int64_t currTime);
 
 	/// Returns the window handle for the widget used for outputting video.
 	WId GetOutputHandle() const;
@@ -30,8 +31,6 @@ private slots:
     void on_stopButton_clicked();
 
     void on_fastForwardButton_clicked();
-
-    void on_fullScreenButton_clicked(bool checked);
 
 private:
     Ui::PlayerWindow *ui;

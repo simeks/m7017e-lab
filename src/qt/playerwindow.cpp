@@ -4,13 +4,15 @@
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
 #include <QFileDialog>
-#include "../player.h"
+#include <QMessageBox>
 #include <QTime>
+
+#include "../player.h"
 
 PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
-    _player(new Player),
+    _player(new Player(this)),
 	_tickTimer(this),
 	_refreshUITimer(this)
 {
@@ -38,7 +40,6 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_refreshUITimer.start();
 
     connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
-
 }
 
 PlayerWindow::~PlayerWindow()
@@ -46,6 +47,23 @@ PlayerWindow::~PlayerWindow()
 	delete _player;
     delete ui;
 }
+void PlayerWindow::PrintError(const std::string& msg)
+{
+	QMessageBox errorBox;
+	errorBox.setText(QString("There was an error: ") + msg.c_str());
+	errorBox.exec();
+}
+void PlayerWindow::StreamEnded()
+{
+	QIcon pauseIcon(":images/playButton.png");
+	ui->playButton->setIcon(pauseIcon);
+    ui->playButton->setEnabled(false);
+    ui->rewindButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+    ui->fastForwardButton->setEnabled(false);
+}
+
+
 void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
@@ -113,8 +131,10 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 {
 	QString totalDurationString;
 	QString currentTimeString;
-	long durationSeconds = duration/1000000000;
-	long currentTimeSeconds = currTime/1000000000;
+	long durationSeconds = duration/1000000000; // Convert duration from nanoseconds to seconds
+	long currentTimeSeconds = currTime/1000000000; // Convert position from nanoseconds to seconds
+
+	// Convert time to a more readable format before printing.
 
 	QTime totalDuration((durationSeconds/3600)%60, (durationSeconds/60)%60, durationSeconds%60, (durationSeconds*1000)%1000);
 	QTime currentTime((currentTimeSeconds/3600)%60, (currentTimeSeconds/60)%60, currentTimeSeconds%60, (currentTimeSeconds*1000)%1000);

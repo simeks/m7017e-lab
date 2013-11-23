@@ -36,8 +36,7 @@ void Bus::Parse(GstMessage* msg)
 
 		gst_message_parse_error(msg, &error, &debug_info);
 		
-		std::string error_msg = "Error: ";
-		error_msg += error->message;
+		std::string error_msg = error->message;
 
 		// Notify our listener about the error
 		_listener->Error(error_msg);

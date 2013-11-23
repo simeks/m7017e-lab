@@ -14,7 +14,7 @@ class PlayerWindow;
 class Player : public PipelineListener
 {
 public:
-	Player();
+	Player(PlayerWindow* window);
 	~Player();
 
 	void SetVideoOutput(uintptr_t window_handle);
@@ -46,6 +46,8 @@ private:
 	int64_t duration;
 	int64_t timeElapsed;
     bool _playing;
+
+	PlayerWindow* _window;
 };
 
 #endif // __PLAYER_H__

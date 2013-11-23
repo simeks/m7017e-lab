@@ -19,6 +19,11 @@ public:
     explicit PlayerWindow(QWidget *parent = 0);
     ~PlayerWindow();
 
+	/// Creates a popup and shows an error message.
+	void PrintError(const std::string& msg);
+
+	/// Indicates that the stream has stopped.
+	void StreamEnded();
 
 
 private slots:

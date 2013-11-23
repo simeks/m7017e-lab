@@ -16,7 +16,7 @@ public:
 	virtual void EndOfStream() {}
 
 	/// Notifies that an error as occured in the pipeline.
-	virtual void Error(const std::string& msg) {}
+	virtual void Error(const std::string& ) {}
 };
 
 /// @brief Class representing a gstreamer pipeline.

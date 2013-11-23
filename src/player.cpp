@@ -5,9 +5,10 @@
 #include "bus.h"
 #include "qt/playerwindow.h"
 
-Player::Player() :
+Player::Player(PlayerWindow* window) :
 	_pipeline(NULL), 
-	_playing(false)
+	_playing(false),
+	_window(window)
 {
 	_pipeline = new Pipeline();
 
@@ -95,15 +96,14 @@ void Player::Tick()
 
 void Player::EndOfStream()
 {
-	// Handle end of stream here.
+	_playing = false;
 
-
-	debug::Printf("[EOS]");
+	_window->StreamEnded();
 }
 void Player::Error(const std::string& msg)
 {
-	// Handle errors here.
+	_playing = false;
 
-
-	debug::Printf("[Error] %s", msg.c_str());
+	_window->PrintError(msg);
+	_window->StreamEnded();
 }

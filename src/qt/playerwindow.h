@@ -28,6 +28,8 @@ public:
 	/// Sets the current track name.
 	void SetTrackName(const std::string& msg);
 
+    void SliderMoved(int);
+
 private slots:
     void open();
 
@@ -41,7 +43,8 @@ private slots:
 
 	void on_timerTick();
 
-	void on_timerRefreshUI();
+    void on_timerRefreshUI();
+
 
 private:
     void UpdateDurationLabels(int64_t duration, int64_t currTime);

@@ -21,6 +21,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui->rewindButton->setDisabled(true);
     ui->stopButton->setDisabled(true);
     ui->fastForwardButton->setDisabled(true);
+    ui->slider->setDisabled(true);
 
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
@@ -39,6 +40,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_refreshUITimer.start();
 
     connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
+    connect(ui->slider, SIGNAL(sliderMoved(int)), this, SLOT(SliderMoved(int)));
 
 }
 
@@ -61,8 +63,11 @@ void PlayerWindow::open()
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
         ui->fastForwardButton->setEnabled(true);
+        ui->slider->setEnabled(true);
+
 	}
 }
+
 
 void PlayerWindow::on_playButton_clicked()
 {
@@ -110,6 +115,13 @@ void PlayerWindow::on_timerRefreshUI()
 		int64_t duration = _player->GetDuration();
 		int64_t currentTime = _player->GetTimeElapsed();
 		UpdateDurationLabels(duration, currentTime);
+
+        ui->slider->setMaximum(duration / 1000000000);
+
+        if (!ui->slider->isSliderDown())
+        {
+            ui->slider->setValue(currentTime / 1000000000);
+		}
 	}
 }
 
@@ -133,9 +145,13 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 	ui->timeElapsed->setText(currentTimeString);
 }
 
-void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e) {
+void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e)
+{
     QWidget::mouseDoubleClickEvent(e);
 
+}
 
+void SliderMoved(int)
+{
 
 }

@@ -22,6 +22,8 @@ public:
 
     void mouseDoubleClickEvent(QMouseEvent *e);
 
+    void SliderMoved(int);
+
 private slots:
     void open();
 
@@ -35,7 +37,8 @@ private slots:
 
 	void on_timerTick();
 
-	void on_timerRefreshUI();
+    void on_timerRefreshUI();
+
 
 private:
     Ui::PlayerWindow *ui;

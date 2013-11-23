@@ -28,7 +28,7 @@ WId PlayerWindow::GetOutputHandle() const
 }
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "Videos (*.webm *.wav *.avi)");
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "Videos (*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
         _player->PlayMedia(fileNames[0]);

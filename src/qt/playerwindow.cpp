@@ -26,8 +26,15 @@ WId PlayerWindow::GetOutputHandle() const
 }
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));
-    _player->PlayMedia(fileNames[0]);
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "Videos (*.webm *.wav *.avi)");
+
+    if(fileNames.length() != 0)
+        _player->PlayMedia(fileNames[0]);
+
+	QIcon pauseIcon(":images/pauseButton.png");
+	ui->playButton->setIcon(pauseIcon);
+	playing = true;
+
 }
 
 void PlayerWindow::on_playButton_clicked()

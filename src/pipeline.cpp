@@ -33,8 +33,6 @@ Pipeline::Pipeline() : _pipeline(NULL), _bus(NULL)
 	// Unreference the bus here, all further use of the bus will be from the Bus object.
 	gst_object_unref(bus);
 
-	//g_object_set(_pipeline, "uri", "file:///E:/Downloads/Laugh.wav", NULL);
-	gst_element_set_state(_pipeline, GST_STATE_READY);
 }
 Pipeline::~Pipeline()
 {

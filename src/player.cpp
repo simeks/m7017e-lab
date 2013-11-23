@@ -28,8 +28,6 @@ int Player::Run(int argc, char *argv[])
 	_window = new PlayerWindow(this);
 	_window->show();
 
-	//_pipeline->SetOutput(_window->GetOutputHandle());
-
 	return a.exec();
 }
 
@@ -71,4 +69,14 @@ void Player::PlayMedia(QString file_name)
 	_pipeline->SetUri(file_uri.c_str());
 	_pipeline->SetOutput(_window->GetOutputHandle());
 	_pipeline->SetState(GST_STATE_PLAYING);
+
+	if(_pipeline->QueryDuration(&duration))
+	{
+		_window->UpdateDurationLabels(duration, duration);
+	}
+	else
+	{
+		//Failed to query
+	}
+
 }

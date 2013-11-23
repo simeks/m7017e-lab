@@ -20,6 +20,8 @@ public:
 	/// Returns the window handle for the widget used for outputting video.
 	WId GetOutputHandle() const;
 
+    void mouseDoubleClickEvent(QMouseEvent *e);
+
 
 private slots:
     void open();

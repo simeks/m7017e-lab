@@ -14,6 +14,8 @@ PlayerWindow::PlayerWindow(Player* player, QWidget *parent) :
     playing = false;
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
+
+    //setWindowFlags( Qt::FramelessWindowHint );
 }
 
 PlayerWindow::~PlayerWindow()
@@ -58,7 +60,7 @@ void PlayerWindow::on_playButton_clicked()
 
 void PlayerWindow::on_rewindButton_clicked()
 {
-	_player->ReWind();
+    _player->ReWind();
 }
 
 void PlayerWindow::on_stopButton_clicked()
@@ -68,7 +70,7 @@ void PlayerWindow::on_stopButton_clicked()
 
 void PlayerWindow::on_fastForwardButton_clicked()
 {
-	_player->FastForward();
+    _player->FastForward();
 }
 
 
@@ -90,4 +92,13 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 
 	currentTimeString = currentTime.toString(format);
 	ui->timeElapsed->setText(currentTimeString);
+}
+
+void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e) {
+    QWidget::mouseDoubleClickEvent(e);
+
+    ui->widget->setWindowFlags(ui->widget->windowFlags() | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    ui->widget->setWindowState(ui->widget->windowState() | Qt::WindowFullScreen);
+
+
 }

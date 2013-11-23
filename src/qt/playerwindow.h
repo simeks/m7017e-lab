@@ -35,13 +35,13 @@ private slots:
 
 	void on_timerTick();
 
-	void on_uiTimerTick();
+	void on_timerRefreshUI();
 
 private:
     Ui::PlayerWindow *ui;
 	Player* _player;
-    QTimer _timer;
-    QTimer _uiTimer;
+    QTimer _tickTimer;
+    QTimer _refreshUITimer;
 
     QStringList fileNames;
     bool playing;

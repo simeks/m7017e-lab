@@ -11,7 +11,8 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
     _player(new Player),
-	_timer(this)
+	_tickTimer(this),
+	_refreshUITimer(this)
 
 {
     ui->setupUi(this);
@@ -23,16 +24,16 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_player->SetVideoOutput(ui->widget->winId());
 
 	// Tick every 25ms
-	_timer.setInterval(25);
-	_timer.start();
+	_tickTimer.setInterval(25);
+	_tickTimer.start();
 
-	connect(&_timer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
+	connect(&_tickTimer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
 
 	// Tick every 1 sec
-	_uiTimer.setInterval(100);
-	_uiTimer.start();
+	_refreshUITimer.setInterval(1000);
+	_refreshUITimer.start();
 
-    connect(&_uiTimer, SIGNAL(timeout()), this, SLOT(on_uiTimerTick()));
+    connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
 
 }
 
@@ -95,7 +96,7 @@ void PlayerWindow::on_timerTick()
 	_player->Tick();
 }
 
-void PlayerWindow::on_uiTimerTick()
+void PlayerWindow::on_timerRefreshUI()
 {
 	if(_player->QueryDuration())
 	{

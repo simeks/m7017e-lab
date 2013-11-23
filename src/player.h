@@ -25,7 +25,7 @@ public:
 	void ReWind();
 	void FastForward();
 	void FullScreen();
-	void PlayMedia(const std::string& fileName);
+	void PlayMedia(const std::string& file_path);
 
 	int64_t GetDuration();
 	int64_t GetTimeElapsed();

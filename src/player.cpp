@@ -54,16 +54,20 @@ void Player::FastForward()
 
 }
 
-void Player::PlayMedia(const std::string& file_name)
+void Player::PlayMedia(const std::string& file_path)
 {
 	// An URI should be in the format "file:///<path to file>"
 	//	therefore we need to append "file:///" here as file_name is only the actual file path.
 
 	std::string file_uri = "file:///";
-	file_uri += file_name;
+	file_uri += file_path;
 	
 	_pipeline->SetUri(file_uri.c_str());
 	Play();
+
+	// Retrieve the file name from the full file path
+	size_t pos = file_path.rfind("/") + 1;
+	std::string file_name = file_path.substr(pos);
 
 	_window->SetTrackName(file_name);
 }

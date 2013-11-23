@@ -11,8 +11,7 @@ class Pipeline
 {
 public:
 	/// @brief Pipeline constructor
-	/// @param pipeline_factory Name of the factory to use when creating the gstreamer pipeline. (E.g. playbin2)
-	Pipeline(const char* pipeline_factory);
+	Pipeline();
 	~Pipeline();
 
 	/// Sets which window the pipeline should output to.
@@ -23,16 +22,26 @@ public:
 	void SetState(GstState state);
 	
 	/// @brief Queries the pipeline for the current position in nanoseconds of the current stream.
-	/// @param duration This parameter will hold the resulting position, in nanoseconds.
+	/// @param position This parameter will hold the resulting position, in nanoseconds.
 	/// @return True if the query were performed successfully.
-	bool QueryPosition(int64_t* duration);
+	bool QueryPosition(int64_t* position);
 
 	/// @brief Queries the pipeline for the total duration in nanoseconds of the current stream.
 	/// @param duration This parameter will hold the resulting duration, in nanoseconds.
 	/// @return True if the query were performed successfully.
 	bool QueryDuration(int64_t* duration);
+	
+	/// @brief Seeks to the specified position
+	/// @return True if the operation was successful, false if not.
+	bool Seek(int64_t position);
 
-	void Pipeline::SetUri(QString fileName);
+	/// @brief Sets the playback rate
+	/// @param rate The playback rate, a negative value means the playback will go in reverse.
+	/// @return True if the operation was successful, false if not.
+	bool SetRate(double rate);
+
+
+	void Pipeline::SetUri(std::string fileName);
 
 
 private:

@@ -4,15 +4,14 @@
 #include "pipeline.h"
 #include "bus.h"
 #include "qt/playerwindow.h"
-#include <Qstring>
+
+using namespace std;
 
 #include <QApplication>
 
 Player::Player() : _pipeline(NULL), _window(NULL)
 {
-	_pipeline = new Pipeline("playbin2");
-	
-
+	_pipeline = new Pipeline();
 }
 Player::~Player()
 {
@@ -31,7 +30,6 @@ int Player::Run(int argc, char *argv[])
 
 	//_pipeline->SetOutput(_window->GetOutputHandle());
 
-
 	return a.exec();
 }
 
@@ -47,19 +45,12 @@ void Player::Pause()
 
 void Player::Stop()
 {
-	_pipeline->SetState(GST_STATE_READY);
+	_pipeline->SetState(GST_STATE_NULL);
 }
 
 void Player::ReWind()
 {
-		if(_pipeline->QueryDuration(&duration))
-	{
-		_window->UpdateDurationLabels(duration, duration);
-	} 
-	else
-	{
-		//Failed to query...
-	}
+
 }
 
 void Player::FastForward()
@@ -74,7 +65,8 @@ void Player::FullScreen()
 
 void Player::PlayMedia(QString fileName)
 {
-	_pipeline->SetUri(fileName);
+	std::string file = fileName.toLocal8Bit().constData();
+	_pipeline->SetUri(file);
 	_pipeline->SetOutput(_window->GetOutputHandle());
 	_pipeline->SetState(GST_STATE_PLAYING);
 }

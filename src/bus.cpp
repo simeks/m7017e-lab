@@ -24,12 +24,17 @@ namespace
 	/// @brief Callback invoked when the pipeline reaches end of stream.
 	void bus_eos_callback(GstBus* gst_bus, GstMessage* msg, void* data)
 	{
-
+		debug::Printf("message::eos");
 	}
 
 	void bus_state_change_callback(GstBus* gst_bus, GstMessage* msg, void* data)
 	{
+		debug::Printf("message::state-changed"); 
+	}
 
+	void bus_application_callback(GstBus* gst_bus, GstMessage* msg, void* data)
+	{
+		debug::Printf("message::application"); 
 	}
 };
 
@@ -43,6 +48,7 @@ Bus::Bus(GstBus* bus) : _bus(bus)
 	g_signal_connect(G_OBJECT(_bus), "message::error", (GCallback)bus_error_callback, this);
 	g_signal_connect(G_OBJECT(_bus), "message::eos", (GCallback)bus_eos_callback, this);
 	g_signal_connect(G_OBJECT(_bus), "message::state-changed", (GCallback)bus_eos_callback, this);
+	g_signal_connect(G_OBJECT(_bus), "message::application", (GCallback)bus_application_callback, this);
 
 }
 Bus::~Bus()

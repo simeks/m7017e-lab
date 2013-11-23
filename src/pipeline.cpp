@@ -47,7 +47,7 @@ Pipeline::~Pipeline()
 	}
 }
 
-void Pipeline::SetOutput(guintptr window_handle)
+void Pipeline::SetOutput(uintptr_t window_handle)
 {
 	g_assert(_pipeline);
 

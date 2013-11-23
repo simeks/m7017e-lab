@@ -16,7 +16,7 @@ public:
 
 	/// Sets which window the pipeline should output to.
 	/// @param window_handle Window handle for the window that should work as canvas.
-	void SetOutput(guintptr window_handle);
+	void SetOutput(uintptr_t window_handle);
 
 	/// @brief Sets the pipeline state.
 	void SetState(GstState state);

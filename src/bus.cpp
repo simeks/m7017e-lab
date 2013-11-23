@@ -21,21 +21,6 @@ namespace
 		g_free(debug_info);
 	}
 
-	/// @brief Callback invoked when the pipeline reaches end of stream.
-	void bus_eos_callback(GstBus* gst_bus, GstMessage* msg, void* data)
-	{
-		debug::Printf("message::eos");
-	}
-
-	void bus_state_change_callback(GstBus* gst_bus, GstMessage* msg, void* data)
-	{
-		debug::Printf("message::state-changed"); 
-	}
-
-	void bus_application_callback(GstBus* gst_bus, GstMessage* msg, void* data)
-	{
-		debug::Printf("message::application"); 
-	}
 };
 
 Bus::Bus(GstBus* bus) : _bus(bus)
@@ -44,11 +29,11 @@ Bus::Bus(GstBus* bus) : _bus(bus)
 	gst_object_ref(_bus);
 
 	// Register callbacks for signals
-	gst_bus_add_signal_watch(_bus);
-	g_signal_connect(G_OBJECT(_bus), "message::error", (GCallback)bus_error_callback, this);
-	g_signal_connect(G_OBJECT(_bus), "message::eos", (GCallback)bus_eos_callback, this);
-	g_signal_connect(G_OBJECT(_bus), "message::state-changed", (GCallback)bus_eos_callback, this);
-	g_signal_connect(G_OBJECT(_bus), "message::application", (GCallback)bus_application_callback, this);
+	//gst_bus_add_signal_watch(_bus); 
+	//g_signal_connect(G_OBJECT(_bus), "message::error", G_CALLBACK(bus_error_callback), this);
+	//g_signal_connect(G_OBJECT(_bus), "message::eos", G_CALLBACK(bus_eos_callback), this);
+	//g_signal_connect(G_OBJECT(_bus), "message::state-changed", G_CALLBACK(bus_eos_callback), this);
+	//g_signal_connect(G_OBJECT(_bus), "message::application", G_CALLBACK(bus_application_callback), this);
 
 }
 Bus::~Bus()
@@ -61,4 +46,26 @@ Bus::~Bus()
 	_bus = NULL;
 }
 
+void Bus::Poll()
+{
+	g_assert(_bus);
 
+	GstMessage* msg;
+	while((msg = gst_bus_pop(_bus)) != NULL)
+	{
+		Parse(msg);
+		gst_message_unref(msg);
+	}
+}
+
+void Bus::Parse(GstMessage* msg)
+{
+	if(msg->type == GST_MESSAGE_ERROR)
+	{
+		debug::Printf("--error--");
+	}
+	else if(msg->type == GST_MESSAGE_EOS)
+	{
+		debug::Printf("--eos--");
+	}
+}

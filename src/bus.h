@@ -9,7 +9,12 @@ public:
 	Bus(GstBus* bus);
 	~Bus();
 
+	/// Polls and handles messages on the bus. This should be called within a regular interval.
+	void Poll();
+
 private:
+	void Parse(GstMessage* msg);
+
 	GstBus* _bus;
 
 };

@@ -60,23 +60,8 @@ void Player::PlayMedia(QString file_name)
 	
 	_pipeline->SetUri(file_uri.c_str());
 	_pipeline->SetState(GST_STATE_PLAYING);
-<<<<<<< HEAD
 }
 
 void Player::Tick()
 {
 }
-
-=======
-
-	if(_pipeline->QueryDuration(&duration))
-	{
-		_window->UpdateDurationLabels(duration, duration);
-	}
-	else
-	{
-		//Failed to query
-	}
-
-}
->>>>>>> a6878480161afe191a9288ca7417e68d598bb67b

@@ -113,3 +113,13 @@ void Player::Error(const std::string& msg)
 	_window->PrintError(msg);
 	_window->StreamEnded();
 }
+
+void Player::Seek(int position)
+{
+	int64_t pos = int64_t(position);
+	pos *= 1000000000;
+	if(!_pipeline->Seek(pos))
+	{
+		debug::Printf("Failed to retrieve new position.");
+	}
+}

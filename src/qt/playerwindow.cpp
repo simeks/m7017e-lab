@@ -42,7 +42,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
     connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
 
-    connect(ui->slider, SIGNAL(sliderMoved(int)), this, SLOT(SliderMoved(int)));
+    connect(ui->slider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
 
 }
 
@@ -149,11 +149,8 @@ void PlayerWindow::on_timerRefreshUI()
 		UpdateDurationLabels(duration, currentTime);
 
         ui->slider->setMaximum(duration / 1000000000);
-
-        if (!ui->slider->isSliderDown())
-        {
-            ui->slider->setValue(currentTime / 1000000000);
-		}
+        ui->slider->setMinimum(0);
+        ui->slider->setValue((currentTime / 1000000000));
 	}
 }
 
@@ -185,7 +182,8 @@ void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e)
 
 }
 
-void SliderMoved(int)
+void PlayerWindow::Seek(int position)
 {
-
+    ui->slider->setValue(position);
+    _player->Seek(position);
 }

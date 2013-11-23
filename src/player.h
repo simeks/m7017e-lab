@@ -26,6 +26,7 @@ public:
 	void FastForward();
 	void FullScreen();
 	void PlayMedia(const std::string& file_path);
+	void Seek(int position);
 
 	int64_t GetDuration();
 	int64_t GetTimeElapsed();
@@ -45,7 +46,8 @@ private:
 	Pipeline* _pipeline;
 	int64_t duration;
 	int64_t timeElapsed;
-    bool _playing;
+	bool _playing;
+	
 
 	PlayerWindow* _window;
 };

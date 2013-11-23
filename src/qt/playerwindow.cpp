@@ -2,6 +2,7 @@
 #include "ui_playerwindow.h"
 #include <QFileDialog>
 #include "../player.h"
+#include <QTime>
 
 PlayerWindow::PlayerWindow(Player* player, QWidget *parent) :
     QMainWindow(parent),
@@ -62,7 +63,23 @@ void PlayerWindow::on_fastForwardButton_clicked()
 	_player->FastForward();
 }
 
-void PlayerWindow::on_fullScreenButton_clicked(bool checked)
+
+void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 {
-    ui->widget->showFullScreen();
+	QString totalDurationString;
+	QString currentTimeString;
+	long durationSeconds = duration/1000000000;
+	long currentTimeSeconds = currTime/1000000000;
+
+	QTime totalDuration((durationSeconds/3600)%60, (durationSeconds/60)%60, durationSeconds%60, (durationSeconds*1000)%1000);
+	QTime currentTime((currentTimeSeconds/3600)%60, (currentTimeSeconds/60)%60, currentTimeSeconds%60, (currentTimeSeconds*1000)%1000);
+	QString format = "mm:ss";
+	if (durationSeconds > 3600)
+            format = "hh:mm:ss";
+
+    totalDurationString = totalDuration.toString(format);
+	ui->totalDuration->setText(totalDurationString);
+
+	currentTimeString = currentTime.toString(format);
+	ui->timeElapsed->setText(currentTimeString);
 }

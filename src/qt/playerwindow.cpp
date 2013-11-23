@@ -22,12 +22,13 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	// Make sure player outputs video to our video widget
 	_player->SetVideoOutput(ui->widget->winId());
 
-	
 	// Tick every 25ms
 	_timer.setInterval(25);
 	_timer.start();
 
 	connect(&_timer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
+
+    //setWindowFlags( Qt::FramelessWindowHint );
 
 }
 
@@ -38,8 +39,15 @@ PlayerWindow::~PlayerWindow()
 }
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));
-    _player->PlayMedia(fileNames[0]);
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "Videos (*.webm *.wav *.avi)");
+
+    if(fileNames.length() != 0)
+        _player->PlayMedia(fileNames[0]);
+
+	QIcon pauseIcon(":images/pauseButton.png");
+	ui->playButton->setIcon(pauseIcon);
+	playing = true;
+
 }
 
 void PlayerWindow::on_playButton_clicked()
@@ -63,7 +71,7 @@ void PlayerWindow::on_playButton_clicked()
 
 void PlayerWindow::on_rewindButton_clicked()
 {
-	_player->ReWind();
+    _player->ReWind();
 }
 
 void PlayerWindow::on_stopButton_clicked()
@@ -73,7 +81,7 @@ void PlayerWindow::on_stopButton_clicked()
 
 void PlayerWindow::on_fastForwardButton_clicked()
 {
-	_player->FastForward();
+    _player->FastForward();
 }
 
 void PlayerWindow::on_timerTick()
@@ -99,4 +107,13 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 
 	currentTimeString = currentTime.toString(format);
 	ui->timeElapsed->setText(currentTimeString);
+}
+
+void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e) {
+    QWidget::mouseDoubleClickEvent(e);
+
+    ui->widget->setWindowFlags(ui->widget->windowFlags() | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    ui->widget->setWindowState(ui->widget->windowState() | Qt::WindowFullScreen);
+
+
 }

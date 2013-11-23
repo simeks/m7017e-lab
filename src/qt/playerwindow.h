@@ -19,6 +19,7 @@ public:
     ~PlayerWindow();
     void UpdateDurationLabels(int64_t duration, int64_t currTime);
 
+    void mouseDoubleClickEvent(QMouseEvent *e);
 
 private slots:
     void open();

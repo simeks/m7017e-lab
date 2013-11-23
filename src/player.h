@@ -3,6 +3,7 @@
 
 #include <Qstring>
 #include <QTimer>
+#include "stdint.h"
 
 class Pipeline;
 class Bus;
@@ -27,9 +28,15 @@ public:
 	/// Updates any sub-systems the player may have, should be called within a regular interval.
 	void Tick();
 
+	bool QueryDuration();
+	bool QueryPosition();
+	int64_t GetDuration();
+	int64_t GetTimeElapsed();
+
 private:
 	Pipeline* _pipeline;
-
+	int64_t duration;
+	int64_t timeElapsed;
 };
 
 #endif // __PLAYER_H__

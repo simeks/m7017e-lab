@@ -45,11 +45,6 @@ void Player::FastForward()
 
 }
 
-void Player::FullScreen()
-{
-
-}
-
 void Player::PlayMedia(QString file_name)
 {
 	// An URI should be in the format "file:///<path to file>"
@@ -60,23 +55,28 @@ void Player::PlayMedia(QString file_name)
 	
 	_pipeline->SetUri(file_uri.c_str());
 	_pipeline->SetState(GST_STATE_PLAYING);
-<<<<<<< HEAD
 }
 
 void Player::Tick()
 {
-}
-
-=======
-
-	if(_pipeline->QueryDuration(&duration))
-	{
-		_window->UpdateDurationLabels(duration, duration);
-	}
-	else
-	{
-		//Failed to query
-	}
 
 }
->>>>>>> a6878480161afe191a9288ca7417e68d598bb67b
+
+bool Player::QueryDuration()
+{
+	return _pipeline->QueryDuration(&duration);
+}
+
+bool Player::QueryPosition()
+{
+	return _pipeline->QueryDuration(&timeElapsed);
+}
+
+int64_t Player::GetDuration()
+{
+	return duration;
+}
+int64_t Player::GetTimeElapsed()
+{
+	return  timeElapsed;
+}

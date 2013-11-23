@@ -110,3 +110,4 @@ bool Pipeline::SetRate(double rate)
 		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE) == TRUE;
 }
 
+

@@ -122,3 +122,4 @@ void Pipeline::SetListener(PipelineListener* listener)
 	_bus->SetListener(listener);
 }
 
+

@@ -28,7 +28,11 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
 	connect(&_timer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
 
-    //setWindowFlags( Qt::FramelessWindowHint );
+	// Tick every 1 sec
+	_uiTimer.setInterval(100);
+	_uiTimer.start();
+
+    connect(&_uiTimer, SIGNAL(timeout()), this, SLOT(on_uiTimerTick()));
 
 }
 
@@ -43,16 +47,17 @@ void PlayerWindow::open()
 
     if(fileNames.length() != 0)
         _player->PlayMedia(fileNames[0]);
-
-	QIcon pauseIcon(":images/pauseButton.png");
-	ui->playButton->setIcon(pauseIcon);
-	playing = true;
+		QIcon pauseIcon(":images/pauseButton.png");
+		ui->playButton->setIcon(pauseIcon);
+		playing = true;
 
 }
 
 void PlayerWindow::on_playButton_clicked()
 {
-    if(playing)
+	if(fileNames.length() != 0)
+	{
+		if(playing)
         {
             QIcon playIcon(":images/playButton.png");
             playing = false;
@@ -60,13 +65,14 @@ void PlayerWindow::on_playButton_clicked()
 			_player->Pause();
 			
         }
-    else
+		else
         {
             QIcon pauseIcon(":images/pauseButton.png");
             playing = true;
             ui->playButton->setIcon(pauseIcon);
             _player->Play();
         }
+	}
 }
 
 void PlayerWindow::on_rewindButton_clicked()
@@ -87,6 +93,28 @@ void PlayerWindow::on_fastForwardButton_clicked()
 void PlayerWindow::on_timerTick()
 {
 	_player->Tick();
+}
+
+void PlayerWindow::on_uiTimerTick()
+{
+	if(_player->QueryDuration())
+	{
+		if(_player->QueryPosition())
+		{
+			int64_t duration = _player->GetDuration();
+			int64_t currentTime = _player->GetTimeElapsed();
+			UpdateDurationLabels(duration, currentTime);
+		}
+		else
+		{
+			// failed to query
+		}
+	}
+	else
+	{
+		//Failed to query
+	}
+
 }
 
 void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
@@ -112,8 +140,6 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e) {
     QWidget::mouseDoubleClickEvent(e);
 
-    ui->widget->setWindowFlags(ui->widget->windowFlags() | Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-    ui->widget->setWindowState(ui->widget->windowState() | Qt::WindowFullScreen);
 
 
 }

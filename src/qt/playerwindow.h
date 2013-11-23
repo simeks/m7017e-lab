@@ -4,6 +4,7 @@
 #include "../common.h"
 #include <QMainWindow>
 #include <QTimer>
+#include "stdint.h"
 
 namespace Ui {
 class PlayerWindow;
@@ -34,10 +35,13 @@ private slots:
 
 	void on_timerTick();
 
+	void on_uiTimerTick();
+
 private:
     Ui::PlayerWindow *ui;
 	Player* _player;
-	QTimer _timer;
+    QTimer _timer;
+    QTimer _uiTimer;
 
     QStringList fileNames;
     bool playing;

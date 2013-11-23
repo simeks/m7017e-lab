@@ -48,11 +48,6 @@ void Player::FastForward()
 
 }
 
-void Player::FullScreen()
-{
-
-}
-
 void Player::PlayMedia(QString file_name)
 {
 	// An URI should be in the format "file:///<path to file>"
@@ -68,6 +63,26 @@ void Player::PlayMedia(QString file_name)
 void Player::Tick()
 {
 	_pipeline->Tick();
+}
+
+
+bool Player::QueryDuration()
+{
+	return _pipeline->QueryDuration(&duration);
+}
+
+bool Player::QueryPosition()
+{
+	return _pipeline->QueryDuration(&timeElapsed);
+}
+
+int64_t Player::GetDuration()
+{
+	return duration;
+}
+int64_t Player::GetTimeElapsed()
+{
+	return  timeElapsed;
 }
 
 void Player::EndOfStream()

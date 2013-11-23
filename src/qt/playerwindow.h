@@ -25,6 +25,8 @@ public:
 	/// Indicates that the stream has stopped.
 	void StreamEnded();
 
+	/// Sets the current track name.
+	void SetTrackName(const std::string& msg);
 
 private slots:
     void open();

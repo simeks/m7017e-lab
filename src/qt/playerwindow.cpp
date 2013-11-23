@@ -61,8 +61,19 @@ void PlayerWindow::StreamEnded()
     ui->rewindButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->fastForwardButton->setEnabled(false);
-}
 
+	SetTrackName("");
+}
+void PlayerWindow::SetTrackName(const std::string& msg)
+{
+	if(msg.empty())
+	{
+	}
+	else
+	{
+		setWindowTitle(QString("MediaPlayer - ") + msg.c_str());
+	}
+}
 
 void PlayerWindow::open()
 {
@@ -74,7 +85,7 @@ void PlayerWindow::open()
 		if(_player->IsPlaying())
 			_player->Stop();
 
-        _player->PlayMedia(fileNames[0]);
+		_player->PlayMedia(fileNames[0].toLocal8Bit().constData());
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
         ui->playButton->setEnabled(true);
@@ -103,6 +114,7 @@ void PlayerWindow::on_playButton_clicked()
 
 void PlayerWindow::on_rewindButton_clicked()
 {
+	ui->rewindButton->toggle();
     _player->ReWind();
 }
 

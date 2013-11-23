@@ -1,7 +1,8 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
-#include <stdint.h>
+
 #include <Qstring>
+#include <QTimer>
 
 class Pipeline;
 class Bus;
@@ -13,7 +14,8 @@ public:
 	Player();
 	~Player();
 
-	int Run(int argc, char *argv[]);
+	void SetVideoOutput(uintptr_t window_handle);
+
 	void Play();
 	void Pause();
 	void Stop();
@@ -22,10 +24,12 @@ public:
 	void FullScreen();
 	void PlayMedia(QString fileName);
 
+	/// Updates any sub-systems the player may have, should be called within a regular interval.
+	void Tick();
+
 private:
 	Pipeline* _pipeline;
-	PlayerWindow* _window;
-	int64_t duration;
+
 };
 
 #endif // __PLAYER_H__

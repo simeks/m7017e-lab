@@ -1,5 +1,9 @@
+#include "common.h"
+
 #include "player.h"
 
+#include <QApplication>
+#include "qt/playerwindow.h"
 
 
 #if defined(_WIN32) && !defined(DEBUG)
@@ -14,6 +18,12 @@ int main(int argc, char *argv[])
     int argc = 1;
 #endif
 
-	Player player;
-    return player.Run(argc, argv);
+    QApplication app(argc, argv);
+	PlayerWindow window;
+
+	window.show();
+
+	return app.exec();
+
+
 }

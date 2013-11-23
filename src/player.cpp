@@ -5,32 +5,19 @@
 #include "bus.h"
 #include "qt/playerwindow.h"
 
-using namespace std;
-
-#include <QApplication>
-
-Player::Player() : _pipeline(NULL), _window(NULL)
+Player::Player() : _pipeline(NULL)
 {
 	_pipeline = new Pipeline();
 }
 Player::~Player()
 {
-	delete _window;
-	_window = NULL;
-
 	delete _pipeline;
 	_pipeline = NULL;
 }
 
-int Player::Run(int argc, char *argv[])
+void Player::SetVideoOutput(uintptr_t window_handle)
 {
-    QApplication a(argc, argv);
-	_window = new PlayerWindow(this);
-	_window->show();
-
-	//_pipeline->SetOutput(_window->GetOutputHandle());
-
-	return a.exec();
+	_pipeline->SetOutput(window_handle);
 }
 
 void Player::Play()
@@ -65,10 +52,17 @@ void Player::FullScreen()
 
 void Player::PlayMedia(QString file_name)
 {
+	// An URI should be in the format "file:///<path to file>"
+	//	therefore we need to append "file:///" here as file_name is only the actual file path.
+
 	std::string file_uri = "file:///";
 	file_uri += file_name.toLocal8Bit().constData();
 	
 	_pipeline->SetUri(file_uri.c_str());
-	_pipeline->SetOutput(_window->GetOutputHandle());
 	_pipeline->SetState(GST_STATE_PLAYING);
 }
+
+void Player::Tick()
+{
+}
+

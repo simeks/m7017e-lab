@@ -5,7 +5,9 @@
 #include "bus.h"
 #include "qt/playerwindow.h"
 
-Player::Player() : _pipeline(NULL)
+Player::Player() :
+	_pipeline(NULL), 
+	_playing(false)
 {
 	_pipeline = new Pipeline();
 
@@ -25,16 +27,19 @@ void Player::SetVideoOutput(uintptr_t window_handle)
 
 void Player::Play()
 {
+	_playing = true;
 	_pipeline->SetState(GST_STATE_PLAYING);
 }
 
 void Player::Pause()
 {
+	_playing = false;
 	_pipeline->SetState(GST_STATE_PAUSED);
 }
 
 void Player::Stop()
 {
+	_playing = false;
 	_pipeline->SetState(GST_STATE_NULL);
 }
 
@@ -57,9 +62,8 @@ void Player::PlayMedia(QString file_name)
 	file_uri += file_name.toLocal8Bit().constData();
 	
 	_pipeline->SetUri(file_uri.c_str());
-	_pipeline->SetState(GST_STATE_PLAYING);
+	Play();
 }
-
 
 int64_t Player::GetDuration()
 {
@@ -78,6 +82,10 @@ int64_t Player::GetTimeElapsed()
 		debug::Printf("Failed to retrieve position.");
 	}
 	return position;
+}
+bool Player::IsPlaying() const
+{
+	return _playing;
 }
 
 void Player::Tick()

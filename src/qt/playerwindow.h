@@ -18,9 +18,8 @@ class PlayerWindow : public QMainWindow
 public:
     explicit PlayerWindow(QWidget *parent = 0);
     ~PlayerWindow();
-    void UpdateDurationLabels(int64_t duration, int64_t currTime);
 
-    void mouseDoubleClickEvent(QMouseEvent *e);
+
 
 private slots:
     void open();
@@ -38,13 +37,17 @@ private slots:
 	void on_timerRefreshUI();
 
 private:
+    void UpdateDurationLabels(int64_t duration, int64_t currTime);
+
+    void mouseDoubleClickEvent(QMouseEvent *e);
+
+
     Ui::PlayerWindow *ui;
 	Player* _player;
     QTimer _tickTimer;
     QTimer _refreshUITimer;
 
     QStringList fileNames;
-    bool _playing;
 };
 
 #endif // PLAYERWINDOW_H

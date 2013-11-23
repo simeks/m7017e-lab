@@ -12,8 +12,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui(new Ui::PlayerWindow),
     _player(new Player),
 	_tickTimer(this),
-	_refreshUITimer(this),
-	_playing(false)
+	_refreshUITimer(this)
 {
     ui->setupUi(this);
 
@@ -56,7 +55,6 @@ void PlayerWindow::open()
         _player->PlayMedia(fileNames[0]);
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
-		_playing = true;
         ui->playButton->setEnabled(true);
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
@@ -66,10 +64,9 @@ void PlayerWindow::open()
 
 void PlayerWindow::on_playButton_clicked()
 {
-    if(_playing)
+	if(_player->IsPlaying())
     {
         QIcon playIcon(":images/playButton.png");
-        _playing = false;
         ui->playButton->setIcon(playIcon);
         _player->Pause();
 
@@ -77,7 +74,6 @@ void PlayerWindow::on_playButton_clicked()
     else
     {
         QIcon pauseIcon(":images/pauseButton.png");
-        _playing = true;
         ui->playButton->setIcon(pauseIcon);
         _player->Play();
     }
@@ -105,7 +101,7 @@ void PlayerWindow::on_timerTick()
 
 void PlayerWindow::on_timerRefreshUI()
 {
-	if(_playing)
+	if(_player->IsPlaying())
 	{
 		int64_t duration = _player->GetDuration();
 		int64_t currentTime = _player->GetTimeElapsed();

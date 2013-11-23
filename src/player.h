@@ -29,6 +29,9 @@ public:
 
 	int64_t GetDuration();
 	int64_t GetTimeElapsed();
+
+	/// Returns true if the player is currently playing, false if not.
+	bool IsPlaying() const;
 	
 	/// Updates any sub-systems the player may have, should be called within a regular interval.
 	void Tick();
@@ -42,6 +45,7 @@ private:
 	Pipeline* _pipeline;
 	int64_t duration;
 	int64_t timeElapsed;
+    bool _playing;
 };
 
 #endif // __PLAYER_H__

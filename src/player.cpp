@@ -5,7 +5,10 @@
 #include "bus.h"
 #include "qt/playerwindow.h"
 
-Player::Player() : _pipeline(NULL)
+Player::Player(PlayerWindow* window) :
+	_pipeline(NULL), 
+	_playing(false),
+	_window(window)
 {
 	_pipeline = new Pipeline();
 
@@ -25,16 +28,19 @@ void Player::SetVideoOutput(uintptr_t window_handle)
 
 void Player::Play()
 {
+	_playing = true;
 	_pipeline->SetState(GST_STATE_PLAYING);
 }
 
 void Player::Pause()
 {
+	_playing = false;
 	_pipeline->SetState(GST_STATE_PAUSED);
 }
 
 void Player::Stop()
 {
+	_playing = false;
 	_pipeline->SetState(GST_STATE_NULL);
 }
 
@@ -48,18 +54,23 @@ void Player::FastForward()
 
 }
 
-void Player::PlayMedia(QString file_name)
+void Player::PlayMedia(const std::string& file_path)
 {
 	// An URI should be in the format "file:///<path to file>"
 	//	therefore we need to append "file:///" here as file_name is only the actual file path.
 
 	std::string file_uri = "file:///";
-	file_uri += file_name.toLocal8Bit().constData();
+	file_uri += file_path;
 	
 	_pipeline->SetUri(file_uri.c_str());
-	_pipeline->SetState(GST_STATE_PLAYING);
-}
+	Play();
 
+	// Retrieve the file name from the full file path
+	size_t pos = file_path.rfind("/") + 1;
+	std::string file_name = file_path.substr(pos);
+
+	_window->SetTrackName(file_name);
+}
 
 int64_t Player::GetDuration()
 {
@@ -79,6 +90,10 @@ int64_t Player::GetTimeElapsed()
 	}
 	return position;
 }
+bool Player::IsPlaying() const
+{
+	return _playing;
+}
 
 void Player::Tick()
 {
@@ -87,15 +102,14 @@ void Player::Tick()
 
 void Player::EndOfStream()
 {
-	// Handle end of stream here.
+	_playing = false;
 
-
-	debug::Printf("[EOS]");
+	_window->StreamEnded();
 }
 void Player::Error(const std::string& msg)
 {
-	// Handle errors here.
+	_playing = false;
 
-
-	debug::Printf("[Error] %s", msg.c_str());
+	_window->PrintError(msg);
+	_window->StreamEnded();
 }

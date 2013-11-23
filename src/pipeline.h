@@ -12,8 +12,11 @@ class PipelineListener
 public:
 	virtual ~PipelineListener() {}
 
+	/// Notifies that the stream has reach its end.
 	virtual void EndOfStream() {}
-	virtual void Error(const std::string& msg) {}
+
+	/// Notifies that an error as occured in the pipeline.
+	virtual void Error(const std::string& ) {}
 };
 
 /// @brief Class representing a gstreamer pipeline.

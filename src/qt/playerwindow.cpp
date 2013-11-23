@@ -4,16 +4,17 @@
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
 #include <QFileDialog>
-#include "../player.h"
+#include <QMessageBox>
 #include <QTime>
+
+#include "../player.h"
 
 PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
-    _player(new Player),
+    _player(new Player(this)),
 	_tickTimer(this),
-	_refreshUITimer(this),
-	_playing(false)
+	_refreshUITimer(this)
 {
     ui->setupUi(this);
 
@@ -40,6 +41,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_refreshUITimer.start();
 
     connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
+
     connect(ui->slider, SIGNAL(sliderMoved(int)), this, SLOT(SliderMoved(int)));
 
 }
@@ -49,16 +51,47 @@ PlayerWindow::~PlayerWindow()
 	delete _player;
     delete ui;
 }
+void PlayerWindow::PrintError(const std::string& msg)
+{
+	QMessageBox errorBox;
+	errorBox.setText(QString("There was an error: ") + msg.c_str());
+	errorBox.exec();
+}
+void PlayerWindow::StreamEnded()
+{
+	QIcon pauseIcon(":images/playButton.png");
+	ui->playButton->setIcon(pauseIcon);
+    ui->playButton->setEnabled(false);
+    ui->rewindButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+    ui->fastForwardButton->setEnabled(false);
+
+	SetTrackName("");
+}
+void PlayerWindow::SetTrackName(const std::string& msg)
+{
+	if(msg.empty())
+	{
+	}
+	else
+	{
+		setWindowTitle(QString("MediaPlayer - ") + msg.c_str());
+	}
+}
+
 void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
 	{
-        _player->PlayMedia(fileNames[0]);
+		// Stop any old media playing before starting any new.
+		if(_player->IsPlaying())
+			_player->Stop();
+
+		_player->PlayMedia(fileNames[0].toLocal8Bit().constData());
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
-		_playing = true;
         ui->playButton->setEnabled(true);
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
@@ -71,10 +104,9 @@ void PlayerWindow::open()
 
 void PlayerWindow::on_playButton_clicked()
 {
-    if(_playing)
+	if(_player->IsPlaying())
     {
         QIcon playIcon(":images/playButton.png");
-        _playing = false;
         ui->playButton->setIcon(playIcon);
         _player->Pause();
 
@@ -82,7 +114,6 @@ void PlayerWindow::on_playButton_clicked()
     else
     {
         QIcon pauseIcon(":images/pauseButton.png");
-        _playing = true;
         ui->playButton->setIcon(pauseIcon);
         _player->Play();
     }
@@ -90,6 +121,7 @@ void PlayerWindow::on_playButton_clicked()
 
 void PlayerWindow::on_rewindButton_clicked()
 {
+	ui->rewindButton->toggle();
     _player->ReWind();
 }
 
@@ -110,7 +142,7 @@ void PlayerWindow::on_timerTick()
 
 void PlayerWindow::on_timerRefreshUI()
 {
-	if(_playing)
+	if(_player->IsPlaying())
 	{
 		int64_t duration = _player->GetDuration();
 		int64_t currentTime = _player->GetTimeElapsed();
@@ -129,8 +161,10 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 {
 	QString totalDurationString;
 	QString currentTimeString;
-	long durationSeconds = duration/1000000000;
-	long currentTimeSeconds = currTime/1000000000;
+	long durationSeconds = duration/1000000000; // Convert duration from nanoseconds to seconds
+	long currentTimeSeconds = currTime/1000000000; // Convert position from nanoseconds to seconds
+
+	// Convert time to a more readable format before printing.
 
 	QTime totalDuration((durationSeconds/3600)%60, (durationSeconds/60)%60, durationSeconds%60, (durationSeconds*1000)%1000);
 	QTime currentTime((currentTimeSeconds/3600)%60, (currentTimeSeconds/60)%60, currentTimeSeconds%60, (currentTimeSeconds*1000)%1000);

@@ -60,29 +60,29 @@ void Player::PlayMedia(QString file_name)
 	_pipeline->SetState(GST_STATE_PLAYING);
 }
 
-void Player::Tick()
-{
-	_pipeline->Tick();
-}
-
-
-bool Player::QueryDuration()
-{
-	return _pipeline->QueryDuration(&duration);
-}
-
-bool Player::QueryPosition()
-{
-	return _pipeline->QueryPosition(&timeElapsed);
-}
 
 int64_t Player::GetDuration()
 {
+	int64_t duration = 0;
+	if(!_pipeline->QueryDuration(&duration))
+	{
+		debug::Printf("Failed to retrieve duration.");
+	}
 	return duration;
 }
 int64_t Player::GetTimeElapsed()
 {
-	return  timeElapsed;
+	int64_t position = 0;
+	if(!_pipeline->QueryPosition(&position))
+	{
+		debug::Printf("Failed to retrieve position.");
+	}
+	return position;
+}
+
+void Player::Tick()
+{
+	_pipeline->Tick();
 }
 
 void Player::EndOfStream()

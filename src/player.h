@@ -27,13 +27,11 @@ public:
 	void FullScreen();
 	void PlayMedia(QString fileName);
 
-	/// Updates any sub-systems the player may have, should be called within a regular interval.
-	void Tick();
-
-	bool QueryDuration();
-	bool QueryPosition();
 	int64_t GetDuration();
 	int64_t GetTimeElapsed();
+	
+	/// Updates any sub-systems the player may have, should be called within a regular interval.
+	void Tick();
 
 	// PipelineListener
 

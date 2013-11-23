@@ -44,7 +44,7 @@ private:
     QTimer _refreshUITimer;
 
     QStringList fileNames;
-    bool playing;
+    bool _playing;
 };
 
 #endif // PLAYERWINDOW_H

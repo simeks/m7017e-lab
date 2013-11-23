@@ -12,8 +12,8 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui(new Ui::PlayerWindow),
     _player(new Player),
 	_tickTimer(this),
-	_refreshUITimer(this)
-
+	_refreshUITimer(this),
+	_playing(false)
 {
     ui->setupUi(this);
 
@@ -22,7 +22,6 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui->stopButton->setDisabled(true);
     ui->fastForwardButton->setDisabled(true);
 
-    playing = false;
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
@@ -53,22 +52,24 @@ void PlayerWindow::open()
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
+	{
         _player->PlayMedia(fileNames[0]);
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
-		playing = true;
+		_playing = true;
         ui->playButton->setEnabled(true);
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
         ui->fastForwardButton->setEnabled(true);
+	}
 }
 
 void PlayerWindow::on_playButton_clicked()
 {
-    if(playing)
+    if(_playing)
     {
         QIcon playIcon(":images/playButton.png");
-        playing = false;
+        _playing = false;
         ui->playButton->setIcon(playIcon);
         _player->Pause();
 
@@ -76,7 +77,7 @@ void PlayerWindow::on_playButton_clicked()
     else
     {
         QIcon pauseIcon(":images/pauseButton.png");
-        playing = true;
+        _playing = true;
         ui->playButton->setIcon(pauseIcon);
         _player->Play();
     }
@@ -104,24 +105,12 @@ void PlayerWindow::on_timerTick()
 
 void PlayerWindow::on_timerRefreshUI()
 {
-	if(_player->QueryDuration())
+	if(_playing)
 	{
-		if(_player->QueryPosition())
-		{
-			int64_t duration = _player->GetDuration();
-			int64_t currentTime = _player->GetTimeElapsed();
-			UpdateDurationLabels(duration, currentTime);
-		}
-		else
-		{
-			// failed to query
-		}
+		int64_t duration = _player->GetDuration();
+		int64_t currentTime = _player->GetTimeElapsed();
+		UpdateDurationLabels(duration, currentTime);
 	}
-	else
-	{
-		//Failed to query
-	}
-
 }
 
 void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)

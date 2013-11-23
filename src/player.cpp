@@ -8,6 +8,9 @@
 Player::Player() : _pipeline(NULL)
 {
 	_pipeline = new Pipeline();
+
+	// Register this as a listener so that we get callbacks and call handle things like errors and EOS.
+	_pipeline->SetListener(this);
 }
 Player::~Player()
 {
@@ -64,4 +67,20 @@ void Player::PlayMedia(QString file_name)
 
 void Player::Tick()
 {
+	_pipeline->Tick();
+}
+
+void Player::EndOfStream()
+{
+	// Handle end of stream here.
+
+
+	debug::Printf("[EOS]");
+}
+void Player::Error(const std::string& msg)
+{
+	// Handle errors here.
+
+
+	debug::Printf("[Error] %s", msg.c_str());
 }

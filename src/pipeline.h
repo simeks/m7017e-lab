@@ -6,6 +6,16 @@
 
 class Bus;
 
+/// @brief Callbacks for pipeline messages
+class PipelineListener
+{
+public:
+	virtual ~PipelineListener() {}
+
+	virtual void EndOfStream() {}
+	virtual void Error(const std::string& msg) {}
+};
+
 /// @brief Class representing a gstreamer pipeline.
 class Pipeline
 {
@@ -40,9 +50,14 @@ public:
 	/// @return True if the operation was successful, false if not.
 	bool SetRate(double rate);
 
-
+	/// @brief Sets the URI to the source media.
 	void Pipeline::SetUri(const char* uri);
 
+	/// @brief Updates the pipeline.
+	void Tick();
+
+	/// @brief Sets a callback for messages from the pipeline.
+	void SetListener(PipelineListener* listener);
 
 private:
 	GstElement* _pipeline;

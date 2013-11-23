@@ -3,6 +3,7 @@
 
 #include <gst/gst.h>
 
+class PipelineListener;
 class Bus
 {
 public:
@@ -12,10 +13,13 @@ public:
 	/// Polls and handles messages on the bus. This should be called within a regular interval.
 	void Poll();
 
+	void SetListener(PipelineListener* listener);
+
 private:
 	void Parse(GstMessage* msg);
 
 	GstBus* _bus;
+	PipelineListener* _listener;
 
 };
 

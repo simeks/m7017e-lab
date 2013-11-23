@@ -110,3 +110,15 @@ bool Pipeline::SetRate(double rate)
 		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE) == TRUE;
 }
 
+void Pipeline::Tick()
+{
+	if(_bus)
+		_bus->Poll();
+}
+
+void Pipeline::SetListener(PipelineListener* listener)
+{
+	g_assert(_bus);
+	_bus->SetListener(listener);
+}
+

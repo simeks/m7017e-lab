@@ -4,11 +4,13 @@
 #include <Qstring>
 #include <QTimer>
 
+#include "pipeline.h"
+
 class Pipeline;
 class Bus;
 class PlayerWindow;
 
-class Player
+class Player : public PipelineListener
 {
 public:
 	Player();
@@ -26,6 +28,13 @@ public:
 
 	/// Updates any sub-systems the player may have, should be called within a regular interval.
 	void Tick();
+
+	
+	// PipelineListener
+
+	void EndOfStream();
+	void Error(const std::string& msg);
+
 
 private:
 	Pipeline* _pipeline;

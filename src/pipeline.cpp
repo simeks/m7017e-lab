@@ -2,6 +2,7 @@
 
 #include "pipeline.h"
 #include "bus.h"
+#include <Qstring>
 
 #include <gst/interfaces/xoverlay.h>
 
@@ -31,8 +32,8 @@ Pipeline::Pipeline(const char* pipeline_factory) : _pipeline(NULL), _bus(NULL)
 	// Unreference the bus here, all further use of the bus will be from the Bus object.
 	gst_object_unref(bus);
 
-	g_object_set(_pipeline, "uri", "http://docs.gstreamer.com/media/sintel_trailer-480p.webm", NULL);
-	gst_element_set_state(_pipeline, GST_STATE_READY);
+	//g_object_set(_pipeline, "uri", "file:///E:/Downloads/Laugh.wav", NULL);
+	//gst_element_set_state(_pipeline, GST_STATE_READY);
 }
 Pipeline::~Pipeline()
 {
@@ -77,3 +78,9 @@ bool Pipeline::QueryDuration(int64_t* duration)
 	return gst_element_query_duration(_pipeline, &fmt, duration) == TRUE;
 }
 
+void Pipeline::SetUri(QString fileName)
+{
+	g_object_set(_pipeline, "uri", "file:///" + fileName, NULL);
+	gst_element_set_state(_pipeline, GST_STATE_READY);
+
+}

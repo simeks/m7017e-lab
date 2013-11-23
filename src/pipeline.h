@@ -2,6 +2,7 @@
 #define __PIPELINE_H__
 
 #include <gst/gst.h>
+#include <Qstring>
 
 class Bus;
 
@@ -30,6 +31,8 @@ public:
 	/// @param duration This parameter will hold the resulting duration, in nanoseconds.
 	/// @return True if the query were performed successfully.
 	bool QueryDuration(int64_t* duration);
+
+	void Pipeline::SetUri(QString fileName);
 
 
 private:

@@ -4,6 +4,7 @@
 #include "pipeline.h"
 #include "bus.h"
 #include "qt/playerwindow.h"
+#include <Qstring>
 
 #include <QApplication>
 
@@ -28,7 +29,7 @@ int Player::Run(int argc, char *argv[])
 	_window = new PlayerWindow(this);
 	_window->show();
 
-	_pipeline->SetOutput(_window->GetOutputHandle());
+	//_pipeline->SetOutput(_window->GetOutputHandle());
 
 
 	return a.exec();
@@ -69,4 +70,11 @@ void Player::FastForward()
 void Player::FullScreen()
 {
 
+}
+
+void Player::PlayMedia(QString fileName)
+{
+	_pipeline->SetUri(fileName);
+	_pipeline->SetOutput(_window->GetOutputHandle());
+	_pipeline->SetState(GST_STATE_PLAYING);
 }

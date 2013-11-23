@@ -27,6 +27,7 @@ WId PlayerWindow::GetOutputHandle() const
 void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"));
+    _player->PlayMedia(fileNames[0]);
 }
 
 void PlayerWindow::on_playButton_clicked()

@@ -119,10 +119,9 @@ void PlayerWindow::on_playButton_clicked()
     }
 }
 
-void PlayerWindow::on_rewindButton_clicked()
+void PlayerWindow::on_rewindButton_toggled()
 {
-	ui->rewindButton->toggle();
-    _player->ReWind();
+    _player->ToggleRewind();
 }
 
 void PlayerWindow::on_stopButton_clicked()
@@ -130,9 +129,9 @@ void PlayerWindow::on_stopButton_clicked()
 	_player->Stop();
 }
 
-void PlayerWindow::on_fastForwardButton_clicked()
+void PlayerWindow::on_fastForwardButton_toggled()
 {
-    _player->FastForward();
+    _player->ToggleFastForward();
 }
 
 void PlayerWindow::on_timerTick()

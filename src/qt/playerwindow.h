@@ -33,11 +33,11 @@ private slots:
 
     void on_playButton_clicked();
 
-    void on_rewindButton_clicked();
+    void on_rewindButton_toggled();
 
     void on_stopButton_clicked();
 
-    void on_fastForwardButton_clicked();
+    void on_fastForwardButton_toggled();
 
 	void on_timerTick();
 

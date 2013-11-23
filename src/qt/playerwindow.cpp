@@ -70,6 +70,10 @@ void PlayerWindow::open()
 
     if(fileNames.length() != 0)
 	{
+		// Stop any old media playing before starting any new.
+		if(_player->IsPlaying())
+			_player->Stop();
+
         _player->PlayMedia(fileNames[0]);
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);

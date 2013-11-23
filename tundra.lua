@@ -116,6 +116,8 @@ Build {
 		MsvcSolutions = {
 			['m7017e-lab.sln'] = {},          -- receives all the units due to empty set
 		},
+		
+		BuildAllByDefault = true,
 	},
 
 	Passes = {

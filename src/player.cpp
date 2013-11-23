@@ -9,7 +9,7 @@
 
 Player::Player() : _pipeline(NULL), _window(NULL)
 {
-	_pipeline = new Pipeline("playbin2");
+	_pipeline = new Pipeline();
 }
 Player::~Player()
 {
@@ -27,7 +27,6 @@ int Player::Run(int argc, char *argv[])
 	_window->show();
 
 	_pipeline->SetOutput(_window->GetOutputHandle());
-
 
 	return a.exec();
 }

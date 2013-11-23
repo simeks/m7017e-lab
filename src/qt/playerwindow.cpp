@@ -16,6 +16,12 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
 {
     ui->setupUi(this);
+
+    ui->playButton->setDisabled(true);
+    ui->rewindButton->setDisabled(true);
+    ui->stopButton->setDisabled(true);
+    ui->fastForwardButton->setDisabled(true);
+
     playing = false;
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
@@ -44,36 +50,36 @@ PlayerWindow::~PlayerWindow()
 }
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "Videos (*.webm *.wav *.avi *.mp3 *.mp4 *.)");
+    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
         _player->PlayMedia(fileNames[0]);
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
 		playing = true;
-
+        ui->playButton->setEnabled(true);
+        ui->rewindButton->setEnabled(true);
+        ui->stopButton->setEnabled(true);
+        ui->fastForwardButton->setEnabled(true);
 }
 
 void PlayerWindow::on_playButton_clicked()
 {
-	if(fileNames.length() != 0)
-	{
-		if(playing)
-        {
-            QIcon playIcon(":images/playButton.png");
-            playing = false;
-            ui->playButton->setIcon(playIcon);
-			_player->Pause();
-			
-        }
-		else
-        {
-            QIcon pauseIcon(":images/pauseButton.png");
-            playing = true;
-            ui->playButton->setIcon(pauseIcon);
-            _player->Play();
-        }
-	}
+    if(playing)
+    {
+        QIcon playIcon(":images/playButton.png");
+        playing = false;
+        ui->playButton->setIcon(playIcon);
+        _player->Pause();
+
+    }
+    else
+    {
+        QIcon pauseIcon(":images/pauseButton.png");
+        playing = true;
+        ui->playButton->setIcon(pauseIcon);
+        _player->Play();
+    }
 }
 
 void PlayerWindow::on_rewindButton_clicked()

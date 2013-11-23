@@ -73,7 +73,7 @@ bool Player::QueryDuration()
 
 bool Player::QueryPosition()
 {
-	return _pipeline->QueryDuration(&timeElapsed);
+	return _pipeline->QueryPosition(&timeElapsed);
 }
 
 int64_t Player::GetDuration()

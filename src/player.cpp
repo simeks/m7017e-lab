@@ -8,6 +8,7 @@
 Player::Player(PlayerWindow* window) :
 	_pipeline(NULL), 
 	_playing(false),
+	_rate(PLAYBACK_NORMAL),
 	_window(window)
 {
 	_pipeline = new Pipeline();
@@ -44,14 +45,31 @@ void Player::Stop()
 	_pipeline->SetState(GST_STATE_NULL);
 }
 
-void Player::ReWind()
+void Player::ToggleRewind()
 {
-
+	if(_rate == PLAYBACK_REWIND)
+	{
+		_pipeline->SetRate(1.0);
+		_rate = PLAYBACK_NORMAL;
+	}
+	else
+	{
+		_pipeline->SetRate(-1.0);
+		_rate = PLAYBACK_REWIND;
+	}
 }
-
-void Player::FastForward()
+void Player::ToggleFastForward()
 {
-
+	if(_rate == PLAYBACK_FASTFORWARD)
+	{
+		_pipeline->SetRate(1.0);
+		_rate = PLAYBACK_NORMAL;
+	}
+	else
+	{
+		_pipeline->SetRate(2.0);
+		_rate = PLAYBACK_FASTFORWARD;
+	}
 }
 
 void Player::PlayMedia(const std::string& file_path)

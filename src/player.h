@@ -22,9 +22,12 @@ public:
 	void Play();
 	void Pause();
 	void Stop();
-	void ReWind();
-	void FastForward();
+
+	void ToggleRewind();
+	void ToggleFastForward();
+
 	void FullScreen();
+
 	void PlayMedia(const std::string& file_path);
 
 	int64_t GetDuration();
@@ -42,10 +45,19 @@ public:
 	void Error(const std::string& msg);
 
 private:
+	enum PlaybackRate
+	{
+		PLAYBACK_NORMAL,
+		PLAYBACK_FASTFORWARD,
+		PLAYBACK_REWIND
+	};
+
 	Pipeline* _pipeline;
+	
 	int64_t duration;
 	int64_t timeElapsed;
     bool _playing;
+	PlaybackRate _rate;
 
 	PlayerWindow* _window;
 };

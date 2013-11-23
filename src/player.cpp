@@ -63,10 +63,12 @@ void Player::FullScreen()
 
 }
 
-void Player::PlayMedia(QString fileName)
+void Player::PlayMedia(QString file_name)
 {
-	std::string file = fileName.toLocal8Bit().constData();
-	_pipeline->SetUri(file);
+	std::string file_uri = "file:///";
+	file_uri += file_name.toLocal8Bit().constData();
+	
+	_pipeline->SetUri(file_uri.c_str());
 	_pipeline->SetOutput(_window->GetOutputHandle());
 	_pipeline->SetState(GST_STATE_PLAYING);
 }

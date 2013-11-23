@@ -41,7 +41,7 @@ public:
 	bool SetRate(double rate);
 
 
-	void Pipeline::SetUri(std::string fileName);
+	void Pipeline::SetUri(const char* uri);
 
 
 private:

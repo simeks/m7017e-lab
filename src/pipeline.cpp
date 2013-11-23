@@ -87,9 +87,9 @@ bool Pipeline::QueryDuration(int64_t* duration)
 }
 
 
-void Pipeline::SetUri(std::string fileName)
+void Pipeline::SetUri(const char* uri)
 {
-	g_object_set(_pipeline, "uri", "file:///" + fileName, NULL);
+	g_object_set(_pipeline, "uri", uri, NULL);
 
 }
 

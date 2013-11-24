@@ -149,25 +149,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QSlider" name="slider">
-          <property name="mouseTracking">
-           <bool>false</bool>
-          </property>
-          <property name="pageStep">
-           <number>1</number>
-          </property>
-          <property name="tracking">
-           <bool>false</bool>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="tickPosition">
-           <enum>QSlider::NoTicks</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="totalDuration">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

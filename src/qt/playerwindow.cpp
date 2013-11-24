@@ -3,6 +3,7 @@
 
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
+#include "playbackslider.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTime>
@@ -12,21 +13,29 @@
 PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
+	_slider(NULL),
     _player(new Player(this)),
 	_tickTimer(this),
 	_refreshUITimer(this)
 {
     ui->setupUi(this);
 
+	// Create our custom slider
+	_slider = new PlaybackSlider(_player, ui->centralWidget);
+	
+	// Insert our slider to the layout
+	ui->horizontalLayout->insertWidget(1, _slider);
+
     ui->playButton->setDisabled(true);
     ui->rewindButton->setDisabled(true);
     ui->stopButton->setDisabled(true);
     ui->fastForwardButton->setDisabled(true);
-    ui->slider->setDisabled(true);
+	_slider->setDisabled(true);
+	_slider->setValue(0);
 
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
-
+	
 	// Make sure player outputs video to our video widget
 	_player->SetVideoOutput(ui->widget->winId());
 
@@ -42,14 +51,13 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
     connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
 
-    connect(ui->slider, SIGNAL(sliderMoved(int)), this, SLOT(Seek(int)));
-
 }
 
 PlayerWindow::~PlayerWindow()
 {
 	delete _player;
-    delete ui;
+    delete _slider;
+	delete ui;
 }
 void PlayerWindow::PrintError(const std::string& msg)
 {
@@ -96,7 +104,7 @@ void PlayerWindow::open()
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
         ui->fastForwardButton->setEnabled(true);
-        ui->slider->setEnabled(true);
+        _slider->setEnabled(true);
 
 	}
 }
@@ -147,12 +155,12 @@ void PlayerWindow::on_timerRefreshUI()
 		int64_t currentTime = _player->GetTimeElapsed();
 		UpdateDurationLabels(duration, currentTime);
 
-        ui->slider->setMaximum(duration / 1000000000);
-        ui->slider->setMinimum(0);
-        ui->slider->setValue((currentTime / 1000000000));
+        _slider->setMaximum(duration / 1000000000);
+        _slider->setMinimum(0);
+        _slider->setValue((currentTime / 1000000000));
 	}
 }
-
+ 
 void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 {
 	QString totalDurationString;
@@ -173,16 +181,4 @@ void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
 
 	currentTimeString = currentTime.toString(format);
 	ui->timeElapsed->setText(currentTimeString);
-}
-
-void PlayerWindow::mouseDoubleClickEvent(QMouseEvent *e)
-{
-    QWidget::mouseDoubleClickEvent(e);
-
-}
-
-void PlayerWindow::Seek(int position)
-{
-    ui->slider->setValue(position);
-    _player->Seek(position);
 }

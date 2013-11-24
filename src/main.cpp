@@ -7,7 +7,7 @@
 
 
 #if defined(_WIN32) && !defined(DEBUG)
-int WINAPI WinMain(HINSTANCE hInstanceIn, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #else
 int main(int argc, char *argv[])
 #endif

@@ -4,13 +4,16 @@
 #include "../common.h"
 #include <QMainWindow>
 #include <QTimer>
-#include "stdint.h"
+
 
 namespace Ui {
 class PlayerWindow;
 }
 
+
+
 class Player;
+class PlaybackSlider;
 class PlayerWindow : public QMainWindow
 {
     Q_OBJECT
@@ -43,16 +46,13 @@ private slots:
 
     void on_timerRefreshUI();
 
-    void Seek(int position);
-
-
 private:
     void UpdateDurationLabels(int64_t duration, int64_t currTime);
 
-    void mouseDoubleClickEvent(QMouseEvent *e);
-
 
     Ui::PlayerWindow *ui;
+	PlaybackSlider* _slider;
+
 	Player* _player;
     QTimer _tickTimer;
     QTimer _refreshUITimer;

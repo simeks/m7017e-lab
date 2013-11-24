@@ -40,7 +40,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	ui->horizontalLayout->insertWidget(1, _slider);
 
     // Create the mute button
-    _muteButton = new QToolButton(ui->frame);
+    _muteButton = new QToolButton(this);
 
 	_playlist_window = new PlaylistWindow(this);
 	// Hide playlist until it's toggled by the user.
@@ -58,9 +58,6 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     QSize muteIconSize(41, 41);
     _muteButton->setIconSize(muteIconSize);
 
-    // Call SetMuted when the mute button is toggled and untoggled
-    connect(_muteButton, SIGNAL(toggled(bool)), this, SLOT(SetMuted(bool)));
-
     // Create a horizontal layout and add the mute button and all the buttons in the UI to it
     _QHbox = new QHBoxLayout();
     _QHbox->addWidget(ui->frame);
@@ -68,6 +65,16 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
     // Add the horizontal layout to the vertical layout inside the UI
     ui->verticalLayout->addLayout(_QHbox);
+
+    _volumeSlider = new QSlider(this);
+
+    _volumeSlider->setOrientation(Qt::Horizontal);
+    _volumeSlider->setFixedWidth(100);
+    _volumeSlider->setTickInterval(1);
+    _volumeSlider->setMaximum(100);
+    _volumeSlider->setMinimum(0);
+    _QHbox->addWidget(_volumeSlider);
+
 
     // Disable all buttons when no file is opened
     ui->playButton->setDisabled(true);
@@ -82,6 +89,8 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui->actionFullscreen, SIGNAL(triggered()), this, SLOT(fullscreen()));
 	connect(ui->actionPlaylist, SIGNAL(triggered()), this, SLOT(playlist()));
+    connect(_muteButton, SIGNAL(toggled(bool)), this, SLOT(SetMuted(bool)));
+    connect(_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(SetVolume(int)));
 	
 	// Make sure player outputs video to our video widget
 	_player->SetVideoOutput(_video_widget->winId());
@@ -316,4 +325,9 @@ void PlayerWindow::UpdateDurationLabels(int duration, int currTime)
 void PlayerWindow::SetMuted(bool muted)
 {
     _player->SetMuted(muted);
+}
+
+void PlayerWindow::SetVolume(int volume)
+{
+    _player->SetVolume(volume);
 }

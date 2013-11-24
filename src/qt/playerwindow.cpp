@@ -152,6 +152,9 @@ void PlayerWindow::StreamEnded()
     _slider->setMaximum(0);
 	
 	setWindowTitle(QString("MediaPlayer"));
+
+	// Clear video widget to make sure it isn't showing any left over frame
+	_video_widget->update();
 }
 
 void PlayerWindow::ToggleFullscreen()

@@ -16,6 +16,7 @@ class PlayerWindow;
 class Player;
 class PlaybackSlider;
 class VideoWidget;
+class PlaylistWindow;
 class PlayerWindow : public QMainWindow
 {
     Q_OBJECT
@@ -35,6 +36,9 @@ public:
 	
 	/// @brief Toggles fullscreen mode
 	void ToggleFullscreen();
+	
+	/// @brief Toggles the playlist
+	void TogglePlaylist();
 
 	/// @return True if the player is currently in fullscreen mode.
 	bool IsFullscreen() const;
@@ -42,6 +46,7 @@ public:
 private slots:
     void open();
 	void fullscreen();
+	void playlist();
 
     void on_playButton_clicked();
 
@@ -64,6 +69,7 @@ private:
 
 
     Ui::PlayerWindow *ui;
+	PlaylistWindow* _playlist_window;
 	PlaybackSlider* _slider;
 	VideoWidget* _video_widget;
     QToolButton* _muteButton;
@@ -74,8 +80,8 @@ private:
     QTimer _refresh_ui_timer;
 
 	bool _fullscreen;
+	bool _playlist_visible;
 
-    QStringList fileNames;
 };
 
 #endif // PLAYERWINDOW_H

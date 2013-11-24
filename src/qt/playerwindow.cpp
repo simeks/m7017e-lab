@@ -3,6 +3,7 @@
 
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
+#include "playlistwindow.h"
 #include "playbackslider.h"
 #include "videowidget.h"
 #include <QFileDialog>
@@ -15,12 +16,14 @@
 PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
-	_slider(NULL),
+    _slider(NULL),
     _muteButton(NULL),
+    _playlist_window(NULL),
     _player(new Player(this)),
 	_tick_timer(this),
 	_refresh_ui_timer(this),
-	_fullscreen(false)
+	_fullscreen(false),
+	_playlist_visible(false)
 {
     ui->setupUi(this);
 
@@ -38,6 +41,10 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
     // Create the mute button
     _muteButton = new QToolButton(ui->frame);
+
+	_playlist_window = new PlaylistWindow(this);
+	// Hide playlist until it's toggled by the user.
+    _playlist_window->hide();
 
     // Set the size for the mute button
     _muteButton->setFixedSize(47, 47);
@@ -74,6 +81,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	connect(ui->actionFullscreen, SIGNAL(triggered()), this, SLOT(fullscreen()));
+	connect(ui->actionPlaylist, SIGNAL(triggered()), this, SLOT(playlist()));
 	
 	// Make sure player outputs video to our video widget
 	_player->SetVideoOutput(_video_widget->winId());
@@ -93,6 +101,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
 PlayerWindow::~PlayerWindow()
 {
+	delete _playlist_window;
 	delete _player;
     delete _slider;
 	delete ui;
@@ -113,6 +122,11 @@ void PlayerWindow::StreamEnded()
     ui->fastForwardButton->setEnabled(false);
     _muteButton->setEnabled(false);
     _slider->setEnabled(false);
+
+	_slider->setDisabled(true);
+	_slider->setValue(0);
+	_slider->setMinimum(0);
+    _slider->setMaximum(0);
 
 	SetTrackName("");
 }
@@ -154,7 +168,25 @@ void PlayerWindow::ToggleFullscreen()
 
 		_fullscreen = true;
 	}
+}void PlayerWindow::TogglePlaylist()
+{
+	if(_playlist_visible)
+	{
+		ui->horizontalLayout_3->removeWidget(_playlist_window);
+		_playlist_window->hide();
+
+		_playlist_visible = false;
+	}
+	else
+	{
+		ui->horizontalLayout_3->addWidget(_playlist_window);
+		_playlist_window->show();
+
+		_playlist_visible = true;
+	}
 }
+
+
 bool PlayerWindow::IsFullscreen() const
 {
 	return _fullscreen;
@@ -162,7 +194,7 @@ bool PlayerWindow::IsFullscreen() const
 
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
 	{
@@ -170,7 +202,23 @@ void PlayerWindow::open()
 		if(_player->IsPlaying())
 			_player->Stop();
 
-		_player->PlayMedia(fileNames[0].toLocal8Bit().constData());
+		// Clear the playlist first
+		_player->GetPlaylist().Clear();
+
+		// Push all opened files to the playlist
+		QStringList::Iterator it, end;
+		it = fileNames.begin(); end = fileNames.end();
+		for( ; it != end; ++it)
+		{
+			_player->GetPlaylist().AddEntry(it->toLocal8Bit().constData());
+		}
+
+		// Start playing the first file in the playlist
+		_player->PlayNext();
+		
+		// Update our playlist window
+		_playlist_window->UpdatePlaylist(_player->GetPlaylist());
+		
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
         ui->playButton->setEnabled(true);
@@ -185,6 +233,10 @@ void PlayerWindow::open()
 void PlayerWindow::fullscreen()
 {
 	ToggleFullscreen();
+}
+void PlayerWindow::playlist()
+{
+	TogglePlaylist();
 }
 
 void PlayerWindow::on_playButton_clicked()

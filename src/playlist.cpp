@@ -1,0 +1,76 @@
+#include "common.h"
+
+#include "playlist.h"
+
+
+Playlist::Iterator::Iterator(const std::vector<std::string>* entries)
+	: _entries(entries), _current_index(0)
+{
+}
+
+const std::string& Playlist::Iterator::Next()
+{
+	// Return empty string if we have reached the end.
+	if(End())
+		return "";
+
+	return (*_entries)[_current_index++]; // Return the current entry and increment the current index.
+}
+bool Playlist::Iterator::End() const
+{
+	return (_current_index == _entries->size());
+}
+
+
+Playlist::RandomIterator::RandomIterator(const std::vector<std::string>* entries)
+	: Iterator(entries)
+{
+}
+
+const std::string& Playlist::RandomIterator::Next()
+{
+	// Generate a new random index.
+	_current_index = rand() % (_entries->size()-1);
+	return (*_entries)[_current_index];
+}
+bool Playlist::RandomIterator::End() const
+{
+	return false;
+}
+
+
+
+
+Playlist::Playlist()
+{
+}
+Playlist::~Playlist()
+{
+}
+
+void Playlist::AddEntry(const std::string& file_path)
+{
+	_entries.push_back(file_path);
+}
+void Playlist::RemoveEntry(const std::string& file_path)
+{
+	std::vector<std::string>::iterator it = std::find(_entries.begin(), _entries.end(), file_path);
+	if(it != _entries.end())
+		_entries.erase(it);
+}
+
+void Playlist::Clear()
+{
+	_entries.clear();
+}
+
+Playlist::Iterator Playlist::CreateIterator() const
+{
+	return Iterator(&_entries);
+}
+
+Playlist::RandomIterator Playlist::CreateRandomIterator() const
+{
+	return RandomIterator(&_entries);
+}
+

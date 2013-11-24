@@ -194,7 +194,7 @@ bool PlayerWindow::IsFullscreen() const
 
 void PlayerWindow::open()
 {
-    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.mkv *.)");
 
     if(fileNames.length() != 0)
 	{

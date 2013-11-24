@@ -122,4 +122,13 @@ void Pipeline::SetListener(PipelineListener* listener)
 	_bus->SetListener(listener);
 }
 
+void Pipeline::SetMuted(bool muted)
+{
+	debug::Printf("%d", muted);
+    if (!_pipeline)
+		debug::Printf("[Error] Failed to find the pipeline.\n");
+
+    g_object_set(_pipeline, "mute", muted, NULL);
+}
+
 

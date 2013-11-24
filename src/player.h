@@ -47,6 +47,8 @@ public:
 	
 	/// Updates any sub-systems the player may have, should be called within a regular interval.
 	void Tick();
+	
+	void SetMuted(bool muted);
 
 	/// Returns the players playlist
 	Playlist& GetPlaylist();

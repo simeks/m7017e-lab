@@ -4,12 +4,13 @@
 #include "../common.h"
 #include <QMainWindow>
 #include <QTimer>
+#include <QToolButton>
+#include <QHBoxLayout>
 
 
 namespace Ui {
 class PlayerWindow;
 }
-
 
 
 class Player;
@@ -59,6 +60,8 @@ private slots:
 
     void on_timerRefreshUI();
 
+    void SetMuted(bool muted);
+
 private:
 	/// @param duration Duration in milliseconds.
 	/// @param currTime Current time in milliseconds.
@@ -69,6 +72,8 @@ private:
 	PlaylistWindow* _playlist_window;
 	PlaybackSlider* _slider;
 	VideoWidget* _video_widget;
+    QToolButton* _muteButton;
+    QHBoxLayout* _QHbox;
 
 	Player* _player;
     QTimer _tick_timer;

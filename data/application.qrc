@@ -5,5 +5,6 @@
         <file>images/playButton.png</file>
         <file>images/rewindButton.png</file>
         <file>images/stopButton.png</file>
+        <file>images/muteButton.png</file>
     </qresource>
 </RCC>

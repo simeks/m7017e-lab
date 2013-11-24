@@ -42,7 +42,7 @@ void PlaylistWindow::UpdatePlaylist(const Playlist& playlist)
 
 		item->setText(file_name.c_str());
 
-		ui->listWidget->addItem(item);
+        ui->listWidget->addItem(item);
 	}
 }
 

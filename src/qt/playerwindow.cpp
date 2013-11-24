@@ -28,8 +28,8 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui->setupUi(this);
 
 	// Create our custom video widget
-	_video_widget = new VideoWidget(_player, this);
-	
+    _video_widget = new VideoWidget(_player, this);
+
 	// Insert the widget to the layout
 	ui->verticalLayout->insertWidget(0, _video_widget);
 

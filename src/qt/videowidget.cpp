@@ -19,8 +19,6 @@ VideoWidget::VideoWidget(Player* player, PlayerWindow* parent)
 	palette.setBrush(QPalette::All, QPalette::Base, QBrush(QColor(0,0,0,255)));
 	palette.setBrush(QPalette::All, QPalette::Window, QBrush(QColor(0,0,0,255)));
 	setPalette(palette);
-
-
 	
 }
 VideoWidget::~VideoWidget()

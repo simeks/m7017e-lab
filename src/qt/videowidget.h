@@ -13,6 +13,7 @@ public:
 	~VideoWidget();
 	
 protected:
+
 	void keyPressEvent(QKeyEvent* key_event);
 	void mouseDoubleClickEvent(QMouseEvent * event);
 

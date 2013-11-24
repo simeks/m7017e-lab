@@ -47,31 +47,45 @@ public:
 	bool IsFullscreen() const;
 
 private slots:
+	/// @brief Callback for when a new media file has been opened.
     void open();
+	
+	
 	void fullscreen();
+	
+	/// Callback for when the "show" button in the playlist menu is clicked.
 	void playlist();
 
+	/// Callback for when the play button is clicked. Starts to play the media file.
     void on_playButton_clicked();
 
+	/// Callback for when the rewind button is clicked. Starts to play the media file backwards.
     void on_rewindButton_toggled();
 
+	/// Callback for when the stop button is clicked. The media file will be closed.
     void on_stopButton_clicked();
 
+	/// Callback for when the fast-forward button is clicked. Starts to play the media file at a 2x rate.
     void on_fastForwardButton_toggled();
+
 
 	void on_timerTick();
 
+	/// @brief Callback for when _refresh_ui_timer ticks, which is every second.
     void on_timerRefreshUI();
 
+	/// @brief Mutes the sound.
     void SetMuted(bool muted);
 
+	/// @brief Changes the volume
+	/// @param volume The value of volume in percent.
     void SetVolume(int volume);
 
 private:
+	/// @brief Updates the text labels.
 	/// @param duration Duration in milliseconds.
 	/// @param currTime Current time in milliseconds.
     void UpdateDurationLabels(int duration, int currTime);
-
 
     Ui::PlayerWindow *ui;
 	PlaylistWindow* _playlist_window;

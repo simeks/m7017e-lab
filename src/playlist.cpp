@@ -4,21 +4,38 @@
 
 
 Playlist::Iterator::Iterator(const std::vector<std::string>* entries)
-	: _entries(entries), _current_index(0)
+	: _entries(entries), _current_index(-1)
 {
 }
 
-const std::string& Playlist::Iterator::Next()
+std::string Playlist::Iterator::Next()
 {
 	// Return empty string if we have reached the end.
 	if(End())
 		return "";
 
-	return (*_entries)[_current_index++]; // Return the current entry and increment the current index.
+	return (*_entries)[++_current_index]; // Return the current entry and increment the current index.
 }
 bool Playlist::Iterator::End() const
 {
-	return (_current_index == _entries->size());
+	return ((_current_index+1) == _entries->size());
+}
+std::string Playlist::Iterator::SkipTo(int index)
+{
+	if(index >= 0 && index < _entries->size())
+	{
+		_current_index = index;
+		return (*_entries)[_current_index];
+	}
+
+	// No entry found, set iterator to end
+	_current_index = _entries->size() - 1;
+	return "";
+}
+
+int Playlist::Iterator::CurrentIndex() const
+{
+	return _current_index;
 }
 
 
@@ -27,7 +44,7 @@ Playlist::RandomIterator::RandomIterator(const std::vector<std::string>* entries
 {
 }
 
-const std::string& Playlist::RandomIterator::Next()
+std::string Playlist::RandomIterator::Next()
 {
 	// Generate a new random index.
 	_current_index = rand() % (_entries->size()-1);
@@ -62,6 +79,14 @@ void Playlist::RemoveEntry(const std::string& file_path)
 void Playlist::Clear()
 {
 	_entries.clear();
+}
+
+std::string Playlist::GetEntry(int index) const
+{
+	if(index >= 0 && index < _entries.size())
+		return _entries[index];
+
+	return ""; // No entry found
 }
 
 Playlist::Iterator Playlist::CreateIterator() const

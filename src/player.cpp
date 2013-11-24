@@ -9,6 +9,7 @@ Player::Player(PlayerWindow* window) :
 	_pipeline(NULL), 
 	_playing(false),
 	_rate(PLAYBACK_NORMAL),
+	_volume(1.0), // 1.0 means 100% volume.
 	_window(window),
 	_playlist_iterator(_playlist.CreateIterator())
 {
@@ -88,10 +89,7 @@ void Player::PlayMedia(const std::string& file_path)
 	_pipeline->SetUri(file_uri.c_str());
 	Play();
 
-	// Retrieve the file name from the full file path
-	size_t pos = file_path.rfind("/") + 1;
-	std::string file_name = file_path.substr(pos);
-
+	std::string file_name = util::GetFileName(file_path);
 	_window->SetTrackName(file_name);
 }
 
@@ -99,6 +97,21 @@ void Player::PlayNext()
 {
 	if(!_playlist_iterator.End())
 		PlayMedia(_playlist_iterator.Next());
+}
+
+void Player::PlayEntry(int playlist_index)
+{
+	std::string entry = _playlist_iterator.SkipTo(playlist_index);
+	
+	// Stop playback if we find no entry
+	if(entry == "")
+	{
+		Stop();
+	}
+	else
+	{
+		PlayMedia(entry);
+	}
 }
 
 int Player::GetDuration()
@@ -175,7 +188,15 @@ void Player::Seek(int position)
 
 void Player::SetMuted(bool muted)
 {
-	_pipeline->SetMuted(muted);
+	// To mute the sound we just set the volume to 0.0 and when we unmute it we reset it to its previous value.
+	if(muted)
+	{
+		_pipeline->SetVolume(0.0);
+	}
+	else
+	{
+		_pipeline->SetVolume(_volume);
+	}
 }
 
 

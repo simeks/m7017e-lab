@@ -62,7 +62,9 @@ public:
 	/// @brief Sets a callback for messages from the pipeline.
 	void SetListener(PipelineListener* listener);
 	
-	void SetMuted(bool muted);
+	/// Sets the volume of the pipeline.
+	/// @param volume The volume value, 0.0 meaning 0% and 1.0 meaning 100%.
+	void SetVolume(double volume);
 
 private:
 	GstElement* _pipeline;

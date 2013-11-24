@@ -88,7 +88,6 @@ bool Pipeline::QueryDuration(int64_t* duration)
 void Pipeline::SetUri(const char* uri)
 {
 	g_object_set(_pipeline, "uri", uri, NULL);
-
 }
 
 bool Pipeline::Seek(int64_t position)
@@ -122,13 +121,11 @@ void Pipeline::SetListener(PipelineListener* listener)
 	_bus->SetListener(listener);
 }
 
-void Pipeline::SetMuted(bool muted)
+void Pipeline::SetVolume(double volume)
 {
-	debug::Printf("%d", muted);
-    if (!_pipeline)
-		debug::Printf("[Error] Failed to find the pipeline.\n");
+	g_assert(_pipeline);
 
-    g_object_set(_pipeline, "mute", muted, NULL);
+    g_object_set(_pipeline, "volume", volume, NULL);
 }
 
 

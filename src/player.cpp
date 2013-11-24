@@ -99,7 +99,7 @@ void Player::PlayNext()
 		std::string file_name = util::GetFileName(file_path);
 		
 		_pipeline->SetState(GST_STATE_READY);
-		PlayMedia(_playlist_iterator.Next());
+		PlayMedia(file_path);
 		_window->TrackStarted(_playlist_iterator.CurrentIndex(), file_name);
 	}
 	else

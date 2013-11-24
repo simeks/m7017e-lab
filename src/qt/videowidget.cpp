@@ -2,9 +2,13 @@
 #include "../player.h"
 
 #include "videowidget.h"
+#include "playerwindow.h"
 
-VideoWidget::VideoWidget(Player* player, QWidget* parent)
-	: _player(player)
+#include <QKeyEvent>
+
+VideoWidget::VideoWidget(Player* player, PlayerWindow* parent)
+	: _player(player),
+	_player_window(parent)
 {
 	// Set properties
 	setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
@@ -16,8 +20,26 @@ VideoWidget::VideoWidget(Player* player, QWidget* parent)
 	palette.setBrush(QPalette::All, QPalette::Window, QBrush(QColor(0,0,0,255)));
 	setPalette(palette);
 
+
+	
 }
 VideoWidget::~VideoWidget()
 {
+}
+
+void VideoWidget::keyPressEvent(QKeyEvent* key_event)
+{
+	if(key_event->key() == Qt::Key_F5) // F5 toggles fullscreen
+	{
+		_player_window->ToggleFullscreen();
+	}
+	else if(key_event->key() == Qt::Key_Escape && _player_window->IsFullscreen()) // Escapes exits fullscreen mode if active
+	{
+		_player_window->ToggleFullscreen();
+	}
+	else
+	{
+		QWidget::keyPressEvent(key_event);
+	}
 }
 

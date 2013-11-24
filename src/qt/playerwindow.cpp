@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTime>
+#include <QKeyEvent>
 
 #include "../player.h"
 
@@ -17,18 +18,19 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_slider(NULL),
     _player(new Player(this)),
 	_tick_timer(this),
-	_refresh_ui_timer(this)
+	_refresh_ui_timer(this),
+	_fullscreen(false)
 {
     ui->setupUi(this);
 
 	// Create our custom video widget
-	_video_widget = new VideoWidget(_player, ui->centralWidget);
+	_video_widget = new VideoWidget(_player, this);
 	
 	// Insert the widget to the layout
 	ui->verticalLayout->insertWidget(0, _video_widget);
 
 	// Create our custom slider
-	_slider = new PlaybackSlider(_player, ui->centralWidget);
+	_slider = new PlaybackSlider(_player, this);
 	
 	// Insert our slider to the layout
 	ui->horizontalLayout->insertWidget(1, _slider);
@@ -87,10 +89,55 @@ void PlayerWindow::SetTrackName(const std::string& msg)
 {
 	if(msg.empty())
 	{
+		setWindowTitle(QString("MediaPlayer"));
 	}
 	else
 	{
 		setWindowTitle(QString("MediaPlayer - ") + msg.c_str());
+	}
+}
+ 
+void PlayerWindow::ToggleFullscreen()
+{
+	if(_fullscreen)
+	{
+		// First we set it to show normally
+		_video_widget->showNormal();
+		
+		_video_widget->setParent(this);
+
+		// Then we attach it to our layout again.
+		ui->verticalLayout->insertWidget(0, _video_widget);
+
+		_fullscreen = false;
+	}
+	else
+	{
+		// Before we set the widget to fullscreen we need to detach it from our window layout
+		ui->verticalLayout->removeWidget(_video_widget);
+		_video_widget->setParent(NULL);
+
+		// Then we just set it to fullscreen
+		_video_widget->showFullScreen();
+		_video_widget->setFocus();
+
+		_fullscreen = true;
+	}
+}
+bool PlayerWindow::IsFullscreen() const
+{
+	return _fullscreen;
+}
+
+void PlayerWindow::keyPressEvent(QKeyEvent* key_event)
+{
+	if(key_event->key() == Qt::Key_F5)
+	{
+		ToggleFullscreen();
+	}
+	else
+	{
+		QMainWindow::keyPressEvent(key_event);
 	}
 }
 
@@ -167,7 +214,7 @@ void PlayerWindow::on_timerRefreshUI()
         _slider->setValue((currentTime));
 	}
 }
- 
+
 void PlayerWindow::UpdateDurationLabels(int duration, int currTime)
 {
 	QString totalDurationString;

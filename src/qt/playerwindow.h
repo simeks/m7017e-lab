@@ -31,6 +31,15 @@ public:
 
 	/// Sets the current track name.
 	void SetTrackName(const std::string& msg);
+	
+	/// @brief Toggles fullscreen mode
+	void ToggleFullscreen();
+
+	/// @return True if the player is currently in fullscreen mode.
+	bool IsFullscreen() const;
+
+protected:
+	void keyPressEvent(QKeyEvent* key_event);
 
 private slots:
     void open();
@@ -60,6 +69,8 @@ private:
 	Player* _player;
     QTimer _tick_timer;
     QTimer _refresh_ui_timer;
+
+	bool _fullscreen;
 
     QStringList fileNames;
 };

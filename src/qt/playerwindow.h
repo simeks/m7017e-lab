@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QSlider>
 
 
 namespace Ui {
@@ -64,6 +65,8 @@ private slots:
 
     void SetMuted(bool muted);
 
+    void SetVolume(int volume);
+
 private:
 	/// @param duration Duration in milliseconds.
 	/// @param currTime Current time in milliseconds.
@@ -76,6 +79,7 @@ private:
 	VideoWidget* _video_widget;
     QToolButton* _muteButton;
     QHBoxLayout* _QHbox;
+    QSlider* _volumeSlider;
 
 	Player* _player;
     QTimer _tick_timer;

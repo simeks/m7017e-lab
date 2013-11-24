@@ -49,6 +49,8 @@ public:
 	void Tick();
 	
 	void SetMuted(bool muted);
+	
+	void SetVolume(int volume);
 
 	/// Returns the players playlist
 	Playlist& GetPlaylist();

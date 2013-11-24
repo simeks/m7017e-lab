@@ -12,10 +12,13 @@ TARGET = Videoplayer
 TEMPLATE = app
 
 
-SOURCES += src/main.cpp src/qt/playerwindow.cpp
+SOURCES += src/main.cpp src/qt/playerwindow.cpp \
+    src/qt/playlistwindow.cpp
 
-HEADERS  += src/qt/playerwindow.h
+HEADERS  += src/qt/playerwindow.h \
+    src/qt/playlistwindow.h
 
-FORMS    += src/qt/playerwindow.ui
+FORMS    += src/qt/playerwindow.ui \
+    src/qt/playlistwindow.ui
 
 RESOURCES += data/application.qrc

@@ -14,6 +14,7 @@ public:
 	
 protected:
 	void keyPressEvent(QKeyEvent* key_event);
+	void mouseDoubleClickEvent(QMouseEvent * event);
 
 protected:
 	Player* _player;

@@ -43,3 +43,10 @@ void VideoWidget::keyPressEvent(QKeyEvent* key_event)
 	}
 }
 
+void VideoWidget::mouseDoubleClickEvent(QMouseEvent * event)
+{
+	// Toggle fullscreen if a user double-clicks the video widget.
+	_player_window->ToggleFullscreen();
+
+	QWidget::mouseDoubleClickEvent(event);
+}

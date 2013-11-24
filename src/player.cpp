@@ -101,6 +101,21 @@ void Player::PlayNext()
 		PlayMedia(_playlist_iterator.Next());
 }
 
+void Player::PlayEntry(int playlist_index)
+{
+	std::string entry = _playlist_iterator.SkipTo(playlist_index);
+	
+	// Stop playback if we find no entry
+	if(entry == "")
+	{
+		Stop();
+	}
+	else
+	{
+		PlayMedia(entry);
+	}
+}
+
 int Player::GetDuration()
 {
 	int64_t duration = 0;

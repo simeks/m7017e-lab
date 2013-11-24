@@ -26,13 +26,12 @@ public:
 
 	void ToggleRewind();
 	void ToggleFastForward();
-
-	void FullScreen();
-
-	void PlayMedia(const std::string& file_path);
 	
 	/// Plays the next media in the playlist
 	void PlayNext();
+
+	/// Plays an entry from the playlist with the specified index.
+	void PlayEntry(int playlist_index);
 
 	/// Seeks the the specified position
 	/// @param position in milliseconds.
@@ -58,6 +57,9 @@ public:
 	void Error(const std::string& msg);
 
 private:
+	void PlayMedia(const std::string& file_path);
+
+
 	enum PlaybackRate
 	{
 		PLAYBACK_NORMAL,

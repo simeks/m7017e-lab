@@ -38,11 +38,9 @@ public:
 	/// @return True if the player is currently in fullscreen mode.
 	bool IsFullscreen() const;
 
-protected:
-	void keyPressEvent(QKeyEvent* key_event);
-
 private slots:
     void open();
+	void fullscreen();
 
     void on_playButton_clicked();
 

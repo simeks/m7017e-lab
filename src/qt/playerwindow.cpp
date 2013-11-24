@@ -45,6 +45,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 
     connect(ui->actionOpen_File, SIGNAL(triggered()), this, SLOT(open()));
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
+	connect(ui->actionFullscreen, SIGNAL(triggered()), this, SLOT(fullscreen()));
 	
 	// Make sure player outputs video to our video widget
 	_player->SetVideoOutput(_video_widget->winId());
@@ -129,18 +130,6 @@ bool PlayerWindow::IsFullscreen() const
 	return _fullscreen;
 }
 
-void PlayerWindow::keyPressEvent(QKeyEvent* key_event)
-{
-	if(key_event->key() == Qt::Key_F5)
-	{
-		ToggleFullscreen();
-	}
-	else
-	{
-		QMainWindow::keyPressEvent(key_event);
-	}
-}
-
 void PlayerWindow::open()
 {
     fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
@@ -162,7 +151,10 @@ void PlayerWindow::open()
 
 	}
 }
-
+void PlayerWindow::fullscreen()
+{
+	ToggleFullscreen();
+}
 
 void PlayerWindow::on_playButton_clicked()
 {

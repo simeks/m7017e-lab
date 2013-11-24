@@ -274,6 +274,9 @@
    <property name="text">
     <string>Fullscreen</string>
    </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

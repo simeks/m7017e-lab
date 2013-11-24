@@ -74,7 +74,7 @@ local function GenerateUISources(sources)
 end
 
 Program {
-	Name = "Main",
+	Name = "MediaPlayer",
 	Sources = {
 		FGlob {
 			Dir = "src",
@@ -141,5 +141,5 @@ Program {
 	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
 
 }
-Default "Main"
+Default "MediaPlayer"
 

@@ -39,23 +39,6 @@ int Playlist::Iterator::CurrentIndex() const
 }
 
 
-Playlist::RandomIterator::RandomIterator(const std::vector<std::string>* entries)
-	: Iterator(entries)
-{
-}
-
-std::string Playlist::RandomIterator::Next()
-{
-	// Generate a new random index.
-	_current_index = rand() % (_entries->size()-1);
-	return (*_entries)[_current_index];
-}
-bool Playlist::RandomIterator::End() const
-{
-	return false;
-}
-
-
 
 
 Playlist::Playlist()
@@ -92,10 +75,5 @@ std::string Playlist::GetEntry(int index) const
 Playlist::Iterator Playlist::CreateIterator() const
 {
 	return Iterator(&_entries);
-}
-
-Playlist::RandomIterator Playlist::CreateRandomIterator() const
-{
-	return RandomIterator(&_entries);
 }
 

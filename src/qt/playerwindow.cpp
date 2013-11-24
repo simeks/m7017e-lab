@@ -138,6 +138,16 @@ void PlayerWindow::TrackStarted(int playlist_index, const std::string& track_nam
 	{
 		setWindowTitle(QString("MediaPlayer - ") + track_name.c_str());
 	}
+
+	QIcon pauseIcon(":images/pauseButton.png");
+	ui->playButton->setIcon(pauseIcon);
+    ui->playButton->setEnabled(true);
+    ui->rewindButton->setEnabled(true);
+    ui->stopButton->setEnabled(true);
+    ui->fastForwardButton->setEnabled(true);
+    _muteButton->setEnabled(true);
+    _slider->setEnabled(true);
+    _volumeSlider->setEnabled(true);
 }
 
 void PlayerWindow::PrintError(const std::string& msg)
@@ -225,9 +235,8 @@ void PlayerWindow::open()
 
     if(fileNames.length() != 0)
 	{
-		// Stop any old media playing before starting any new.
-		if(_player->IsPlaying())
-			_player->Stop();
+		/// Make sure to stop any previous playback.
+		_player->Stop();
 
 		// Clear the playlist first
 		_player->GetPlaylist().Clear();

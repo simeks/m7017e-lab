@@ -170,6 +170,7 @@ Playlist& Player::GetPlaylist()
 
 void Player::EndOfStream()
 {
+	_pipeline->SetState(GST_STATE_READY);
 	if(_playlist_iterator.End())
 	{
 		_playing = false;
@@ -177,7 +178,6 @@ void Player::EndOfStream()
 	}
 	else
 	{
-		_pipeline->SetState(GST_STATE_READY);
 		PlayMedia(_playlist_iterator.Next());
 	}
 }

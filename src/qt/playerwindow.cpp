@@ -16,6 +16,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlayerWindow),
 	_slider(NULL),
+    _muteButton(NULL),
     _player(new Player(this)),
 	_tick_timer(this),
 	_refresh_ui_timer(this),
@@ -35,11 +36,38 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	// Insert our slider to the layout
 	ui->horizontalLayout->insertWidget(1, _slider);
 
+    // Create the mute button
+    _muteButton = new QToolButton(ui->frame);
 
+    // Set the size for the mute button
+    _muteButton->setFixedSize(47, 47);
+
+    // Make the mute button checkable
+    _muteButton->setCheckable(true);
+
+    // Give the mute button an icon
+    QIcon muteIcon(":images/muteButton.png");
+    _muteButton->setIcon(muteIcon);
+    QSize muteIconSize(41, 41);
+    _muteButton->setIconSize(muteIconSize);
+
+    // Call SetMuted when the mute button is toggled and untoggled
+    connect(_muteButton, SIGNAL(toggled(bool)), this, SLOT(SetMuted(bool)));
+
+    // Create a horizontal layout and add the mute button and all the buttons in the UI to it
+    _QHbox = new QHBoxLayout();
+    _QHbox->addWidget(ui->frame);
+    _QHbox->addWidget(_muteButton);
+
+    // Add the horizontal layout to the vertical layout inside the UI
+    ui->verticalLayout->addLayout(_QHbox);
+
+    // Disable all buttons when no file is opened
     ui->playButton->setDisabled(true);
     ui->rewindButton->setDisabled(true);
     ui->stopButton->setDisabled(true);
     ui->fastForwardButton->setDisabled(true);
+    _muteButton->setDisabled((true));
 	_slider->setDisabled(true);
 	_slider->setValue(0);
 
@@ -83,6 +111,8 @@ void PlayerWindow::StreamEnded()
     ui->rewindButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->fastForwardButton->setEnabled(false);
+    _muteButton->setEnabled(false);
+    _slider->setEnabled(false);
 
 	SetTrackName("");
 }
@@ -147,6 +177,7 @@ void PlayerWindow::open()
         ui->rewindButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
         ui->fastForwardButton->setEnabled(true);
+        _muteButton->setEnabled(true);
         _slider->setEnabled(true);
 
 	}
@@ -228,4 +259,9 @@ void PlayerWindow::UpdateDurationLabels(int duration, int currTime)
 
 	currentTimeString = currentTime.toString(format);
 	ui->timeElapsed->setText(currentTimeString);
+}
+
+void PlayerWindow::SetMuted(bool muted)
+{
+    _player->SetMuted(muted);
 }

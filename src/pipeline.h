@@ -61,6 +61,8 @@ public:
 
 	/// @brief Sets a callback for messages from the pipeline.
 	void SetListener(PipelineListener* listener);
+	
+	void SetMuted(bool muted);
 
 private:
 	GstElement* _pipeline;

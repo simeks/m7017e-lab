@@ -149,3 +149,10 @@ void Player::Seek(int position)
 		debug::Printf("[Warning] Failed to set new position.\n");
 	}
 }
+
+void Player::SetMuted(bool muted)
+{
+	_pipeline->SetMuted(muted);
+}
+
+

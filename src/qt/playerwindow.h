@@ -87,6 +87,7 @@ private:
 
 	bool _fullscreen;
 	bool _playlist_visible;
+    int _sliderPosition;
 
 };
 

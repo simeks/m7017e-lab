@@ -4,6 +4,7 @@
 #include "playerwindow.h"
 #include "ui_playerwindow.h"
 #include "playbackslider.h"
+#include "videowidget.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTime>
@@ -15,16 +16,23 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     ui(new Ui::PlayerWindow),
 	_slider(NULL),
     _player(new Player(this)),
-	_tickTimer(this),
-	_refreshUITimer(this)
+	_tick_timer(this),
+	_refresh_ui_timer(this)
 {
     ui->setupUi(this);
+
+	// Create our custom video widget
+	_video_widget = new VideoWidget(_player, ui->centralWidget);
+	
+	// Insert the widget to the layout
+	ui->verticalLayout->insertWidget(0, _video_widget);
 
 	// Create our custom slider
 	_slider = new PlaybackSlider(_player, ui->centralWidget);
 	
 	// Insert our slider to the layout
 	ui->horizontalLayout->insertWidget(1, _slider);
+
 
     ui->playButton->setDisabled(true);
     ui->rewindButton->setDisabled(true);
@@ -37,20 +45,19 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
 	
 	// Make sure player outputs video to our video widget
-	_player->SetVideoOutput(ui->widget->winId());
+	_player->SetVideoOutput(_video_widget->winId());
 
 	// Tick every 25ms
-	_tickTimer.setInterval(25);
-	_tickTimer.start();
+	_tick_timer.setInterval(25);
+	_tick_timer.start();
 
-	connect(&_tickTimer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
+	connect(&_tick_timer, SIGNAL(timeout()), this, SLOT(on_timerTick()));
 
 	// Tick every 1 sec
-	_refreshUITimer.setInterval(1000);
-	_refreshUITimer.start();
+	_refresh_ui_timer.setInterval(1000);
+	_refresh_ui_timer.start();
 
-    connect(&_refreshUITimer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
-
+    connect(&_refresh_ui_timer, SIGNAL(timeout()), this, SLOT(on_timerRefreshUI()));
 }
 
 PlayerWindow::~PlayerWindow()

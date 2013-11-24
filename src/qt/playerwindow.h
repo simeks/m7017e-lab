@@ -14,6 +14,7 @@ class PlayerWindow;
 
 class Player;
 class PlaybackSlider;
+class VideoWidget;
 class PlayerWindow : public QMainWindow
 {
     Q_OBJECT
@@ -54,10 +55,11 @@ private:
 
     Ui::PlayerWindow *ui;
 	PlaybackSlider* _slider;
+	VideoWidget* _video_widget;
 
 	Player* _player;
-    QTimer _tickTimer;
-    QTimer _refreshUITimer;
+    QTimer _tick_timer;
+    QTimer _refresh_ui_timer;
 
     QStringList fileNames;
 };

@@ -90,23 +90,31 @@ void Player::PlayMedia(const std::string& file_path)
 	_window->SetTrackName(file_name);
 }
 
-int64_t Player::GetDuration()
+int Player::GetDuration()
 {
 	int64_t duration = 0;
 	if(!_pipeline->QueryDuration(&duration))
 	{
-		debug::Printf("Failed to retrieve duration.");
+		debug::Printf("[Warning] Failed to retrieve duration.\n");
 	}
-	return duration;
+
+	// Convert time into milliseconds before returning
+	int time_sec = int(duration / 1000000);
+
+	return time_sec;
 }
-int64_t Player::GetTimeElapsed()
+int Player::GetTimeElapsed()
 {
 	int64_t position = 0;
 	if(!_pipeline->QueryPosition(&position))
 	{
-		debug::Printf("Failed to retrieve position.");
+		debug::Printf("[Warning] Failed to retrieve position.\n");
 	}
-	return position;
+
+	// Convert time into seconds before returning
+	int time_sec = int(position / 1000000);
+
+	return time_sec;
 }
 bool Player::IsPlaying() const
 {
@@ -135,9 +143,9 @@ void Player::Error(const std::string& msg)
 void Player::Seek(int position)
 {
 	int64_t pos = int64_t(position);
-	pos *= 1000000000;
+	pos *= 1000000; // Convert into nanoseconds (from milliseconds)
 	if(!_pipeline->Seek(pos))
 	{
-		debug::Printf("Failed to retrieve new position.");
+		debug::Printf("[Warning] Failed to set new position.\n");
 	}
 }

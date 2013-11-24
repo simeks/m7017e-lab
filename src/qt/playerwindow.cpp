@@ -151,22 +151,23 @@ void PlayerWindow::on_timerRefreshUI()
 {
 	if(_player->IsPlaying())
 	{
-		int64_t duration = _player->GetDuration();
-		int64_t currentTime = _player->GetTimeElapsed();
+		int duration = _player->GetDuration();
+		int currentTime = _player->GetTimeElapsed();
 		UpdateDurationLabels(duration, currentTime);
 
-        _slider->setMaximum(duration / 1000000000);
+        _slider->setMaximum(duration);
         _slider->setMinimum(0);
-        _slider->setValue((currentTime / 1000000000));
+        _slider->setValue((currentTime));
 	}
 }
  
-void PlayerWindow::UpdateDurationLabels(int64_t duration, int64_t currTime)
+void PlayerWindow::UpdateDurationLabels(int duration, int currTime)
 {
 	QString totalDurationString;
 	QString currentTimeString;
-	long durationSeconds = duration/1000000000; // Convert duration from nanoseconds to seconds
-	long currentTimeSeconds = currTime/1000000000; // Convert position from nanoseconds to seconds
+
+	long durationSeconds = duration / 1000; // Convert duration from milliseconds to seconds
+	long currentTimeSeconds = currTime / 1000; // Convert position from milliseconds to seconds
 
 	// Convert time to a more readable format before printing.
 

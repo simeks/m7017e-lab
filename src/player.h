@@ -29,10 +29,15 @@ public:
 	void FullScreen();
 
 	void PlayMedia(const std::string& file_path);
+	
+	/// Seeks the the specified position
+	/// @param position in milliseconds.
 	void Seek(int position);
 
-	int64_t GetDuration();
-	int64_t GetTimeElapsed();
+	/// Returns the duration in milliseconds.
+	int GetDuration();
+	/// Returns the time elapsed in milliseconds.
+	int GetTimeElapsed();
 
 	/// Returns true if the player is currently playing, false if not.
 	bool IsPlaying() const;

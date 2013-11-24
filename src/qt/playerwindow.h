@@ -47,7 +47,9 @@ private slots:
     void on_timerRefreshUI();
 
 private:
-    void UpdateDurationLabels(int64_t duration, int64_t currTime);
+	/// @param duration Duration in milliseconds.
+	/// @param currTime Current time in milliseconds.
+    void UpdateDurationLabels(int duration, int currTime);
 
 
     Ui::PlayerWindow *ui;

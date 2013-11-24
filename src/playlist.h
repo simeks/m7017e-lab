@@ -31,19 +31,6 @@ public:
 
 	};
 
-	/// Class for randomly going through a playlist
-	class RandomIterator : public Iterator
-	{
-	public:
-		RandomIterator(const std::vector<std::string>* entries);
-
-		virtual std::string Next();
-
-		/// The random iterator can never reach the end so this will always return false.
-		virtual bool End() const;
-
-	};
-
 
 public:
 	Playlist();
@@ -61,9 +48,6 @@ public:
 
 	/// Creates an iterator for iterating through the playlist entries.
 	Iterator CreateIterator() const;
-
-	/// Creates an random iterator for randomly selecting entries from the playlist.
-	RandomIterator CreateRandomIterator() const;
 
 private:
 	std::vector<std::string> _entries;

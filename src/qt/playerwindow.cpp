@@ -73,6 +73,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     _volumeSlider->setTickInterval(1);
     _volumeSlider->setMaximum(100);
     _volumeSlider->setMinimum(0);
+    _volumeSlider->setSliderPosition(100);
     _QHbox->addWidget(_volumeSlider);
 
 
@@ -330,4 +331,14 @@ void PlayerWindow::SetMuted(bool muted)
 void PlayerWindow::SetVolume(int volume)
 {
     _player->SetVolume(volume);
+    if(_volumeSlider->sliderPosition() == 0)
+    {
+        if(!_muteButton->isChecked())
+            _muteButton->toggle();
+    }
+    else
+    {
+        if(_muteButton->isChecked())
+            _muteButton->toggle();
+    }
 }

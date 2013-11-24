@@ -379,14 +379,14 @@ void PlayerWindow::SetVolume(int volume)
     {
         if(!_muteButton->isChecked())
         {
-            _muteButton->toggle();
+			_muteButton->setDown(true);
         }
     }
     else
     {
         if(_muteButton->isChecked())
         {
-            _muteButton->toggle();
+            _muteButton->setDown(false);
         }
     }
 }

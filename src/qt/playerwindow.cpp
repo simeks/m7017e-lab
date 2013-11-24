@@ -120,6 +120,9 @@ PlayerWindow::~PlayerWindow()
 
 void PlayerWindow::TrackStarted(int playlist_index, const std::string& track_name)
 {
+	// Clear video widget to make sure it isn't showing any left over frame
+	_video_widget->update();
+
 	if(track_name.empty())
 	{
 		setWindowTitle(QString("MediaPlayer"));

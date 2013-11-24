@@ -61,6 +61,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     // Create the volume slider
     _volumeSlider = new QSlider(this);
 
+    // Set the properties for the volume slider
     _volumeSlider->setOrientation(Qt::Horizontal);
     _volumeSlider->setFixedWidth(100);
     _volumeSlider->setTickInterval(1);
@@ -155,6 +156,7 @@ void PlayerWindow::StreamEnded()
     ui->fastForwardButton->setEnabled(false);
     _muteButton->setEnabled(false);
     _slider->setEnabled(false);
+    _volumeSlider->setEnabled(false);
 
 	_slider->setDisabled(true);
 	_slider->setValue(0);

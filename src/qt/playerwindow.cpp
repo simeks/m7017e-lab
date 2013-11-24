@@ -265,6 +265,8 @@ void PlayerWindow::open()
         _slider->setEnabled(true);
         _volumeSlider->setEnabled(true);
 
+        _volumeSlider->setSliderPosition(100);
+
 	}
 }
 void PlayerWindow::fullscreen()
@@ -372,4 +374,19 @@ void PlayerWindow::SetMuted(bool muted)
 void PlayerWindow::SetVolume(int volume)
 {
     _player->SetVolume(volume);
+
+    if(_volumeSlider->sliderPosition() == 0)
+    {
+        if(!_muteButton->isChecked())
+        {
+            _muteButton->toggle();
+        }
+    }
+    else
+    {
+        if(_muteButton->isChecked())
+        {
+            _muteButton->toggle();
+        }
+    }
 }

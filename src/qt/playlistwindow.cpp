@@ -17,7 +17,7 @@ PlaylistWindow::PlaylistWindow(Player* player, QWidget *parent) :
 
 PlaylistWindow::~PlaylistWindow()
 {
-	FreeItems();
+	ui->listWidget->clear();
     delete ui;
 }
 
@@ -30,7 +30,6 @@ void PlaylistWindow::UpdatePlaylist(const Playlist& playlist)
 {
 	// Clear current entries
 	ui->listWidget->clear();
-	FreeItems();
 
 	Playlist::Iterator it = playlist.CreateIterator();
 	while(!it.End())
@@ -38,8 +37,8 @@ void PlaylistWindow::UpdatePlaylist(const Playlist& playlist)
 		// We only want to show the file name in the playlist, not the whole path.
 		std::string file_name = util::GetFileName(it.Next());
 
+		// We can allocate our item here and just throw away the pointer as it seems like Qt deletes the object later.
 		PlaylistItem* item = new PlaylistItem(it.CurrentIndex());
-		_items.push_back(item);
 
 		item->setText(file_name.c_str());
 
@@ -51,16 +50,4 @@ void PlaylistWindow::ItemDoubleClicked(QListWidgetItem* item)
 {
 	PlaylistItem* playlist_item = (PlaylistItem*)item;
 	_player->PlayTrack(playlist_item->PlaylistIndex());
-}
-
-void PlaylistWindow::FreeItems()
-{
-	std::vector<PlaylistItem*>::iterator it, end;
-	it = _items.begin();
-	end = _items.end();
-	for( ; it != end; ++it)
-	{
-		delete *it;
-	}
-	_items.clear();
 }

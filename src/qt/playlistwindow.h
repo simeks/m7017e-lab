@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include "../common.h"
 
 namespace Ui {
 class PlaylistWindow;
@@ -18,8 +19,8 @@ class PlaylistWindow : public QWidget
 	class PlaylistItem : public QListWidgetItem
 	{
 	public:
-		PlaylistItem(int playlist_index) : _playlist_index(playlist_index) {}
-		~PlaylistItem() {}
+		PlaylistItem(int playlist_index) : _playlist_index(playlist_index) { }
+		~PlaylistItem() { }
 
 		int PlaylistIndex() const { return _playlist_index; }
 
@@ -39,13 +40,9 @@ protected slots:
 	void ItemDoubleClicked(QListWidgetItem* item);
 
 private:
-	/// Frees all items that have been allocated and stored in _items;
-	void FreeItems();
-
     Ui::PlaylistWindow *ui;
 
 	Player* _player;
-	std::vector<PlaylistItem*> _items;
 
 };
 

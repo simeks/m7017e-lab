@@ -16,5 +16,6 @@
 #endif
 
 #include "debug.h"
+#include "util.h"
 
 #endif // __COMMON_H__

@@ -26,6 +26,9 @@ void PlaylistWindow::UpdatePlaylist(const Playlist& playlist)
 	Playlist::Iterator it = playlist.CreateIterator();
 	while(!it.End())
 	{
-		ui->listWidget->addItem(it.Next().c_str());
+		// We only want to show the file name in the playlist, not the whole path.
+		std::string file_name = util::GetFileName(it.Next());
+
+		ui->listWidget->addItem(file_name.c_str());
 	}
 }

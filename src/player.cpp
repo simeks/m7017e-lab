@@ -89,10 +89,7 @@ void Player::PlayMedia(const std::string& file_path)
 	_pipeline->SetUri(file_uri.c_str());
 	Play();
 
-	// Retrieve the file name from the full file path
-	size_t pos = file_path.rfind("/") + 1;
-	std::string file_name = file_path.substr(pos);
-
+	std::string file_name = util::GetFileName(file_path);
 	_window->SetTrackName(file_name);
 }
 

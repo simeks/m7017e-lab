@@ -9,7 +9,8 @@ Player::Player(PlayerWindow* window) :
 	_pipeline(NULL), 
 	_playing(false),
 	_rate(PLAYBACK_NORMAL),
-	_window(window)
+	_window(window),
+	_playlist_iterator(_playlist.CreateIterator())
 {
 	_pipeline = new Pipeline();
 
@@ -42,7 +43,11 @@ void Player::Pause()
 void Player::Stop()
 {
 	_playing = false;
-	_pipeline->SetState(GST_STATE_NULL);
+	_pipeline->SetState(GST_STATE_READY);
+	_window->StreamEnded();
+
+	// Restart our playlist
+	_playlist_iterator = _playlist.CreateIterator();
 }
 
 void Player::ToggleRewind()
@@ -90,6 +95,12 @@ void Player::PlayMedia(const std::string& file_path)
 	_window->SetTrackName(file_name);
 }
 
+void Player::PlayNext()
+{
+	if(!_playlist_iterator.End())
+		PlayMedia(_playlist_iterator.Next());
+}
+
 int Player::GetDuration()
 {
 	int64_t duration = 0;
@@ -126,11 +137,23 @@ void Player::Tick()
 	_pipeline->Tick();
 }
 
+Playlist& Player::GetPlaylist()
+{
+	return _playlist;
+}
+
 void Player::EndOfStream()
 {
-	_playing = false;
-
-	_window->StreamEnded();
+	if(_playlist_iterator.End())
+	{
+		_playing = false;
+		_window->StreamEnded();
+	}
+	else
+	{
+		_pipeline->SetState(GST_STATE_READY);
+		PlayMedia(_playlist_iterator.Next());
+	}
 }
 void Player::Error(const std::string& msg)
 {

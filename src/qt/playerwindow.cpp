@@ -91,6 +91,10 @@ void PlayerWindow::StreamEnded()
     ui->rewindButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     ui->fastForwardButton->setEnabled(false);
+	_slider->setDisabled(true);
+	_slider->setValue(0);
+	_slider->setMinimum(0);
+	_slider->setMaximum(0);
 
 	SetTrackName("");
 }
@@ -158,7 +162,7 @@ bool PlayerWindow::IsFullscreen() const
 
 void PlayerWindow::open()
 {
-    fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
+    QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Files"), "/", "(*.webm *.wav *.avi *.mp3 *.mp4 *.)");
 
     if(fileNames.length() != 0)
 	{
@@ -166,7 +170,23 @@ void PlayerWindow::open()
 		if(_player->IsPlaying())
 			_player->Stop();
 
-		_player->PlayMedia(fileNames[0].toLocal8Bit().constData());
+		// Clear the playlist first
+		_player->GetPlaylist().Clear();
+
+		// Push all opened files to the playlist
+		QStringList::Iterator it, end;
+		it = fileNames.begin(); end = fileNames.end();
+		for( ; it != end; ++it)
+		{
+			_player->GetPlaylist().AddEntry(it->toLocal8Bit().constData());
+		}
+
+		// Start playing the first file in the playlist
+		_player->PlayNext();
+		
+		// Update our playlist window
+		_playlist_window->UpdatePlaylist(_player->GetPlaylist());
+		
 		QIcon pauseIcon(":images/pauseButton.png");
 		ui->playButton->setIcon(pauseIcon);
         ui->playButton->setEnabled(true);

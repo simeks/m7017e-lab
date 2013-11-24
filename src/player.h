@@ -6,6 +6,7 @@
 #include "stdint.h"
 
 #include "pipeline.h"
+#include "playlist.h"
 
 class Pipeline;
 class Bus;
@@ -30,6 +31,9 @@ public:
 
 	void PlayMedia(const std::string& file_path);
 	
+	/// Plays the next media in the playlist
+	void PlayNext();
+
 	/// Seeks the the specified position
 	/// @param position in milliseconds.
 	void Seek(int position);
@@ -44,6 +48,9 @@ public:
 	
 	/// Updates any sub-systems the player may have, should be called within a regular interval.
 	void Tick();
+
+	/// Returns the players playlist
+	Playlist& GetPlaylist();
 
 	// PipelineListener
 
@@ -64,9 +71,10 @@ private:
 	int64_t timeElapsed;
 
 	bool _playing;
-	
 	PlaybackRate _rate;
-
+	
+	Playlist _playlist;
+	Playlist::Iterator _playlist_iterator;
 
 	PlayerWindow* _window;
 };

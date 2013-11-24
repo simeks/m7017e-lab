@@ -77,7 +77,6 @@ private:
 	bool _fullscreen;
 	bool _playlist_visible;
 
-    QStringList fileNames;
 };
 
 #endif // PLAYERWINDOW_H

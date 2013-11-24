@@ -7,6 +7,7 @@ namespace Ui {
 class PlaylistWindow;
 }
 
+class Playlist;
 class PlaylistWindow : public QWidget
 {
     Q_OBJECT
@@ -14,6 +15,8 @@ class PlaylistWindow : public QWidget
 public:
     explicit PlaylistWindow(QWidget *parent = 0);
     ~PlaylistWindow();
+
+	void UpdatePlaylist(const Playlist& playlist);
 
 private:
     Ui::PlaylistWindow *ui;

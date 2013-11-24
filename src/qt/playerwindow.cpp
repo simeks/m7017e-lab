@@ -58,24 +58,31 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     QSize muteIconSize(41, 41);
     _muteButton->setIconSize(muteIconSize);
 
-    // Create a horizontal layout and add the mute button and all the buttons in the UI to it
-    _QHbox = new QHBoxLayout();
-    _QHbox->addWidget(ui->frame);
-    _QHbox->addWidget(_muteButton);
-
-    // Add the horizontal layout to the vertical layout inside the UI
-    ui->verticalLayout->addLayout(_QHbox);
-
+    // Create the volume slider
     _volumeSlider = new QSlider(this);
 
+    // Set the properties for the volume slider
     _volumeSlider->setOrientation(Qt::Horizontal);
     _volumeSlider->setFixedWidth(100);
     _volumeSlider->setTickInterval(1);
     _volumeSlider->setMaximum(100);
     _volumeSlider->setMinimum(0);
     _volumeSlider->setSliderPosition(100);
-    _QHbox->addWidget(_volumeSlider);
 
+    // Create a horizontal layout for the volume button and volume slider
+    _QHboxVolume = new QHBoxLayout();
+    _QHboxVolume->addWidget(_muteButton);
+    _QHboxVolume->addWidget(_volumeSlider);
+    _QHboxVolume->setAlignment(Qt::AlignRight);
+
+    // Create a horizontal layout and add the buttons and the volume slider to it
+    _QHboxControls = new QHBoxLayout();
+    _QHboxControls->addWidget(ui->frame);
+    _QHboxControls->addLayout(_QHboxVolume);
+    _QHboxControls->setAlignment(Qt::AlignLeft);
+
+    // Add the horizontal layout to the vertical layout inside the UI
+    ui->verticalLayout->addLayout(_QHboxControls);
 
     // Disable all buttons and sliders when no file is opened
     ui->playButton->setDisabled(true);
@@ -149,6 +156,7 @@ void PlayerWindow::StreamEnded()
     ui->fastForwardButton->setEnabled(false);
     _muteButton->setEnabled(false);
     _slider->setEnabled(false);
+    _volumeSlider->setEnabled(false);
 
 	_slider->setDisabled(true);
 	_slider->setValue(0);

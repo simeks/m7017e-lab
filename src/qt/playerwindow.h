@@ -78,7 +78,8 @@ private:
 	PlaybackSlider* _slider;
 	VideoWidget* _video_widget;
     QToolButton* _muteButton;
-    QHBoxLayout* _QHbox;
+    QHBoxLayout* _QHboxControls;
+    QHBoxLayout* _QHboxVolume;
     QSlider* _volumeSlider;
 
 	Player* _player;

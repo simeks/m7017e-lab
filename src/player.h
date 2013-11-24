@@ -31,7 +31,7 @@ public:
 	void PlayNext();
 
 	/// Plays an entry from the playlist with the specified index.
-	void PlayEntry(int playlist_index);
+	void PlayTrack(int playlist_index);
 
 	/// Seeks the the specified position
 	/// @param position in milliseconds.

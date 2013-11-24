@@ -42,7 +42,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     // Create the mute button
     _muteButton = new QToolButton(ui->frame);
 
-	_playlist_window = new PlaylistWindow(this);
+	_playlist_window = new PlaylistWindow(_player, this);
 	// Hide playlist until it's toggled by the user.
     _playlist_window->hide();
 
@@ -106,6 +106,19 @@ PlayerWindow::~PlayerWindow()
     delete _slider;
 	delete ui;
 }
+
+void PlayerWindow::TrackStarted(int playlist_index, const std::string& track_name)
+{
+	if(track_name.empty())
+	{
+		setWindowTitle(QString("MediaPlayer"));
+	}
+	else
+	{
+		setWindowTitle(QString("MediaPlayer - ") + track_name.c_str());
+	}
+}
+
 void PlayerWindow::PrintError(const std::string& msg)
 {
 	QMessageBox errorBox;
@@ -127,21 +140,10 @@ void PlayerWindow::StreamEnded()
 	_slider->setValue(0);
 	_slider->setMinimum(0);
     _slider->setMaximum(0);
+	
+	setWindowTitle(QString("MediaPlayer"));
+}
 
-	SetTrackName("");
-}
-void PlayerWindow::SetTrackName(const std::string& msg)
-{
-	if(msg.empty())
-	{
-		setWindowTitle(QString("MediaPlayer"));
-	}
-	else
-	{
-		setWindowTitle(QString("MediaPlayer - ") + msg.c_str());
-	}
-}
- 
 void PlayerWindow::ToggleFullscreen()
 {
 	if(_fullscreen)

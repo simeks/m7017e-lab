@@ -76,6 +76,7 @@ private:
 
 	bool _playing;
 	PlaybackRate _rate;
+	double _volume;
 	
 	Playlist _playlist;
 	Playlist::Iterator _playlist_iterator;

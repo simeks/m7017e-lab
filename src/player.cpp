@@ -9,6 +9,7 @@ Player::Player(PlayerWindow* window) :
 	_pipeline(NULL), 
 	_playing(false),
 	_rate(PLAYBACK_NORMAL),
+	_volume(1.0), // 1.0 means 100% volume.
 	_window(window),
 	_playlist_iterator(_playlist.CreateIterator())
 {
@@ -190,7 +191,15 @@ void Player::Seek(int position)
 
 void Player::SetMuted(bool muted)
 {
-	_pipeline->SetMuted(muted);
+	// To mute the sound we just set the volume to 0.0 and when we unmute it we reset it to its previous value.
+	if(muted)
+	{
+		_pipeline->SetVolume(0.0);
+	}
+	else
+	{
+		_pipeline->SetVolume(_volume);
+	}
 }
 
 

@@ -235,9 +235,8 @@ void PlayerWindow::open()
 
     if(fileNames.length() != 0)
 	{
-		// Stop any old media playing before starting any new.
-		if(_player->IsPlaying())
-			_player->Stop();
+		/// Make sure to stop any previous playback.
+		_player->Stop();
 
 		// Clear the playlist first
 		_player->GetPlaylist().Clear();

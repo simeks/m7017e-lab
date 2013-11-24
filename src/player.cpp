@@ -89,17 +89,26 @@ void Player::PlayMedia(const std::string& file_path)
 	_pipeline->SetUri(file_uri.c_str());
 	Play();
 
-	std::string file_name = util::GetFileName(file_path);
-	_window->SetTrackName(file_name);
 }
 
 void Player::PlayNext()
 {
 	if(!_playlist_iterator.End())
+	{
+		std::string file_path = _playlist_iterator.Next();
+		std::string file_name = util::GetFileName(file_path);
+		
+		_pipeline->SetState(GST_STATE_READY);
 		PlayMedia(_playlist_iterator.Next());
+		_window->TrackStarted(_playlist_iterator.CurrentIndex(), file_name);
+	}
+	else
+	{
+		_window->StreamEnded();
+	}
 }
 
-void Player::PlayEntry(int playlist_index)
+void Player::PlayTrack(int playlist_index)
 {
 	std::string entry = _playlist_iterator.SkipTo(playlist_index);
 	
@@ -110,7 +119,11 @@ void Player::PlayEntry(int playlist_index)
 	}
 	else
 	{
+		_pipeline->SetState(GST_STATE_READY);
 		PlayMedia(entry);
+
+		std::string file_name = util::GetFileName(entry);
+		_window->TrackStarted(playlist_index, file_name);
 	}
 }
 
@@ -173,7 +186,9 @@ void Player::Error(const std::string& msg)
 	_playing = false;
 
 	_window->PrintError(msg);
-	_window->StreamEnded();
+	
+	// Just continue to the next playlist entry.
+	PlayNext();
 }
 
 void Player::Seek(int position)

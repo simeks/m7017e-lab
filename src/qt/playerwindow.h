@@ -26,14 +26,16 @@ public:
     explicit PlayerWindow(QWidget *parent = 0);
     ~PlayerWindow();
 
+	/// Called when a new track is started.
+	/// @param playlist_index An index in the players playlist.
+	/// @param track_name Name of the track.
+	void TrackStarted(int playlist_index, const std::string& track_name);
+
 	/// Creates a popup and shows an error message.
 	void PrintError(const std::string& msg);
 
 	/// Indicates that the stream has stopped.
 	void StreamEnded();
-
-	/// Sets the current track name.
-	void SetTrackName(const std::string& msg);
 	
 	/// @brief Toggles fullscreen mode
 	void ToggleFullscreen();

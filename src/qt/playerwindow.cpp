@@ -53,8 +53,8 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     _muteButton->setCheckable(true);
 
     // Give the mute button an icon
-    QIcon muteIcon(":images/muteButton.png");
-    _muteButton->setIcon(muteIcon);
+    QIcon muteButton(":images/muteButton.png");
+    _muteButton->setIcon(muteButton);
     QSize muteIconSize(41, 41);
     _muteButton->setIconSize(muteIconSize);
 
@@ -77,12 +77,13 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     _QHbox->addWidget(_volumeSlider);
 
 
-    // Disable all buttons when no file is opened
+    // Disable all buttons and sliders when no file is opened
     ui->playButton->setDisabled(true);
     ui->rewindButton->setDisabled(true);
     ui->stopButton->setDisabled(true);
     ui->fastForwardButton->setDisabled(true);
-    _muteButton->setDisabled((true));
+    _muteButton->setDisabled(true);
+    _volumeSlider->setDisabled(true);
 	_slider->setDisabled(true);
 	_slider->setValue(0);
 
@@ -237,6 +238,7 @@ void PlayerWindow::open()
         ui->fastForwardButton->setEnabled(true);
         _muteButton->setEnabled(true);
         _slider->setEnabled(true);
+        _volumeSlider->setEnabled(true);
 
 	}
 }
@@ -326,19 +328,23 @@ void PlayerWindow::UpdateDurationLabels(int duration, int currTime)
 void PlayerWindow::SetMuted(bool muted)
 {
     _player->SetMuted(muted);
+
+    if(muted)
+    {
+        // Save the volume slider position, and then set the slider position to 0 when the mute button is toggled
+        _sliderPosition = _volumeSlider->sliderPosition();
+        _volumeSlider->setSliderPosition(0);
+    }
+    else
+    {
+        // Set the volume slider position to the position it had before the mute button was toggled
+        _volumeSlider->setSliderPosition(_sliderPosition);
+    }
+
+
 }
 
 void PlayerWindow::SetVolume(int volume)
 {
     _player->SetVolume(volume);
-    if(_volumeSlider->sliderPosition() == 0)
-    {
-        if(!_muteButton->isChecked())
-            _muteButton->toggle();
-    }
-    else
-    {
-        if(_muteButton->isChecked())
-            _muteButton->toggle();
-    }
 }

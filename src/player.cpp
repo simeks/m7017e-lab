@@ -201,7 +201,7 @@ void Player::SetMuted(bool muted)
 
 void Player::SetVolume(int volume)
 {
-	double newVolume = double(volume) / 100;
-	_pipeline->SetVolume(newVolume);
+	_volume = double(volume) / 100;
+	_pipeline->SetVolume(_volume);
 }
 

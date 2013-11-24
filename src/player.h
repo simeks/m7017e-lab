@@ -50,6 +50,7 @@ public:
 	
 	void SetMuted(bool muted);
 	
+	/// Changes the volume. volume is given in percent.
 	void SetVolume(int volume);
 
 	/// Returns the players playlist

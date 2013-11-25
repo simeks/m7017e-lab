@@ -19,6 +19,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
     _slider(NULL),
     _muteButton(NULL),
     _playlist_window(NULL),
+    _volumeSlider(NULL),
     _player(new Player(this)),
 	_tick_timer(this),
 	_refresh_ui_timer(this),
@@ -26,6 +27,9 @@ PlayerWindow::PlayerWindow(QWidget *parent) :
 	_playlist_visible(false)
 {
     ui->setupUi(this);
+
+    // hide the status bar at the bottom of the screen
+    this->statusBar()->hide();
 
 	// Create our custom video widget
     _video_widget = new VideoWidget(_player, this);

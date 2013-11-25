@@ -18,6 +18,8 @@ class Player;
 class PlaybackSlider;
 class VideoWidget;
 class PlaylistWindow;
+
+/// This is the main window of our media player.
 class PlayerWindow : public QMainWindow
 {
     Q_OBJECT

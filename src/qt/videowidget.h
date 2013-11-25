@@ -5,6 +5,8 @@
 
 class Player;
 class PlayerWindow;
+
+/// This is the widget that will be used for outputting video.
 class VideoWidget : public QWidget
 {
 	Q_OBJECT;

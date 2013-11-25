@@ -21,11 +21,6 @@ PlaylistWindow::~PlaylistWindow()
     delete ui;
 }
 
-void PlaylistWindow::TrackStarted(int playlist_index)
-{
-	ui->listWidget->item(playlist_index)->setSelected(true);
-}
-
 void PlaylistWindow::UpdatePlaylist(const Playlist& playlist)
 {
 	// Clear current entries

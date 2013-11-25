@@ -1,8 +1,6 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include <Qstring>
-#include <QTimer>
 #include "stdint.h"
 
 #include "pipeline.h"

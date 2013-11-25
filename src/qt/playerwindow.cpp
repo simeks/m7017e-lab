@@ -381,14 +381,14 @@ void PlayerWindow::SetVolume(int volume)
 
     if(_volumeSlider->sliderPosition() == 0)
     {
-        if(!_muteButton->isChecked())
+        if(!_muteButton->isDown())
         {
-			_muteButton->setDown(true);
+            _muteButton->setDown(true);
         }
     }
     else
     {
-        if(_muteButton->isChecked())
+        if(_muteButton->isDown())
         {
             _muteButton->setDown(false);
         }

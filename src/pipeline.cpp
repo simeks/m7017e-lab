@@ -104,9 +104,30 @@ bool Pipeline::SetRate(double rate)
 {
 	g_assert(_pipeline);
 
-	// Sets the playback rate for the pipeline.
-	return gst_element_seek(_pipeline, rate, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, 
-		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE) == TRUE;
+	int64_t pos;
+	if(!QueryPosition(&pos))
+	{
+		debug::Printf("[Warning] Failed to retrieve current position.\n");
+		return false;
+	}
+
+	if(rate > 0) // Play forward
+	{
+		// Sets the playback rate for the pipeline.
+		return gst_element_seek(_pipeline, rate, GST_FORMAT_TIME, GstSeekFlags(GST_SEEK_FLAG_FLUSH|GST_SEEK_FLAG_ACCURATE), 
+			GST_SEEK_TYPE_SET, pos, GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE) == TRUE;
+	}
+	else if(rate < 0) // Play backward
+	{
+		// Sets the playback rate for the pipeline.
+		return gst_element_seek(_pipeline, rate, GST_FORMAT_TIME, GstSeekFlags(GST_SEEK_FLAG_FLUSH|GST_SEEK_FLAG_ACCURATE), 
+			GST_SEEK_TYPE_SET, 0, GST_SEEK_TYPE_SET, pos) == TRUE;
+	}
+	else
+	{
+		debug::Printf("[Warning] Can't set playback rate to 0.0.\n");
+		return false;
+	}
 }
 
 void Pipeline::Tick()

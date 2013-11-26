@@ -70,7 +70,7 @@ bool Pipeline::QueryPosition(int64_t* position)
 	GstFormat fmt = GST_FORMAT_TIME;
 
 	// Query the pipeline for the position
-	return gst_element_query_position(_pipeline, &fmt, position) == TRUE;
+	return gst_element_query_position(_pipeline, &fmt, (gint64*)position) == TRUE;
 }
 
 bool Pipeline::QueryDuration(int64_t* duration)
@@ -81,7 +81,7 @@ bool Pipeline::QueryDuration(int64_t* duration)
 	GstFormat fmt = GST_FORMAT_TIME;
 
 	// Query the pipeline for the total duration
-	return gst_element_query_duration(_pipeline, &fmt, duration) == TRUE;
+	return gst_element_query_duration(_pipeline, &fmt, (gint64*)duration) == TRUE;
 }
 
 

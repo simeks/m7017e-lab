@@ -2,7 +2,6 @@
 #define __PIPELINE_H__
 
 #include <gst/gst.h>
-#include <Qstring>
 
 class Bus;
 
@@ -54,7 +53,7 @@ public:
 	bool SetRate(double rate);
 
 	/// @brief Sets the URI to the source media.
-	void Pipeline::SetUri(const char* uri);
+	void SetUri(const char* uri);
 
 	/// @brief Updates the pipeline.
 	void Tick();

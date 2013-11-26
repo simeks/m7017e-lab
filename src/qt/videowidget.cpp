@@ -11,7 +11,7 @@ VideoWidget::VideoWidget(Player* player, PlayerWindow* parent)
 	_player_window(parent)
 {
 	// Set properties
-	setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setLayoutDirection(Qt::LeftToRight);
 	setAutoFillBackground(true);
 

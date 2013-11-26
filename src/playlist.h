@@ -1,6 +1,7 @@
 #ifndef __PLAYLIST_H__
 #define __PLAYLIST_H__
 
+/// @brief A simple container class for holding playlist entries.
 class Playlist
 {
 public:
@@ -36,7 +37,11 @@ public:
 	Playlist();
 	~Playlist();
 
+	/// Adds an entry to the bottom of the playlist.
 	void AddEntry(const std::string& file_path);
+
+	/// Removes the specified entry from the playlist.
+	/// @remark Will only remove the first entry found if there's duplicate entries.
 	void RemoveEntry(const std::string& file_path);
 
 	/// Clears all entries from the playlist

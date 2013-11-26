@@ -1,8 +1,6 @@
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 
-#include <Qstring>
-#include <QTimer>
 #include "stdint.h"
 
 #include "pipeline.h"
@@ -12,19 +10,26 @@ class Pipeline;
 class Bus;
 class PlayerWindow;
 
+/// @brief Class responsible for the player logic.
 class Player : public PipelineListener
 {
 public:
+	/// Constructor
+	/// @param window Pointer to the window handling this Player.
 	Player(PlayerWindow* window);
 	~Player();
 
+	/// Sets which window the video should output to.
 	void SetVideoOutput(uintptr_t window_handle);
 
 	void Play();
 	void Pause();
 	void Stop();
 
+	/// Toggles the rewind mode. Rewind move meaning playback in reverse at x1 speed.
 	void ToggleRewind();
+
+	/// Toggles fast forward, meaning x2 speed.
 	void ToggleFastForward();
 	
 	/// Plays the next media in the playlist
@@ -62,8 +67,8 @@ public:
 	void Error(const std::string& msg);
 
 private:
+	/// Starts playback of the specified file.
 	void PlayMedia(const std::string& file_path);
-
 
 	enum PlaybackRate
 	{

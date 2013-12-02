@@ -1,4 +1,4 @@
-
+local path     = require "tundra.path"
 
 DefRule {
 	Name = "GenerateMoc",
@@ -11,9 +11,10 @@ DefRule {
 	},
 
 	Setup = function (env, data)
+		local base_name = path.get_filename_dir(data.Input) 
 		return {
 			InputFiles    = { data.Input },
-			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. data.Output },
+			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. base_name .. "/" .. data.Output },
 		}
 	end,
 }
@@ -29,9 +30,10 @@ DefRule {
 	},
 
 	Setup = function (env, data)
+		local base_name = path.get_filename_dir(data.Input) 
 		return {
 			InputFiles    = { data.Input },
-			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. data.Output },
+			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. base_name .. "/" .. data.Output },
 		}
 	end,
 }
@@ -47,9 +49,10 @@ DefRule {
 	},
 
 	Setup = function (env, data)
+		local base_name = path.get_filename_dir(data.Input) 
 		return {
 			InputFiles    = { data.Input },
-			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. data.Output },
+			OutputFiles   = { "$(OBJECTDIR)/_generated/" .. base_name .. "/" .. data.Output },
 		}
 	end,
 }
@@ -73,57 +76,20 @@ local function GenerateUISources(sources)
 	return result
 end
 
-Program {
-	Name = "MediaPlayer",
+StaticLibrary {
+	Name = "Shared",
 	Sources = {
 		FGlob {
-			Dir = "src",
+			Dir = "src/shared",
 			Extensions = { ".c", ".cpp", ".h", ".inl" },
 			Filters = {
 				{ Pattern = "win32"; Config = "win32-*-*"; },
 			},
 		},
-		GenerateMocSources {
-			Glob { 
-				Dir = "src/qt", 
-				Extensions = { ".h" } 
-			}, 
-		},
-		GenerateUISources {
-			Glob { 
-				Dir = "src/qt", 
-				Extensions = { ".ui" } 
-			}, 
-		},
-		GenerateQRC {
-			Input = "data/application.qrc",
-			Output = "application.cpp"
-		}
 	},
-	Env = {
-		CPPPATH = { 
-			"$(GSTREAMER_INCLUDE)",
-			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
-			"$(GSTREAMER_INCLUDE)/glib-2.0",
-			"$(GSTREAMER_INCLUDE)/libxml2",
-			"$(GSTREAMER_LIBS)/glib-2.0/include",
-			"$(QT5_INCLUDE)/QtWidgets",
-			"$(QT5_INCLUDE)/QtGui",
-			"$(QT5_INCLUDE)/QtCore", 
-			"$(QT5_INCLUDE)/QtANGLE", 
-			"$(QT5_INCLUDE)",
-			"$(OBJECTDIR)/_generated/",
-		},
-		LIBPATH = {
-			"$(GSTREAMER_LIBS)",
-			"$(QT5_LIBS)",
-		},
-		PROGOPTS = {
-			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
-			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
-		},
-	},
-	Libs = { 
+}
+
+local program_lib = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
 			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
 			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib"; 
@@ -136,10 +102,123 @@ Program {
 			"Qt5Core", "Qt5Widgets", "Qt5Gui";
 			Config = { "linux-*-*" } 
 		}
+	}
+
+Program {
+	Name = "MediaPlayer",
+	Depends = { "Shared" },
+	Sources = {
+		FGlob {
+			Dir = "src/mediaplayer",
+			Extensions = { ".c", ".cpp", ".h", ".inl" },
+			Filters = {
+				{ Pattern = "win32"; Config = "win32-*-*"; },
+			},
+		},
+		GenerateMocSources {
+			Glob { 
+				Dir = "src/mediaplayer/qt", 
+				Extensions = { ".h" } 
+			}, 
+		},
+		GenerateUISources {
+			Glob { 
+				Dir = "src/mediaplayer/qt", 
+				Extensions = { ".ui" } 
+			}, 
+		},
+		GenerateQRC {
+			Input = "data/mediaplayer/application.qrc",
+			Output = "application.cpp"
+		}
 	},
+	Env = {	
+		CPPPATH = { 
+			"$(GSTREAMER_INCLUDE)",
+			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
+			"$(QT5_INCLUDE)/QtWidgets",
+			"$(QT5_INCLUDE)/QtGui",
+			"$(QT5_INCLUDE)/QtCore", 
+			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)",
+			"src",
+			"$(OBJECTDIR)/_generated/src/mediaplayer/qt",
+		},
+		LIBPATH = {
+			"$(GSTREAMER_LIBS)",
+			"$(QT5_LIBS)",
+		},
+		PROGOPTS = {
+			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
+			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
+		},
+	},
+	Libs = program_lib,
 
 	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
 
 }
-Default "MediaPlayer"
+
+Program {
+	Name = "VoiceChat",	
+	Depends = { "Shared" },
+	Sources = {
+		FGlob {
+			Dir = "src/voicechat",
+			Extensions = { ".c", ".cpp", ".h", ".inl" },
+			Filters = {
+				{ Pattern = "win32"; Config = "win32-*-*"; },
+			},
+		},
+		GenerateMocSources {
+			Glob { 
+				Dir = "src/voicechat/qt", 
+				Extensions = { ".h" } 
+			}, 
+		},
+		GenerateUISources {
+			Glob { 
+				Dir = "src/voicechat/qt", 
+				Extensions = { ".ui" } 
+			}, 
+		},
+		GenerateQRC {
+			Input = "data/voicechat/application.qrc",
+			Output = "application.cpp"
+		}
+	},
+	Env = {	
+		CPPPATH = { 
+			"$(GSTREAMER_INCLUDE)",
+			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
+			"$(QT5_INCLUDE)/QtWidgets",
+			"$(QT5_INCLUDE)/QtGui",
+			"$(QT5_INCLUDE)/QtCore", 
+			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)",
+			"src",
+			"$(OBJECTDIR)/_generated/src/mediaplayer/qt",
+		},
+		LIBPATH = {
+			"$(GSTREAMER_LIBS)",
+			"$(QT5_LIBS)",
+		},
+		PROGOPTS = {
+			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
+			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
+		},
+	},
+	Libs = program_lib,
+
+	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
+
+}
+
+Default "VoiceChat"
 

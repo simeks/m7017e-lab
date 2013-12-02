@@ -1,4 +1,4 @@
-#include "../common.h"
+#include "shared/common.h"
 
 #include "playlistwindow.h"
 #include "ui_playlistwindow.h"

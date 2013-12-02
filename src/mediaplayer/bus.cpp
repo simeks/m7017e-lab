@@ -1,4 +1,4 @@
-#include "common.h"
+#include "shared/common.h"
 
 #include "bus.h"
 #include "pipeline.h"

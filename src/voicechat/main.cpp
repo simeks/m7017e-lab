@@ -1,9 +1,4 @@
-#include "common.h"
-
-#include "player.h"
-
-#include <QApplication>
-#include "qt/playerwindow.h"
+#include "shared/common.h"
 
 
 #if defined(_WIN32) && !defined(DEBUG)
@@ -18,12 +13,8 @@ int main(int argc, char *argv[])
     int argc = 1;
 #endif
 
-    QApplication app(argc, argv);
-	PlayerWindow window;
-
-	window.show();
-
-	return app.exec();
+	debug::Printf("Hello world!");
 
 
+	return 0;
 }

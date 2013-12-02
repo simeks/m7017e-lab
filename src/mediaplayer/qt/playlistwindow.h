@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QListWidget>
-#include "../common.h"
+#include "shared/common.h"
 
 namespace Ui {
 class PlaylistWindow;

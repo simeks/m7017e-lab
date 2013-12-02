@@ -16,12 +16,16 @@ local win32_config = {
 			"/wd4250", -- C4250: "inherits '...' via dominance"
 			"/wd4127", -- C4127: conditional expression is constant
 			"/wd4244", -- C4244: '=' : conversion from 'Glib::IOCondition' to 'gushort', possible loss of data"
+			"/wd4512", -- C4512: assignment operator could not be generated.
+			"/wd4481", -- C4481: nonstandard extensino used
 			{ "/Od"; Config = "*-*-debug" },
 			{ "/O2"; Config = {"*-*-release", "*-*-production"} },
 		},
 		GENERATE_PDB = {
 			{ "0"; Config = "*-vs2012-release" },
 			{ "1"; Config = { "*-vs2012-debug", "*-vs2012-production" } },
+			{ "0"; Config = "*-vs2010-release" },
+			{ "1"; Config = { "*-vs2010-debug", "*-vs2010-production" } },
 		}
 	},
 }
@@ -78,15 +82,20 @@ Build {
 			Inherit = macosx_config,
 		},
 		Config {
+			Name = 'win32-vs2010',
+			Tools = { { "msvc-vs2010"; TargetArch = "x86" }, },
+			Inherit = win32_config,
+		},
+		Config {
 			Name = 'win32-vs2012',
-			Tools = { { "msvc-vs2012"; TargetArch = "x86" }, },
+			Tools = { { "msvc-vs2012"; TargetArch = "x86" }, }, 
 			DefaultOnHost = "windows",
 			Inherit = win32_config,
 		},
 		Config {
-		        Name = "linux-gcc",
-		        DefaultOnHost = "linux",
-		        Tools = { "gcc" },
+			Name = "linux-gcc",
+			DefaultOnHost = "linux",
+			Tools = { "gcc" },
 			Inherit = linux_config,
 		},
 	},
@@ -116,8 +125,6 @@ Build {
 		MsvcSolutions = {
 			['m7017e-lab.sln'] = {},          -- receives all the units due to empty set
 		},
-		
-		BuildAllByDefault = true,
 	},
 
 	Passes = {

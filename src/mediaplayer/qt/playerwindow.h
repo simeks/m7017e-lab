@@ -1,7 +1,7 @@
 #ifndef PLAYERWINDOW_H
 #define PLAYERWINDOW_H
 
-#include "../common.h"
+#include "shared/common.h"
 #include <QMainWindow>
 #include <QTimer>
 #include <QToolButton>

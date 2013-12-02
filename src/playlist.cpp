@@ -2,6 +2,7 @@
 
 #include "playlist.h"
 
+#include <algorithm>
 
 Playlist::Iterator::Iterator(const std::vector<std::string>* entries)
 	: _entries(entries), _current_index(-1)

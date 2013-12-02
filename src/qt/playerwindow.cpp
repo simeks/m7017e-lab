@@ -129,7 +129,7 @@ PlayerWindow::~PlayerWindow()
 	delete ui;
 }
 
-void PlayerWindow::TrackStarted(int playlist_index, const std::string& track_name)
+void PlayerWindow::TrackStarted(int, const std::string& track_name)
 {
 	// Clear video widget to make sure it isn't showing any left over frame
 	_video_widget->update();

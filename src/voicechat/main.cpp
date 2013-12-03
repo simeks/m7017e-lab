@@ -1,4 +1,7 @@
-#include "shared/common.h"
+#include <QApplication>
+#include "qt/mainwindow.h"
+
+#include "../shared/common.h"
 
 
 #if defined(_WIN32) && !defined(DEBUG)
@@ -13,8 +16,9 @@ int main(int argc, char *argv[])
     int argc = 1;
 #endif
 
-	debug::Printf("Hello world!");
-
-
-	return 0;
+    QApplication app(argc, argv);
+    MainWindow w;
+    w.show();
+	
+	return app.exec();
 }

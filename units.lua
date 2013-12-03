@@ -203,7 +203,7 @@ Program {
 			"$(QT5_INCLUDE)/QtANGLE", 
 			"$(QT5_INCLUDE)",
 			"src",
-			"$(OBJECTDIR)/_generated/src/mediaplayer/qt",
+			"$(OBJECTDIR)/_generated/src/voicechat/qt",
 		},
 		LIBPATH = {
 			"$(GSTREAMER_LIBS)",

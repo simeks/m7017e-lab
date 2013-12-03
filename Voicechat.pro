@@ -17,3 +17,6 @@ SOURCES += src/voicechat/main.cpp src/voicechat/qt/mainwindow.cpp
 HEADERS  += src/voicechat/qt/mainwindow.h
 
 FORMS    += src/voicechat/qt/mainwindow.ui
+
+RESOURCES += \
+    data/voicechat/application.qrc

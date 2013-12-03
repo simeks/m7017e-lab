@@ -25,3 +25,13 @@ void MainWindow::on_lineEdit_returnPressed()
         ui->lineEdit->clear();
     }
 }
+
+void MainWindow::on_muteVolume_toggled(bool toggled)
+{
+
+}
+
+void MainWindow::on_muteMic_toggled(bool toggled)
+{
+
+}

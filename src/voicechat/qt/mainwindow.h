@@ -18,6 +18,10 @@ public:
 private slots:
     void on_lineEdit_returnPressed();
 
+    void on_muteVolume_toggled(bool toggled);
+
+    void on_muteMic_toggled(bool toggled);
+
 private:
     Ui::MainWindow *ui;
 };

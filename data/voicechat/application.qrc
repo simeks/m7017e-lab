@@ -1,4 +1,6 @@
 <RCC>
     <qresource prefix="/">
+        <file>images/muteButton.png</file>
+        <file>images/muteMic.png</file>
     </qresource>
 </RCC>

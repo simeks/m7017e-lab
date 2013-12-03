@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>464</width>
-    <height>441</height>
+    <width>510</width>
+    <height>437</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
      <number>3</number>
     </property>
@@ -31,53 +31,51 @@
      <number>3</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>3</number>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <item>
-       <widget class="QTreeWidget" name="treeWidget">
-        <property name="headerHidden">
-         <bool>true</bool>
+      <widget class="QTreeWidget" name="treeWidget">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string>Rooms</string>
         </property>
-        <column>
-         <property name="text">
-          <string>Rooms</string>
-         </property>
-        </column>
+       </column>
+       <item>
+        <property name="text">
+         <string>Room 1</string>
+        </property>
         <item>
          <property name="text">
-          <string>Room 1</string>
+          <string>Person 1</string>
          </property>
-         <item>
-          <property name="text">
-           <string>Person 1</string>
-          </property>
-         </item>
+        </item>
+       </item>
+       <item>
+        <property name="text">
+         <string>Room 2</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Person 2</string>
+         </property>
         </item>
         <item>
          <property name="text">
-          <string>Room 2</string>
+          <string>Person 3</string>
          </property>
-         <item>
-          <property name="text">
-           <string>Person 2</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Person 3</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Person 4</string>
-          </property>
-         </item>
         </item>
-       </widget>
-      </item>
-      <item>
+        <item>
+         <property name="text">
+          <string>Person 4</string>
+         </property>
+        </item>
+       </item>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
          <number>3</number>
@@ -102,8 +100,8 @@
          <widget class="QLineEdit" name="lineEdit"/>
         </item>
        </layout>
-      </item>
-     </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -112,13 +110,55 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>464</width>
+     <width>510</width>
      <height>21</height>
     </rect>
    </property>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="muteVolume"/>
+   <addaction name="muteMic"/>
+  </widget>
+  <action name="muteVolume">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/voicechat/application.qrc">
+     <normaloff>:/images/muteButton.png</normaloff>:/images/muteButton.png</iconset>
+   </property>
+   <property name="text">
+    <string>muteVolume</string>
+   </property>
+  </action>
+  <action name="muteMic">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../data/voicechat/application.qrc">
+     <normaloff>:/images/muteMic.png</normaloff>:/images/muteMic.png</iconset>
+   </property>
+   <property name="text">
+    <string>muteMic</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../../../data/voicechat/application.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,4 +1,5 @@
 #include "shared/common.h"
+#include "shared/netprotocol.h"
 
 #include "server.h"
 #include "user.h"
@@ -22,6 +23,21 @@ Server::~Server()
 {
 	_tcp_server->close();
 	delete _tcp_server;
+}
+
+void Server::SendChatMessage(const std::string& sender, const std::string& message)
+{
+	char msg_header = net_server_msg::NET_CHAT_MSG;
+
+	std::vector<User*>::iterator it, end;
+	it = _users.begin(); end = _users.end();
+	for( ; it != end; ++it)
+	{
+		(*it)->Socket()->write(&msg_header, 1);
+		(*it)->Socket()->write(sender.c_str(), sender.size()+1); // +1 to include the '\0'.
+		(*it)->Socket()->write(message.c_str(), message.size()+1); // +1 to include the '\0'.
+		(*it)->Socket()->flush();
+	}
 }
 
 void Server::UserDisconnected(User* user)

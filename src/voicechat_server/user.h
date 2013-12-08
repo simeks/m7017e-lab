@@ -25,9 +25,22 @@ private slots:
 	void ReadyRead();
 
 private:
+	/// @brief Reads a hello message from the socket.
+	void ReadHelloMsg();
+
+	/// @brief Reads a chat message from the socket.
+	void ReadChatMsg();
+
+
+	/// @brief Sends a welcome message to a client.
+	void SendWelcomeMsg();
+
+private:
 	Server* _server;
 	QTcpSocket* _socket;
 
+	bool _authed;
+	std::string _name;
 
 };
 

@@ -13,6 +13,11 @@ class Server : public QObject
 public:
 	Server(int tcp_port, int udp_port_min, int udp_port_max);
 	~Server();
+	
+	/// @brief Broadcasts a chat message to all users.
+	/// @param sender Name of the sender.
+	/// @param message The actual message.
+	void SendChatMessage(const std::string& sender, const std::string& message);
 
 	/// @brief Notifies the server about a disconnected user.
 	void UserDisconnected(User* user);

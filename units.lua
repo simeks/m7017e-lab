@@ -87,6 +87,16 @@ StaticLibrary {
 			},
 		},
 	},
+	Env = {	
+		CPPPATH = { 
+			"$(GSTREAMER_INCLUDE)",
+			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
+			"src",
+		},
+	},
 }
 
 local program_lib = { 
@@ -217,6 +227,29 @@ Program {
 	Libs = program_lib,
 
 	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
+
+}
+
+Program {
+	Name = "VoiceChatServer",	
+	Depends = { "Shared" },
+	Sources = {
+		FGlob {
+			Dir = "src/voicechat_server",
+			Extensions = { ".c", ".cpp", ".h", ".inl" },
+			Filters = {
+				{ Pattern = "win32"; Config = "win32-*-*"; },
+			},
+		},
+	},
+	Env = {	
+		CPPPATH = { 
+			"src",
+		},
+		PROGOPTS = {
+			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-*" } },
+		},
+	},
 
 }
 

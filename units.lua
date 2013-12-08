@@ -241,16 +241,38 @@ Program {
 				{ Pattern = "win32"; Config = "win32-*-*"; },
 			},
 		},
+		GenerateMocSources {
+			Glob { 
+				Dir = "src/voicechat_server", 
+				Extensions = { ".h" } 
+			}, 
+		},
 	},
 	Env = {	
 		CPPPATH = { 
 			"src",
+			"$(QT5_INCLUDE)/QtCore", 
+			"$(QT5_INCLUDE)/QtNetwork", 
+			"$(QT5_INCLUDE)",
+		},
+		LIBPATH = {
+			"$(QT5_LIBS)",
 		},
 		PROGOPTS = {
 			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-*" } },
 		},
 	},
+	Libs = { 
+		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", "WS2_32.lib",
+			"Qt5Core.lib", "Qt5Network.lib"; 
+			Config = { "win32-*-*" } 
+		},
+		{
+			"Qt5Core", "Qt5Network"; Config = { "linux-*-*" } 
+		}
+	},
 
+	Frameworks = { "QtCore", "QtNetwork"  },	
 }
 
 Default "VoiceChat"

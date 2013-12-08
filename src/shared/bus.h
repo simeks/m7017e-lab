@@ -3,7 +3,18 @@
 
 #include <gst/gst.h>
 
-class PipelineListener;
+/// @brief Callbacks for pipeline messages
+class PipelineListener
+{
+public:
+	virtual ~PipelineListener() {}
+
+	/// Notifies that the stream has reach its end.
+	virtual void EndOfStream() {}
+
+	/// Notifies that an error as occured in the pipeline.
+	virtual void Error(const std::string& ) {}
+};
 
 /// Class responsible for polling messages from the pipeline.
 class Bus

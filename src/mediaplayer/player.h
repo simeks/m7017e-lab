@@ -3,7 +3,7 @@
 
 #include "stdint.h"
 
-#include "pipeline.h"
+#include "shared/bus.h"
 #include "playlist.h"
 
 class Pipeline;

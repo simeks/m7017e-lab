@@ -2,7 +2,6 @@
 
 #include "player.h"
 #include "pipeline.h"
-#include "bus.h"
 #include "qt/playerwindow.h"
 
 Player::Player(PlayerWindow* window) :

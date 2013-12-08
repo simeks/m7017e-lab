@@ -1,7 +1,7 @@
 #include "shared/common.h"
 
 #include "pipeline.h"
-#include "bus.h"
+#include "shared/bus.h"
 
 #include <gst/interfaces/xoverlay.h>
 

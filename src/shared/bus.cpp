@@ -1,7 +1,6 @@
 #include "shared/common.h"
 
 #include "bus.h"
-#include "pipeline.h"
 
 Bus::Bus(GstBus* bus) : _bus(bus), _listener(NULL)
 {

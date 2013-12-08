@@ -2,10 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "connectdialog.h"
+#include "../client.h"
 
 namespace Ui {
 class MainWindow;
 }
+
+class Client;
+class ConnectDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -15,6 +20,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void Connected();
+
 private slots:
     void on_lineEdit_returnPressed();
 
@@ -22,8 +29,12 @@ private slots:
 
     void on_muteMic_toggled(bool toggled);
 
+    void on_actionConnect_triggered();
+
 private:
     Ui::MainWindow *ui;
+    ConnectDialog* _connect_dialog;
+    Client* _client;
 };
 
 #endif // MAINWINDOW_H

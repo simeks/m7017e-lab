@@ -12,11 +12,16 @@ TARGET = Voicechat
 TEMPLATE = app
 
 
-SOURCES += src/voicechat/main.cpp src/voicechat/qt/mainwindow.cpp
+SOURCES += src/voicechat/main.cpp src/voicechat/qt/mainwindow.cpp \
+    src/voicechat/qt/connectdialog.cpp \
+    src/voicechat/client.cpp
 
-HEADERS  += src/voicechat/qt/mainwindow.h
+HEADERS  += src/voicechat/qt/mainwindow.h \
+    src/voicechat/qt/connectdialog.h \
+    src/voicechat/client.h \
 
-FORMS    += src/voicechat/qt/mainwindow.ui
+FORMS    += src/voicechat/qt/mainwindow.ui \
+    src/voicechat/qt/connectdialog.ui
 
 RESOURCES += \
     data/voicechat/application.qrc

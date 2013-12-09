@@ -10,15 +10,37 @@ Server messages:
 
 // Welcome message that the server sends to a user after receiving a Hello message.
 {
-	"msg_type" = "NET_WELCOME",
-	"udp_port" = <UDP port for gstreamer>
+	"msg_type" : "NET_WELCOME",
+	"udp_port" : <UDP port for gstreamer>,
 }
 
 // Message the server sends when broadcasting a chat message
 {
-	"msg_type" = "NET_CHAT_MSG",
-	"username" = "<username>",
-	"chat_msg" = "<chat message>",
+	"msg_type" : "NET_CHAT_MSG",
+	"username" : "<username>",
+	"chat_msg" : "<chat message>",
+}
+
+// Message containing a snapshot of the servers current state, all channels and users
+{
+	"msg_type" : "NET_SERVER_STATE",
+	"channels" : [
+		{ "id" : <channel id>, "parent_id" : <parent id>, "name" : "<channel name>" } 
+		...
+	],
+	"users" : [
+		{ "id" : <user id>, "name" : "<user name>", "channel" : <channel id> }
+		...
+	]
+}
+
+// Message indicating a change in a users state
+{
+	"msg_type" : "NET_USER_STATE",
+	"user_id" : <user id>,
+	"username" : "<username>",
+	"online" : <true/false>, 
+	"channel" : <channel id>
 }
 
 */
@@ -28,37 +50,20 @@ Client messages:
 
 // Hello message that the client sends to the server when connecting.
 {
-	"msg_type" = "NET_HELLO",
-	"username" = "<username>"
+	"msg_type" : "NET_HELLO",
+	"username" : "<username>"
 }
 
 // Message the client sends to the server when sending a chat message
 {
-	"msg_type" = "NET_CHAT_MSG",
-	"chat_msg" = "<chat message>",
+	"msg_type" : "NET_CHAT_MSG",
+	"chat_msg" : "<chat message>",
 }
 
 */
 
 
 class ConfigValue;
-
-
-/// @brief Utilities for formatting network messages
-namespace net_server
-{
-	/// @brief Formats a welcome message.
-	/// @param msg_object This is the object that will contain the message.
-	/// @param udp_port The UDP port used for streaming audio.
-	void CreateWelcomeMsg(ConfigValue& msg_object, int udp_port);
-
-	/// @brief Formats a chat message.
-	/// @param msg_object This is the object that will contain the message.
-	/// @param username Name of the sender.
-	/// @param message The actual chat message.
-	void CreateChatMsg(ConfigValue& msg_object, const std::string& username, const std::string& message);
-
-};
 
 /// @brief Message definitions for messages from the client.
 namespace net_client

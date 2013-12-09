@@ -1,15 +1,20 @@
 #include "shared/common.h"
-#include "shared/netprotocol.h"
 #include "shared/configvalue.h"
 #include "shared/json.h"
 
+#include "netprotocol.h"
 #include "server.h"
 #include "user.h"
+#include "channel.h"
 
 
 Server::Server(int tcp_port, int udp_port_min, int udp_port_max)
-	: _tcp_port(tcp_port)
+	: _tcp_port(tcp_port),
+	_next_uid(0)
 {
+	// Create our root channel, which will get ID 0
+	CreateChannel("root", (uint32_t)-1); // -1 indicates that there is no parent channel
+
 	// Fill our list of free udp ports
 	for(int p = udp_port_min; p <= udp_port_max; ++p)
 		_free_udp_ports.push_back(p);
@@ -33,6 +38,13 @@ Server::~Server()
 	}
 	_users.clear();
 
+	// Release all existing channels
+	for(std::vector<Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		delete (*it);
+	}
+	_channels.clear();
+
 	_tcp_server->close();
 	delete _tcp_server;
 }
@@ -49,6 +61,12 @@ void Server::BroadcastMessage(const ConfigValue& msg_object)
 void Server::UserDisconnected(User* user)
 {
 	debug::Printf("User \"%s\" disconnected.\n", user->Socket()->peerAddress().toString().toLocal8Bit().constData());
+	
+	// Broadcast that a user disconnected.
+	ConfigValue msg;
+	net_server::CreateUserStateMsg(msg, user, false);
+
+	BroadcastMessage(msg);
 
 	// Remove the user from our user list.
 	std::vector<User*>::iterator it = std::find(_users.begin(), _users.end(), user);
@@ -62,6 +80,19 @@ void Server::UserDisconnected(User* user)
 		// Free the user object
 		delete user;
 	}
+}
+
+/// @brief Creates a new channel with the specified name.
+void Server::CreateChannel(const std::string& name, int parent_channel)
+{
+	Channel* channel = new Channel(_next_uid++, parent_channel, name);
+	_channels.push_back(channel);
+
+	// Broadcast the changed state to all users
+	ConfigValue msg;
+	net_server::CreateServerStateMsg(msg, _channels, _users);
+
+	BroadcastMessage(msg);
 }
 
 void Server::NewConnection()
@@ -82,9 +113,14 @@ void Server::NewConnection()
 	int udp_port = _free_udp_ports.back();
 	_free_udp_ports.pop_back();
 
-	User* user = new User(this, client_socket, udp_port);
+	User* user = new User(_next_uid++, this, client_socket, udp_port);
 	_users.push_back(user);
 
+	// Broadcast that we have a new user
+	ConfigValue msg;
+	net_server::CreateUserStateMsg(msg, user, true);
+
+	BroadcastMessage(msg);
 }
 
 

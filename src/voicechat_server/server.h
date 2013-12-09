@@ -6,6 +6,7 @@
 #include <QTcpServer>
 
 class User;
+class Channel;
 class ConfigValue;
 class Server : public QObject
 {
@@ -22,6 +23,10 @@ public:
 	/// @brief Notifies the server about a disconnected user.
 	void UserDisconnected(User* user);
 
+	/// @brief Creates a new channel with the specified name.
+	/// @param name Name of the new channel.
+	/// @param parent_channel Specifies the parent channel, 0 means the root channel, -1 indicates that there is no parent channel.
+	void CreateChannel(const std::string& name, int parent_channel = 0);
 
 private slots:
 	void NewConnection();
@@ -33,6 +38,9 @@ private:
 	QTcpServer* _tcp_server;
 
 	std::vector<User*> _users;
+	std::vector<Channel*> _channels;
+
+	int _next_uid; // Used for generating new unique identifiers for server objects such as users and channels.
 };
 
 

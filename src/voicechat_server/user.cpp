@@ -1,17 +1,19 @@
 #include "shared/common.h"
-#include "shared/netprotocol.h"
 #include "shared/configvalue.h"
 #include "shared/json.h"
 
+#include "netprotocol.h"
 #include "user.h"
 #include "server.h"
 
-User::User(Server* server, QTcpSocket* socket, int udp_port) 
-	: _server(server),
+User::User(int user_id, Server* server, QTcpSocket* socket, int udp_port) 
+	: _user_id(user_id),
+	_channel_id(-1), // -1 indicates that the user is currently not in any channel
+	_server(server),
 	_socket(socket),
 	_udp_port(udp_port),
 	_authed(false),	
-	_name("Unnamed")
+	_name("Noname")
 
 {
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
@@ -38,6 +40,21 @@ void User::SendMessage(const ConfigValue& msg_object)
 
 	_socket->write(data.c_str(), data.size()+1); // +1 for the terminator (\0)
 	_socket->flush();
+}
+
+const std::string& User::Name() const
+{
+	return _name;
+}
+
+int User::Id() const
+{
+	return _user_id;
+}
+
+int User::Channel() const
+{
+	return _channel_id;
 }
 
 int User::UdpPort() const

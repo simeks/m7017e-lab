@@ -95,6 +95,56 @@ void Server::CreateChannel(const std::string& name, int parent_channel)
 	BroadcastMessage(msg);
 }
 
+void Server::MoveUser(int user_id, int channel_id)
+{
+	User* user = GetUser(user_id);
+	if(!user)
+	{
+		debug::Printf("[Error] Server::MoveUser: No user with id %d.", user_id);
+		return; // Not a valid user, nothing to do.
+	}
+
+	Channel* channel = GetChannel(channel_id);
+	if(!channel)
+	{
+		debug::Printf("[Error] Server::MoveUser: No channel with id %d.", channel_id);
+		return; // Not a valid channel, nothing to do.
+	}
+
+	// First remove the user from any old channel
+	if(channel_id >= 0)
+	{
+		Channel* old_channel = GetChannel(channel_id);
+		assert(old_channel);
+
+		old_channel->RemoveUser(user);
+	}
+
+	// Then add it to the new one
+	channel->AddUser(user);
+	// Notify the user about the new channel
+	user->SetChannel(channel_id);
+}
+
+User* Server::GetUser(int id)
+{
+	for(std::vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		if((*it)->Id() == id)
+			return (*it);
+	}
+	return NULL;
+}
+Channel* Server::GetChannel(int id)
+{
+	for(std::vector<Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		if((*it)->Id() == id)
+			return (*it);
+	}
+	return NULL;
+}
+
 void Server::NewConnection()
 {
 	QTcpSocket* client_socket = _tcp_server->nextPendingConnection();
@@ -121,6 +171,9 @@ void Server::NewConnection()
 	net_server::CreateUserStateMsg(msg, user, true);
 
 	BroadcastMessage(msg);
+
+	// Move the user to the root channel
+	MoveUser(user->Id(), 0);
 }
 
 

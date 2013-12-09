@@ -32,7 +32,7 @@ namespace json
 		Reader();
 		~Reader();
 
-		/// Parses a simplified-JSON document into ConfigValues
+		/// Parses a JSON document into ConfigValues
 		///	@param doc JSON docoument
 		///	@param root This is going to be the root node
 		///	@return True if the parsing was successful, else false
@@ -40,7 +40,6 @@ namespace json
 		
 		/// Returns an error message if the last call to Parse failed.
 		const std::string& GetErrorMessage();
-
 
 	private:
 		const char* _begin;

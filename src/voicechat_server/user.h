@@ -31,6 +31,9 @@ public:
 	/// @return Channel id, -1 if currently not in any channel.
 	int Channel() const; 
 
+	/// @brief Sets a new channel for this user.
+	void SetChannel(int channel_id);
+
 	/// @brief Returns the UDP port used by this user.
 	int UdpPort() const;
 

@@ -57,6 +57,11 @@ int User::Channel() const
 	return _channel_id;
 }
 
+void User::SetChannel(int channel_id)
+{
+	_channel_id = channel_id;
+}
+
 int User::UdpPort() const
 {
 	return _udp_port;

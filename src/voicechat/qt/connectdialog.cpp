@@ -24,10 +24,10 @@ void ConnectDialog::on_pushButton_clicked()
 
     if (!userName.isEmpty() && !serverIP.isEmpty() && !serverPortText.isEmpty())
     {
-        _client->ConnectClicked();
         _client->SetUserName(userName);
         _client->SetServerIp(serverIP);
         _client->SetServerPort(serverPort);
+        _client->ConnectClicked();
 
         this->close();
     }

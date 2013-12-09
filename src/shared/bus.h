@@ -2,6 +2,7 @@
 #define __BUS_H__
 
 #include <gst/gst.h>
+#include <string>
 
 /// @brief Callbacks for pipeline messages
 class PipelineListener

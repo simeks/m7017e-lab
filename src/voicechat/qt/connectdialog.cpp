@@ -17,13 +17,18 @@ ConnectDialog::~ConnectDialog()
 
 void ConnectDialog::on_pushButton_clicked()
 {
-    QString userName = ui->lineEdit->text();
-    QString serverIP = ui->lineEdit_2->text();
-    QString serverPort = ui->lineEdit_3->text();
+    QString userName = ui->userNameEdit->text();
+    QString serverIP = ui->serverIpEdit->text();
+    QString serverPortText = ui->serverPortEdit->text();
+    int serverPort = serverPortText.toInt();
 
-    if (!userName.isEmpty() && !serverIP.isEmpty() && !serverPort.isEmpty())
+    if (!userName.isEmpty() && !serverIP.isEmpty() && !serverPortText.isEmpty())
     {
         _client->ConnectClicked();
+        _client->SetUserName(userName);
+        _client->SetServerIp(serverIP);
+        _client->SetServerPort(serverPort);
+
         this->close();
     }
     else

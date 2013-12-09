@@ -102,7 +102,7 @@ StaticLibrary {
 local program_lib = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
 			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
-			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib"; 
+			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "WS2_32.lib"; 
 			Config = { "win32-*-*" } 
 		},
 		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10";
@@ -185,7 +185,7 @@ Program {
 		},
 		GenerateMocSources {
 			Glob { 
-				Dir = "src/voicechat/qt", 
+				Dir = "src/voicechat", 
 				Extensions = { ".h" } 
 			}, 
 		},
@@ -211,6 +211,7 @@ Program {
 			"$(QT5_INCLUDE)/QtGui",
 			"$(QT5_INCLUDE)/QtCore", 
 			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)/QtNetwork", 
 			"$(QT5_INCLUDE)",
 			"src",
 			"$(OBJECTDIR)/_generated/src/voicechat/qt",
@@ -224,7 +225,7 @@ Program {
 			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
 		},
 	},
-	Libs = program_lib,
+	Libs = program_lib, 
 
 	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
 

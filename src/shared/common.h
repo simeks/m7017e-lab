@@ -19,4 +19,6 @@
 #include "debug.h"
 #include "util.h"
 
+#include <assert.h>
+
 #endif // __COMMON_H__

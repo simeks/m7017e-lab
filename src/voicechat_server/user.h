@@ -13,13 +13,19 @@ class User : public QObject
 public:
 	/// Constructor
 	/// @param socket An open socket for the connection to this user.
-	User(Server* server, QTcpSocket* socket);
+	/// @param udp_port The udp port assigned to this user for media streaming.
+	User(Server* server, QTcpSocket* socket, int udp_port);
 	~User();
 
 	/// @brief Sends a message object to this User.
 	void SendMessage(const ConfigValue& msg_object);
 
+	// @brief Returns the UDP port used by this user.
+	int UdpPort() const;
+
+	/// @brief Returns the TCP socket for this user.
 	QTcpSocket* Socket();
+
 
 private slots:
 	/// @brief The socket disconnected.
@@ -55,6 +61,7 @@ private:
 	Server* _server;
 	QTcpSocket* _socket;
 
+	int _udp_port;
 	bool _authed;
 	std::string _name;
 

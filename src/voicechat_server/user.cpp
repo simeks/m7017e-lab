@@ -6,9 +6,10 @@
 #include "user.h"
 #include "server.h"
 
-User::User(Server* server, QTcpSocket* socket) 
+User::User(Server* server, QTcpSocket* socket, int udp_port) 
 	: _server(server),
 	_socket(socket),
+	_udp_port(udp_port),
 	_authed(false),	
 	_name("Unnamed")
 
@@ -39,6 +40,10 @@ void User::SendMessage(const ConfigValue& msg_object)
 	_socket->flush();
 }
 
+int User::UdpPort() const
+{
+	return _udp_port;
+}
 QTcpSocket* User::Socket()
 {
 	return _socket;
@@ -104,9 +109,8 @@ void User::ProcessMessage(const std::string& message)
 void User::SendWelcomeMsg()
 {
 	ConfigValue msg_object;
-	int udp_port = 0; // TODO: Set this later
 
-	net_server::CreateWelcomeMsg(msg_object, udp_port);
+	net_server::CreateWelcomeMsg(msg_object, _udp_port);
 
 	SendMessage(msg_object);
 }

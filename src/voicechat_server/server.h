@@ -28,8 +28,7 @@ private slots:
 
 private:
 	int _tcp_port;
-	int _udp_port_min;
-	int _udp_port_max;
+	std::vector<int> _free_udp_ports; // List of available udp ports we can assign to new clients
 
 	QTcpServer* _tcp_server;
 

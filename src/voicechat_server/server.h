@@ -6,6 +6,7 @@
 #include <QTcpServer>
 
 class User;
+class ConfigValue;
 class Server : public QObject
 {
 	Q_OBJECT;
@@ -14,10 +15,9 @@ public:
 	Server(int tcp_port, int udp_port_min, int udp_port_max);
 	~Server();
 	
-	/// @brief Broadcasts a chat message to all users.
-	/// @param sender Name of the sender.
-	/// @param message The actual message.
-	void SendChatMessage(const std::string& sender, const std::string& message);
+	/// @brief Broadcasts a  message to all users.
+	/// @param msg_object The object to send.
+	void BroadcastMessage(const Configvalue& msg_object);
 
 	/// @brief Notifies the server about a disconnected user.
 	void UserDisconnected(User* user);

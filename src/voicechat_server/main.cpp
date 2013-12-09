@@ -45,7 +45,6 @@ bool ParseCommandLine(int argc, char* argv[], int& port)
 	return true;
 }
 
-
 int main(int argc, char* argv[])
 {
 	int tcp_port = 25010;

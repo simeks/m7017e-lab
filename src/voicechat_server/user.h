@@ -29,19 +29,27 @@ private slots:
 	void ReadyRead();
 
 private:
+	typedef void (User::*MessageCallback)(const ConfigValue&);
+
+	/// @brief Registers a callback for the specified message type.
+	///	The registered callback will be called every time we recieve a packet of the specified type.
+	void RegisterCallback(const std::string& msg_type, MessageCallback callback);
+
 	/// @brief Processes a message.
 	void ProcessMessage(const std::string& message);
 
-
-	/// @brief Reads a hello message from the socket.
-	void ReadHelloMsg(const ConfigValue& msg_object);
-
-	/// @brief Reads a chat message from the socket.
-	void ReadChatMsg(const ConfigValue& msg_object);
-
-
 	/// @brief Sends a welcome message to a client.
 	void SendWelcomeMsg();
+
+
+	/// Message callbacks
+
+	/// @brief Reads a hello message from the socket.
+	void OnHelloMsg(const ConfigValue& msg_object);
+
+	/// @brief Reads a chat message from the socket.
+	void OnChatMsg(const ConfigValue& msg_object);
+
 
 private:
 	Server* _server;
@@ -50,6 +58,7 @@ private:
 	bool _authed;
 	std::string _name;
 
+	std::map<std::string, MessageCallback> _message_callbacks;
 };
 
 

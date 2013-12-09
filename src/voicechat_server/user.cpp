@@ -15,6 +15,10 @@ User::User(Server* server, QTcpSocket* socket)
 {
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
+
+	// Register callbacks
+	RegisterCallback("NET_HELLO", &User::OnHelloMsg);
+	RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
 }
 User::~User()
 {
@@ -31,12 +35,8 @@ void User::SendMessage(const ConfigValue& msg_object)
 
 	std::string data = ss.str(); // The data to send.
 
-	// Send the data to all users
-	for(std::vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it)
-	{
-		_socket->write(data.c_str(), data.size()+1); // +1 for the terminator (\0)
-		_socket->flush();
-	}
+	_socket->write(data.c_str(), data.size()+1); // +1 for the terminator (\0)
+	_socket->flush();
 }
 
 QTcpSocket* User::Socket()
@@ -63,6 +63,11 @@ void User::ReadyRead()
 	}
 }
 
+void User::RegisterCallback(const std::string& msg_type, MessageCallback callback)
+{
+	_message_callbacks[msg_type] = callback;
+}
+
 void User::ProcessMessage(const std::string& message)
 {
 	if(message.empty())
@@ -84,10 +89,29 @@ void User::ProcessMessage(const std::string& message)
 		return;
 	}
 
+	std::string msg_type = msg_object["msg_type"].AsString();
+
+	// Call any callbacks notifying them about the new message
+	std::map<std::string, MessageCallback>::iterator it = _message_callbacks.find(msg_type);
+	if (it != _message_callbacks.end())
+	{
+		// Callback found, invoke it
+		(this->*(it->second))(msg_object);
+	}
 
 }
 
-void User::ReadHelloMsg(const ConfigValue& msg_object)
+void User::SendWelcomeMsg()
+{
+	ConfigValue msg_object;
+	int udp_port = 0; // TODO: Set this later
+
+	net_server::CreateWelcomeMsg(msg_object, udp_port);
+
+	SendMessage(msg_object);
+}
+
+void User::OnHelloMsg(const ConfigValue& msg_object)
 {
 	if(msg_object["username"].IsString()) // If the name is empty, set to default name
 		_name = msg_object["username"].AsString();
@@ -99,7 +123,7 @@ void User::ReadHelloMsg(const ConfigValue& msg_object)
 	SendWelcomeMsg();
 }
 
-void User::ReadChatMsg(const ConfigValue& msg_object)
+void User::OnChatMsg(const ConfigValue& msg_object)
 {
 	std::string message = "";
 
@@ -107,18 +131,11 @@ void User::ReadChatMsg(const ConfigValue& msg_object)
 		message = msg_object["message"].AsString();
 	
 	if(_authed && message.size()) // Only send if actually authed
-		_server->SendChatMessage(_name, message);
+	{
+		ConfigValue msg_object;
+		net_server::CreateChatMsg(msg_object, _name, message);
+
+		_server->BroadcastMessage(msg_object);
+	}
 }
 
-void User::SendWelcomeMsg()
-{
-
-
-
-	uint8_t msg = net_server_msg::NET_WELCOME;
-	_socket->write((char*)&msg, 1);
-	
-	int udp_port = 0; // TODO: Set this later
-	_socket->write((char*)&udp_port, 4);
-	_socket->flush();
-}

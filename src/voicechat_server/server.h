@@ -17,7 +17,7 @@ public:
 	
 	/// @brief Broadcasts a  message to all users.
 	/// @param msg_object The object to send.
-	void BroadcastMessage(const Configvalue& msg_object);
+	void BroadcastMessage(const ConfigValue& msg_object);
 
 	/// @brief Notifies the server about a disconnected user.
 	void UserDisconnected(User* user);

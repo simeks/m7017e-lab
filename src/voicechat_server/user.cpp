@@ -95,6 +95,8 @@ void User::ProcessMessage(const std::string& message)
 	if(message.empty())
 		return;
 
+	debug::Printf("[Msg] %s\n", message.c_str());
+
 	// Read the json formatted message
 	json::Reader json_reader;
 
@@ -142,11 +144,13 @@ void User::OnChatMsg(const ConfigValue& msg_object)
 {
 	std::string message = "";
 
-	if(msg_object["message"].IsString())
-		message = msg_object["message"].AsString();
+	if(msg_object["chat_msg"].IsString())
+		message = msg_object["chat_msg"].AsString();
 	
 	if(_authed && message.size()) // Only send if actually authed
 	{
+		debug::Printf("[Chat] %s: %s\n", _name.c_str(), message.c_str());
+
 		ConfigValue msg_object;
 		net_server::CreateChatMsg(msg_object, _name, message);
 

@@ -6,7 +6,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include "../shared/bus.h"
-
+#include <QDebug>
 
 
 #include "../shared/messagecallbackhandler.h"

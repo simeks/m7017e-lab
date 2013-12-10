@@ -59,7 +59,6 @@ void Client::SendMessage(const ConfigValue& msg_object)
 
     std::string data = ss.str();
 
-
     _socket->write(data.c_str(), data.size()+1);
     _socket->flush();
 }
@@ -67,7 +66,7 @@ void Client::SendMessage(const ConfigValue& msg_object)
 void Client::SendHelloMessage(const QString &username)
 {
     ConfigValue msg_object;
-    std::string uname = username.toLocal8Bit().constData(); // convert from Qstring to std::string
+    std::string uname = username.toStdString(); // convert from Qstring to std::string
 
     net_client::CreateHelloMsg(msg_object, uname.c_str());
     SendMessage(msg_object);
@@ -76,7 +75,7 @@ void Client::SendHelloMessage(const QString &username)
 void Client::SendChatMessage(const QString &message)
  {
     ConfigValue msg_object;
-    std::string mess = message.toLocal8Bit().constData();
+    std::string mess = message.toStdString();
 
     net_client::CreateChatMsg(msg_object, mess.c_str());
     SendMessage(msg_object);
@@ -135,17 +134,36 @@ void Client::ProcessMessage(const std::string& message)
 
 	_callback_handler.InvokeCallback(msg_type, msg_object);
 }
+
 void Client::OnWelcomeMsg(const ConfigValue& msg_object)
 {
+    std::string message = "";
 
+    if(msg_object["chat_msg"].IsString())
+        message = msg_object["message"].AsString();
+
+    QString mess = QString::fromStdString(message);
+
+    _window->OnMessageRecieved(mess);
 }
 
 void Client::OnChatMsg(const ConfigValue& msg_object)
 {
+    std::string message = "";
+
+    if(msg_object["chat_msg"].IsString())
+        message = msg_object["message"].AsString();
+
+    QString mess = QString::fromStdString(message);
+
+    _window->OnMessageRecieved(mess);
 }
+
 void Client::OnServerState(const ConfigValue& msg_object)
 {
+
 }
+
 void Client::OnUserState(const ConfigValue& msg_object)
 {
 

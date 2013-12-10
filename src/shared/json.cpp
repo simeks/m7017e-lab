@@ -246,7 +246,7 @@ bool json::Reader::ParseString(std::string& str)
 			};
 		}
 
-		str.append(c,1);
+		str.append(1, c);
 	}
 	if(quotes)
 		_cur++; // Trailing "

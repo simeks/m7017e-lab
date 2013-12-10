@@ -31,7 +31,7 @@ void Client::ConnectClicked()
     if(_socket->waitForConnected(500))
     {
         _window->Connected();
-        sendHelloMessage(_user_name);
+        SendHelloMessage(_user_name);
     }
 }
 
@@ -50,43 +50,47 @@ void Client::SetServerPort(int port)
     _server_port = port;
 }
 
-void Client::sendHelloMessage(const QString &username)
+void Client::SendMessage(const ConfigValue& msg_object)
+{
+    json::Writer json_writer;
+
+    std::stringstream ss;
+    json_writer.Write(msg_object, ss, false);
+
+    std::string data = ss.str();
+
+
+    _socket->write(data.c_str(), data.size()+1);
+    _socket->flush();
+}
+
+void Client::SendHelloMessage(const QString &username)
 {
     ConfigValue msg_object;
     std::string uname = username.toLocal8Bit().constData(); // convert from Qstring to std::string
 
     net_client::CreateHelloMsg(msg_object, uname.c_str());
-
-    json::Writer json_writer;
-
-    std::stringstream ss;
-    json_writer.Write(msg_object, ss, false);
-
-    std::string data = ss.str();
-
-    _socket->write(data.c_str(), data.size()+1);
-    _socket->flush();
-
+    SendMessage(msg_object);
 }
 
-void Client::sendChatMessage(const QString &message)
+void Client::SendChatMessage(const QString &message)
  {
     ConfigValue msg_object;
     std::string mess = message.toLocal8Bit().constData();
 
     net_client::CreateChatMsg(msg_object, mess.c_str());
-
-    json::Writer json_writer;
-
-    std::stringstream ss;
-    json_writer.Write(msg_object, ss, false);
-
-    std::string data = ss.str();
-
-    _socket->write(data.c_str(), data.size()+1);
-    _socket->flush();
-
+    SendMessage(msg_object);
  }
+
+void Client::MuteMic(bool toggled)
+{
+
+}
+
+void Client::MuteVolume(bool toggled)
+{
+
+}
 void Client::Disconnected()
 {
 
@@ -144,4 +148,5 @@ void Client::OnServerState(const ConfigValue& msg_object)
 }
 void Client::OnUserState(const ConfigValue& msg_object)
 {
+
 }

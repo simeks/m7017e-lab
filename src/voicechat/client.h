@@ -2,13 +2,14 @@
 #define CLIENT_H
 
 #include "qt/mainwindow.h"
-#include "shared/netprotocol.h"
+#include "../shared/netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
-#include <QDebug>
-#include <string>
+#include "../shared/bus.h"
 
-#include "shared/messagecallbackhandler.h"
+
+
+#include "../shared/messagecallbackhandler.h"
 
 class MainWindow;
 class ConfigValue;
@@ -28,9 +29,11 @@ public:
     void SetServerIp(QString serverIP);
     void SetUserName(QString userName);
     void SetServerPort(int port);
-    void sendChatMessage(const QString &message);
-    void sendHelloMessage(const QString &message);
-
+    void SendChatMessage(const QString &message);
+    void SendHelloMessage(const QString &message);
+    void SendMessage(const ConfigValue& msg_object);
+    void MuteVolume(bool toggled);
+    void MuteMic(bool toggled);
 
 private slots:
 	/// @brief The socket disconnected.

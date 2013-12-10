@@ -21,6 +21,8 @@ public:
     ~MainWindow();
 
     void Connected();
+    void ChangeChannel(QString username);
+    void OnMessageRecieved(QString text);
 
 private slots:
     void on_lineEdit_returnPressed();

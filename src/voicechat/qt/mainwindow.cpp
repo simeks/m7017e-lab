@@ -32,7 +32,8 @@ void MainWindow::on_lineEdit_returnPressed()
 
     if (!text.isEmpty())
     {
-        ui->textEdit->append(text);
+        _client->sendChatMessage(text);
+        //ui->textEdit->append(text);
         ui->lineEdit->clear();
     }
 }

@@ -3,12 +3,16 @@
 
 #include "../shared/bus.h"
 #include "qt/mainwindow.h"
+#include "../shared/netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
-
+#include <QDebug>
+#include <string>
+#include "../shared/bus.h"
 
 
 class MainWindow;
+class ConfigValue;
 
 class Client : public QObject
 {
@@ -24,7 +28,8 @@ public:
     void SetServerIp(QString serverIP);
     void SetUserName(QString userName);
     void SetServerPort(int port);
-
+    void sendChatMessage(const QString &message);
+    void sendHelloMessage(const QString &message);
 
 
 

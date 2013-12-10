@@ -95,11 +95,14 @@ void User::ProcessMessage(const std::string& message)
 	if(message.empty())
 		return;
 
+	std::string amessage = "{ \"msg_type\": \"NET_HELLO\", \"username\": \"asd\" }";
+	debug::Printf("Receive msg: %s\n", amessage.c_str());
+
 	// Read the json formatted message
 	json::Reader json_reader;
 
 	ConfigValue msg_object;
-	if(!json_reader.Read(message.c_str(), message.size(), msg_object))
+	if(!json_reader.Read(amessage.c_str(), amessage.size(), msg_object))
 	{
 		debug::Printf("[Error] Failed to read message: %s\n", json_reader.GetErrorMessage().c_str());
 		return;

@@ -3,6 +3,7 @@
 #include "server.h"
 
 #include <QCoreApplication>
+#include <gst/gst.h>
 
 void ShowHelp()
 {
@@ -47,6 +48,9 @@ bool ParseCommandLine(int argc, char* argv[], int& port)
 
 int main(int argc, char* argv[])
 {
+	// initialize gstreamer
+	gst_init(&argc, &argv);
+
 	int tcp_port = 25010;
 	int udp_min = 25011; // Udp range: 25011 - 25111 (max 100 ports)
 	int udp_max = 25111;

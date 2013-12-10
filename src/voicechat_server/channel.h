@@ -3,6 +3,8 @@
 
 class User;
 class Server;
+class ChannelPipeline;
+
 class Channel
 {
 public:
@@ -33,6 +35,7 @@ private:
 
 	std::string _name;
 
+	ChannelPipeline* _pipeline;
 };
 
 

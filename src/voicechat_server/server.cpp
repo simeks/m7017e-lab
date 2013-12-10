@@ -85,7 +85,7 @@ void Server::UserDisconnected(User* user)
 /// @brief Creates a new channel with the specified name.
 void Server::CreateChannel(const std::string& name, int parent_channel)
 {
-	Channel* channel = new Channel(_next_uid++, parent_channel, name);
+	Channel* channel = new Channel(_next_uid++, parent_channel, name, this);
 	_channels.push_back(channel);
 
 	// Broadcast the changed state to all users

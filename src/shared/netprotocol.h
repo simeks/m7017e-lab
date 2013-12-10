@@ -5,6 +5,7 @@
 *	Below are the definitions of all these messages.
 */
 
+
 /**
 Server messages:
 
@@ -64,6 +65,7 @@ Client messages:
 
 
 class ConfigValue;
+
 
 /// @brief Message definitions for messages from the client.
 namespace net_client

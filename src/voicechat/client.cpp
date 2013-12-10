@@ -6,9 +6,14 @@
 #include "../shared/json.h"
 
 Client::Client(MainWindow* window) :
-    _window(window)
+    _window(window),
+	_callback_handler(this)
 {
-
+	// Register callbacks
+	_callback_handler.RegisterCallback("NET_WELCOME", &Client::OnWelcomeMsg);
+	_callback_handler.RegisterCallback("NET_CHAT_MSG", &Client::OnChatMsg);
+	_callback_handler.RegisterCallback("NET_SERVER_STATE", &Client::OnServerState);
+	_callback_handler.RegisterCallback("NET_USER_STATE", &Client::OnUserState);
 }
 Client::~Client()
 {
@@ -17,10 +22,13 @@ Client::~Client()
 
 void Client::ConnectClicked()
 {
-    socket = new QTcpSocket(this);
-    socket->connectToHost(_server_ip, _server_port);
+    _socket = new QTcpSocket(this);
+    _socket->connectToHost(_server_ip, _server_port);
+	
+	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 
-    if(socket->waitForConnected(500))
+    if(_socket->waitForConnected(500))
     {
         _window->Connected();
         sendHelloMessage(_user_name);
@@ -56,8 +64,8 @@ void Client::sendHelloMessage(const QString &username)
 
     std::string data = ss.str();
 
-    socket->write(data.c_str(), data.size()+1);
-    socket->flush();
+    _socket->write(data.c_str(), data.size()+1);
+    _socket->flush();
 
 }
 
@@ -75,7 +83,65 @@ void Client::sendChatMessage(const QString &message)
 
     std::string data = ss.str();
 
-    socket->write(data.c_str(), data.size()+1);
-    socket->flush();
+    _socket->write(data.c_str(), data.size()+1);
+    _socket->flush();
 
  }
+void Client::Disconnected()
+{
+
+}
+void Client::ReadyRead()
+{
+	std::string msg = "";
+
+	// Read the message character by character until we reach the terminator
+	char c;
+	while(_socket->read(&c, 1))
+	{
+		if(c == '\0')
+			ProcessMessage(msg);
+
+		msg += c;
+	}
+}
+
+void Client::ProcessMessage(const std::string& message)
+{
+	if(message.empty())
+		return;
+
+	// Read the json formatted message
+	json::Reader json_reader;
+
+	ConfigValue msg_object;
+	if(!json_reader.Read(message.c_str(), message.size(), msg_object))
+	{
+		debug::Printf("[Error] Failed to read message: %s\n", json_reader.GetErrorMessage().c_str());
+		return;
+	}
+
+	if(!msg_object["msg_type"].IsString())
+	{
+		debug::Printf("[Error] Invalid message, missing msg_type\n");
+		return;
+	}
+
+	std::string msg_type = msg_object["msg_type"].AsString();
+
+	_callback_handler.InvokeCallback(msg_type, msg_object);
+}
+void Client::OnWelcomeMsg(const ConfigValue& msg_object)
+{
+
+}
+
+void Client::OnChatMsg(const ConfigValue& msg_object)
+{
+}
+void Client::OnServerState(const ConfigValue& msg_object)
+{
+}
+void Client::OnUserState(const ConfigValue& msg_object)
+{
+}

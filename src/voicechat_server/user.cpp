@@ -13,15 +13,15 @@ User::User(int user_id, Server* server, QTcpSocket* socket, int udp_port)
 	_socket(socket),
 	_udp_port(udp_port),
 	_authed(false),	
-	_name("Noname")
-
+	_name("Noname"),
+	_callback_handler(this)
 {
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 
 	// Register callbacks
-	RegisterCallback("NET_HELLO", &User::OnHelloMsg);
-	RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
+	_callback_handler.RegisterCallback("NET_HELLO", &User::OnHelloMsg);
+	_callback_handler.RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
 }
 User::~User()
 {
@@ -90,11 +90,6 @@ void User::ReadyRead()
 	}
 }
 
-void User::RegisterCallback(const std::string& msg_type, MessageCallback callback)
-{
-	_message_callbacks[msg_type] = callback;
-}
-
 void User::ProcessMessage(const std::string& message)
 {
 	if(message.empty())
@@ -119,13 +114,7 @@ void User::ProcessMessage(const std::string& message)
 	std::string msg_type = msg_object["msg_type"].AsString();
 
 	// Call any callbacks notifying them about the new message
-	std::map<std::string, MessageCallback>::iterator it = _message_callbacks.find(msg_type);
-	if (it != _message_callbacks.end())
-	{
-		// Callback found, invoke it
-		(this->*(it->second))(msg_object);
-	}
-
+	_callback_handler.InvokeCallback(msg_type, msg_object);
 }
 
 void User::SendWelcomeMsg()

@@ -1,18 +1,18 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include "../shared/bus.h"
 #include "qt/mainwindow.h"
-#include "../shared/netprotocol.h"
+#include "shared/netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
 #include <QDebug>
 #include <string>
-#include "../shared/bus.h"
 
+#include "shared/messagecallbackhandler.h"
 
 class MainWindow;
 class ConfigValue;
+
 
 class Client : public QObject
 {
@@ -32,7 +32,30 @@ public:
     void sendHelloMessage(const QString &message);
 
 
+private slots:
+	/// @brief The socket disconnected.
+	void Disconnected();
 
+	/// @brief Ready to read from the socket.
+	void ReadyRead();
+
+private:
+	typedef void (Client::*MessageCallback)(const ConfigValue&);
+	
+	/// @brief Registers a callback for the specified message type.
+	///	The registered callback will be called every time we recieve a packet of the specified type.
+	void RegisterCallback(const std::string& msg_type, MessageCallback callback);
+
+
+	/// @brief Processes a message.
+	void ProcessMessage(const std::string& message);
+
+	// Callback methods
+
+	void OnWelcomeMsg(const ConfigValue& msg_object);
+	void OnChatMsg(const ConfigValue& msg_object);
+	void OnServerState(const ConfigValue& msg_object);
+	void OnUserState(const ConfigValue& msg_object);
 
 
 private:
@@ -40,7 +63,9 @@ private:
     QString _server_ip;
     QString _user_name;
     int _server_port;
-    QTcpSocket* socket;
+    QTcpSocket* _socket;
+	
+	MessageCallbackHandler<Client> _callback_handler;
 };
 
 

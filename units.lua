@@ -252,26 +252,24 @@ Program {
 	Env = {	
 		CPPPATH = { 
 			"src",
+			"$(GSTREAMER_INCLUDE)",
+			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
 			"$(QT5_INCLUDE)/QtCore", 
 			"$(QT5_INCLUDE)/QtNetwork", 
 			"$(QT5_INCLUDE)",
 		},
 		LIBPATH = {
+			"$(GSTREAMER_LIBS)",
 			"$(QT5_LIBS)",
 		},
 		PROGOPTS = {
 			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-*" } },
 		},
 	},
-	Libs = { 
-		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", "WS2_32.lib",
-			"Qt5Core.lib", "Qt5Network.lib"; 
-			Config = { "win32-*-*" } 
-		},
-		{
-			"Qt5Core", "Qt5Network"; Config = { "linux-*-*" } 
-		}
-	},
+	Libs = program_lib,
 
 	Frameworks = { "QtCore", "QtNetwork"  },	
 }

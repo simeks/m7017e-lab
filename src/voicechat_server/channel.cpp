@@ -2,7 +2,6 @@
 
 #include "channel.h"
 #include "user.h"
-#include "channel_pipeline.h"
 
 
 Channel::Channel(int channel_id, int parent_id, const std::string& channel_name, Server* server) 
@@ -11,11 +10,9 @@ Channel::Channel(int channel_id, int parent_id, const std::string& channel_name,
 	_parent_id(parent_id),
 	_name(channel_name)
 {
-	_pipeline = new ChannelPipeline();
 }
 Channel::~Channel()
 {
-	delete _pipeline;
 }
 
 void Channel::AddUser(User* user)

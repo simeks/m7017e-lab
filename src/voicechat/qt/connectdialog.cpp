@@ -7,7 +7,9 @@ ConnectDialog::ConnectDialog(Client* client, QWidget *parent) :
     _client(client)
 {
     ui->setupUi(this);
-
+	ui->userNameEdit->setText("Nameless");
+	ui->serverIpEdit->setText("localhost");
+	ui->serverPortEdit->setText("25010");
 }
 
 ConnectDialog::~ConnectDialog()

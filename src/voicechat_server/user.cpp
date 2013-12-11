@@ -62,10 +62,6 @@ void User::SetChannel(int channel_id)
 	_channel_id = channel_id;
 }
 
-int User::UdpPort() const
-{
-	return _udp_port;
-}
 QTcpSocket* User::Socket()
 {
 	return _socket;
@@ -94,8 +90,6 @@ void User::ProcessMessage(const std::string& message)
 {
 	if(message.empty())
 		return;
-
-	debug::Printf("[Msg] %s\n", message.c_str());
 
 	// Read the json formatted message
 	json::Reader json_reader;
@@ -135,6 +129,8 @@ void User::OnHelloMsg(const ConfigValue& msg_object)
 
 	// Mark the user as authed, meaning it is allowed to actually do stuff.
 	_authed = true;
+
+	debug::Printf("User authed: %s\n", _name.c_str());
 
 	// Send a welcome message to the new client
 	SendWelcomeMsg();

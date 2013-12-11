@@ -35,7 +35,6 @@ private:
 
 	std::string _name;
 
-	ChannelPipeline* _pipeline;
 };
 
 

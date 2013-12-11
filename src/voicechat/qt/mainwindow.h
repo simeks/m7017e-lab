@@ -21,6 +21,7 @@ public:
     ~MainWindow();
 
     void Connected();
+	void Disconnected();
     void ChangeChannel(QString username);
     void OnMessageRecieved(QString text);
 

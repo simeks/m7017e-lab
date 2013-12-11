@@ -6,18 +6,17 @@
 #include "server.h"
 #include "user.h"
 #include "channel.h"
+#include "server_pipeline.h"
 
 
-Server::Server(int tcp_port, int udp_port_min, int udp_port_max)
+Server::Server(int tcp_port, int udp_port)
 	: _tcp_port(tcp_port),
-	_next_uid(0)
+	_udp_port(udp_port),
+	_next_uid(0),
+	_tick_timer(this)
 {
 	// Create our root channel, which will get ID 0
 	CreateChannel("root", (uint32_t)-1); // -1 indicates that there is no parent channel
-
-	// Fill our list of free udp ports
-	for(int p = udp_port_min; p <= udp_port_max; ++p)
-		_free_udp_ports.push_back(p);
 
 	_tcp_server = new QTcpServer(this);
 
@@ -27,6 +26,13 @@ Server::Server(int tcp_port, int udp_port_min, int udp_port_max)
 	{
 		debug::Printf("[Error] Failed to start server.\n");
 	}
+
+	_pipeline = new ServerPipeline(_udp_port);
+
+	// Registers a timer which will update our pipeline at a regular interval.
+	_tick_timer.setInterval(25);
+	_tick_timer.start();
+	connect(&_tick_timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 }
 Server::~Server()
 {
@@ -47,6 +53,7 @@ Server::~Server()
 
 	_tcp_server->close();
 	delete _tcp_server;
+	delete _pipeline;
 }
 
 void Server::BroadcastMessage(const ConfigValue& msg_object)
@@ -72,9 +79,6 @@ void Server::UserDisconnected(User* user)
 	std::vector<User*>::iterator it = std::find(_users.begin(), _users.end(), user);
 	if(it != _users.end())
 	{
-		// Release the users udp port
-		_free_udp_ports.push_back((*it)->UdpPort());
-
 		_users.erase(it);
 		
 		// Free the user object
@@ -149,19 +153,8 @@ void Server::NewConnection()
 {
 	QTcpSocket* client_socket = _tcp_server->nextPendingConnection();
 
-	debug::Printf("New connection from %s.\n", client_socket->peerAddress().toString().toLocal8Bit().constData());
-
-	// Assign an udp port to the user
-	if(_free_udp_ports.empty())
-	{
-		// No available ports, therefore we need to reject this connect.
-		debug::Printf("No free udp ports available, rejecting connection.\n");
-		client_socket->close();
-		return;
-	}
-
-	int udp_port = _free_udp_ports.back();
-	_free_udp_ports.pop_back();
+	int udp_port = _udp_port+_next_uid; // We generate a unique udp port for each user, this is mostly for testing purposes on localhost
+	debug::Printf("New connection from %s. (Port: %d)\n", client_socket->peerAddress().toString().toLocal8Bit().constData(), udp_port);
 
 	User* user = new User(_next_uid++, this, client_socket, udp_port);
 	_users.push_back(user);
@@ -174,6 +167,17 @@ void Server::NewConnection()
 
 	// Move the user to the root channel
 	MoveUser(user->Id(), 0);
+
+	std::string addr = user->Socket()->peerAddress().toString().toLocal8Bit().constData();
+	if(user->Socket()->peerAddress().isLoopback()) // 127.0.0.1 doesn't seem to be working with gstreamer so we need to change to localhost (Issues with ipv4 vs ipv6 maybe?)
+		addr = "localhost";
+
+	_pipeline->AddReceiver(user->Id(), addr, _udp_port+user->Id());
+}
+void Server::TimerTick()
+{
+	if(_pipeline)
+		_pipeline->Tick();
 }
 
 

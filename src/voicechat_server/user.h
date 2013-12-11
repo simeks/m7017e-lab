@@ -36,9 +36,6 @@ public:
 	/// @brief Sets a new channel for this user.
 	void SetChannel(int channel_id);
 
-	/// @brief Returns the UDP port used by this user.
-	int UdpPort() const;
-
 	/// @brief Returns the TCP socket for this user.
 	QTcpSocket* Socket();
 

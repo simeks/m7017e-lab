@@ -63,3 +63,9 @@ void MainWindow::Connected()
     ui->lineEdit->setEnabled(true);
     ui->treeWidget->showColumn(0);
 }
+
+void MainWindow::Disconnected()
+{
+    ui->lineEdit->setEnabled(false);
+	ui->treeWidget->hideColumn(0);
+}

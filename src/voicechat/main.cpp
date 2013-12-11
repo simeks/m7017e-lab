@@ -10,6 +10,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 int main(int argc, char *argv[])
 #endif
 {
+	gst_init(&argc, &argv);
 
 #if defined(_WIN32) && !defined(DEBUG)
     char** argv = __argv;

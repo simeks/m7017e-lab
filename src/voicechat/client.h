@@ -2,18 +2,21 @@
 #define CLIENT_H
 
 #include "qt/mainwindow.h"
-#include "../shared/netprotocol.h"
+#include "shared/netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
-#include "../shared/bus.h"
+#include "shared/bus.h"
 #include <QDebug>
+#include <QTimer>
 
 
-#include "../shared/messagecallbackhandler.h"
+#include "shared/messagecallbackhandler.h"
 
 class MainWindow;
 class ConfigValue;
 
+class ReceiverPipeline;
+class SenderPipeline;
 
 class Client : public QObject
 {
@@ -36,11 +39,17 @@ public:
     void MuteMic(bool toggled);
 
 private slots:
+	/// @brief The socket successfully connected
+	void Connected();
+
 	/// @brief The socket disconnected.
 	void Disconnected();
 
+
 	/// @brief Ready to read from the socket.
 	void ReadyRead();
+
+	void TimerTick();
 
 private:
 	typedef void (Client::*MessageCallback)(const ConfigValue&);
@@ -65,9 +74,15 @@ private:
     MainWindow* _window;
     QString _server_ip;
     QString _user_name;
-    int _server_port;
+    int _server_tcp_port;
+    int _server_udp_port; // The port to send audio to
+    int _listen_udp_port; // The port for receiving audio from.
     QTcpSocket* _socket;
+	QTimer _tick_timer;
 	
+	ReceiverPipeline* _receiver_pipeline;
+	SenderPipeline* _sender_pipeline;
+
 	MessageCallbackHandler<Client> _callback_handler;
 };
 

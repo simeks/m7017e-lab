@@ -1,38 +1,70 @@
-#include "../shared/common.h"
+#include "shared/common.h"
 
 #include "client.h"
 #include "qt/mainwindow.h"
-#include "../shared/configvalue.h"
-#include "../shared/json.h"
+#include "shared/configvalue.h"
+#include "shared/json.h"
+
+#include "receiverpipeline.h"
+#include "senderpipeline.h"
+
+#include <sstream>
+
+#include <qhostaddress.h>
+#include <qthread.h>
 
 Client::Client(MainWindow* window) :
     _window(window),
-	_callback_handler(this)
+	_callback_handler(this),
+	_server_udp_port(25011),
+	_server_tcp_port(25010),
+	_receiver_pipeline(NULL),
+	_sender_pipeline(NULL)
 {
+    _socket = new QTcpSocket(this);
+
 	// Register callbacks
 	_callback_handler.RegisterCallback("NET_WELCOME", &Client::OnWelcomeMsg);
 	_callback_handler.RegisterCallback("NET_CHAT_MSG", &Client::OnChatMsg);
 	_callback_handler.RegisterCallback("NET_SERVER_STATE", &Client::OnServerState);
 	_callback_handler.RegisterCallback("NET_USER_STATE", &Client::OnUserState);
+
+	// Registers a timer which will update our pipeline at a regular interval.
+	_tick_timer.setInterval(25);
+	_tick_timer.start();
+	connect(&_tick_timer, SIGNAL(timeout()), this, SLOT(TimerTick()));
 }
 Client::~Client()
 {
+	if(_socket)
+		delete _socket;
 
+	if(_receiver_pipeline)
+		delete _receiver_pipeline;
+
+	if(_sender_pipeline)
+		delete _sender_pipeline;
 }
 
 void Client::ConnectClicked()
 {
-    _socket = new QTcpSocket(this);
-    _socket->connectToHost(_server_ip, _server_port);
+	if(_socket->isOpen()) // Already connected
+	{
+		_window->OnMessageRecieved("[Warning] Already connected to a server!");
+		return;
+	}
 	
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
+	connect(_socket, SIGNAL(connected()), this, SLOT(Connected()));
+	
+    _socket->connectToHost(_server_ip, _server_tcp_port);
 
-    if(_socket->waitForConnected(500))
+    if(!_socket->waitForConnected(500))
     {
-        _window->Connected();
-        SendHelloMessage(_user_name);
-    }
+		_window->OnMessageRecieved("Failed to connect to server.");
+		_socket->close();
+	}
 }
 
 void Client::SetServerIp(QString serverIP)
@@ -47,7 +79,8 @@ void Client::SetUserName(QString userName)
 
 void Client::SetServerPort(int port)
 {
-    _server_port = port;
+    _server_tcp_port = port;
+	_server_udp_port = port;
 }
 
 void Client::SendMessage(const ConfigValue& msg_object)
@@ -58,9 +91,8 @@ void Client::SendMessage(const ConfigValue& msg_object)
     json_writer.Write(msg_object, ss, false);
 
     std::string data = ss.str();
-
+	
     _socket->write(data.c_str(), data.size()+1);
-    _socket->flush();
 }
 
 void Client::SendHelloMessage(const QString &username)
@@ -90,9 +122,28 @@ void Client::MuteVolume(bool toggled)
 {
 
 }
+void Client::Connected()
+{
+	_window->Connected();
+    SendHelloMessage(_user_name);
+}
 void Client::Disconnected()
 {
-
+	// Remove our pipelines
+	if(_sender_pipeline)
+	{
+		delete _sender_pipeline;
+		_sender_pipeline = NULL;
+	}
+	if(_receiver_pipeline)
+	{
+		delete _receiver_pipeline;
+		_receiver_pipeline = NULL;
+	}
+	
+	_window->OnMessageRecieved("Disconnected from server.");
+	_window->Disconnected();
+	_socket->close();
 }
 void Client::ReadyRead()
 {
@@ -108,6 +159,14 @@ void Client::ReadyRead()
 		msg += c;
 	}
 }
+void Client::TimerTick()
+{
+	if(_receiver_pipeline)
+		_receiver_pipeline->Tick();
+	if(_sender_pipeline)
+		_sender_pipeline->Tick();
+}
+
 
 void Client::ProcessMessage(const std::string& message)
 {
@@ -137,14 +196,26 @@ void Client::ProcessMessage(const std::string& message)
 
 void Client::OnWelcomeMsg(const ConfigValue& msg_object)
 {
-    std::string message = "";
+	if(msg_object["udp_port"].IsNumber())
+		_listen_udp_port = msg_object["udp_port"].AsInt();
 
-    if(msg_object["chat_msg"].IsString())
-        message = msg_object["message"].AsString();
+	std::stringstream ss;
+	ss << "[Server] You're now connnected successfully. UDP port: " << _listen_udp_port;
 
-    QString mess = QString::fromStdString(message);
+	_window->OnMessageRecieved(QString::fromStdString(ss.str()));
 
-    _window->OnMessageRecieved(mess);
+	// Create our pipelines
+	if(!_receiver_pipeline)
+		_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
+	
+	if(!_sender_pipeline)
+	{
+		std::string host = _socket->peerAddress().toString().toStdString();
+		if(_socket->peerAddress().isLoopback())
+			host = "localhost";
+
+		_sender_pipeline = new SenderPipeline(host, _server_udp_port);
+	}
 }
 
 void Client::OnChatMsg(const ConfigValue& msg_object)
@@ -152,7 +223,7 @@ void Client::OnChatMsg(const ConfigValue& msg_object)
     std::string message = "";
 
     if(msg_object["chat_msg"].IsString())
-        message = msg_object["message"].AsString();
+        message = msg_object["chat_msg"].AsString();
 
     QString mess = QString::fromStdString(message);
 

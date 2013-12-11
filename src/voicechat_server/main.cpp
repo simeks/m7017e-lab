@@ -52,8 +52,7 @@ int main(int argc, char* argv[])
 	gst_init(&argc, &argv);
 
 	int tcp_port = 25010;
-	int udp_min = 25011; // Udp range: 25011 - 25111 (max 100 ports)
-	int udp_max = 25111;
+	int udp_port = 25010;
 	if(!ParseCommandLine(argc, argv, tcp_port))
 	{
 		ShowHelp();
@@ -62,7 +61,7 @@ int main(int argc, char* argv[])
 
 	QCoreApplication app(argc, argv);
 
-	Server server(tcp_port, udp_min, udp_max);
+	Server server(tcp_port, udp_port);
 
 	return app.exec();
 }

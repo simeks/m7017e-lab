@@ -38,12 +38,13 @@ Client::~Client()
 {
 	if(_socket)
 		delete _socket;
+	
+	if(_sender_pipeline)
+		delete _sender_pipeline;
 
 	if(_receiver_pipeline)
 		delete _receiver_pipeline;
 
-	if(_sender_pipeline)
-		delete _sender_pipeline;
 }
 
 void Client::ConnectClicked()

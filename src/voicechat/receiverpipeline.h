@@ -16,12 +16,6 @@ public:
 
 private:
     GstElement* _pipeline;
-    GstElement* _udpsrc;
-    GstElement* _queue;
-    GstElement* _decoder;
-    GstElement* _audio_sink;
-    GstElement* _converter;
-    GstElement* _resample;
     Bus* _bus;
 
 };

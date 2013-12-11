@@ -13,15 +13,15 @@ User::User(int user_id, Server* server, QTcpSocket* socket, int udp_port)
 	_socket(socket),
 	_udp_port(udp_port),
 	_authed(false),	
-	_name("Noname")
-
+	_name("Noname"),
+	_callback_handler(this)
 {
 	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
 	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
 
 	// Register callbacks
-	RegisterCallback("NET_HELLO", &User::OnHelloMsg);
-	RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
+	_callback_handler.RegisterCallback("NET_HELLO", &User::OnHelloMsg);
+	_callback_handler.RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
 }
 User::~User()
 {
@@ -62,10 +62,6 @@ void User::SetChannel(int channel_id)
 	_channel_id = channel_id;
 }
 
-int User::UdpPort() const
-{
-	return _udp_port;
-}
 QTcpSocket* User::Socket()
 {
 	return _socket;
@@ -88,11 +84,6 @@ void User::ReadyRead()
 
 		msg += c;
 	}
-}
-
-void User::RegisterCallback(const std::string& msg_type, MessageCallback callback)
-{
-	_message_callbacks[msg_type] = callback;
 }
 
 void User::ProcessMessage(const std::string& message)
@@ -119,13 +110,7 @@ void User::ProcessMessage(const std::string& message)
 	std::string msg_type = msg_object["msg_type"].AsString();
 
 	// Call any callbacks notifying them about the new message
-	std::map<std::string, MessageCallback>::iterator it = _message_callbacks.find(msg_type);
-	if (it != _message_callbacks.end())
-	{
-		// Callback found, invoke it
-		(this->*(it->second))(msg_object);
-	}
-
+	_callback_handler.InvokeCallback(msg_type, msg_object);
 }
 
 void User::SendWelcomeMsg()
@@ -145,6 +130,8 @@ void User::OnHelloMsg(const ConfigValue& msg_object)
 	// Mark the user as authed, meaning it is allowed to actually do stuff.
 	_authed = true;
 
+	debug::Printf("User authed: %s\n", _name.c_str());
+
 	// Send a welcome message to the new client
 	SendWelcomeMsg();
 }
@@ -153,11 +140,13 @@ void User::OnChatMsg(const ConfigValue& msg_object)
 {
 	std::string message = "";
 
-	if(msg_object["message"].IsString())
-		message = msg_object["message"].AsString();
+	if(msg_object["chat_msg"].IsString())
+		message = msg_object["chat_msg"].AsString();
 	
 	if(_authed && message.size()) // Only send if actually authed
 	{
+		debug::Printf("[Chat] %s: %s\n", _name.c_str(), message.c_str());
+
 		ConfigValue msg_object;
 		net_server::CreateChatMsg(msg_object, _name, message);
 

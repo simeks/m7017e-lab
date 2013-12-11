@@ -4,16 +4,18 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QTcpServer>
+#include <QTimer>
 
 class User;
 class Channel;
 class ConfigValue;
+class ServerPipeline;
 class Server : public QObject
 {
 	Q_OBJECT;
 
 public:
-	Server(int tcp_port, int udp_port_min, int udp_port_max);
+	Server(int tcp_port, int udp_port);
 	~Server();
 	
 	/// @brief Broadcasts a  message to all users.
@@ -43,10 +45,15 @@ public:
 
 private slots:
 	void NewConnection();
+	void TimerTick();
 
 private:
 	int _tcp_port;
-	std::vector<int> _free_udp_ports; // List of available udp ports we can assign to new clients
+	int _udp_port;
+
+	QTimer _tick_timer;
+
+	ServerPipeline* _pipeline;
 
 	QTcpServer* _tcp_server;
 

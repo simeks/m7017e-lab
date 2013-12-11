@@ -24,27 +24,33 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_lineEdit_returnPressed()
 {
-
-    // skicka meddelandet till servern som sen det vidare till alla klienter?
-
-
     QString text = ui->lineEdit->text();
 
     if (!text.isEmpty())
     {
-        ui->textEdit->append(text);
+        _client->SendChatMessage(text);
         ui->lineEdit->clear();
     }
 }
 
-void MainWindow::on_muteVolume_toggled(bool toggled)
+void MainWindow::OnMessageRecieved(QString text)
+{
+    ui->textEdit->append(text);
+}
+
+void MainWindow::ChangeChannel(QString username)
 {
 
 }
 
+void MainWindow::on_muteVolume_toggled(bool toggled)
+{
+    _client->MuteVolume(toggled);
+}
+
 void MainWindow::on_muteMic_toggled(bool toggled)
 {
-
+    _client->MuteMic(toggled);
 }
 
 void MainWindow::on_actionConnect_triggered()
@@ -56,4 +62,10 @@ void MainWindow::Connected()
 {
     ui->lineEdit->setEnabled(true);
     ui->treeWidget->showColumn(0);
+}
+
+void MainWindow::Disconnected()
+{
+    ui->lineEdit->setEnabled(false);
+	ui->treeWidget->hideColumn(0);
 }

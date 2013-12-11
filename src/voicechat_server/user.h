@@ -3,6 +3,8 @@
 
 #include <QTcpSocket>
 
+#include "shared/messagecallbackhandler.h"
+
 class Server;
 class ConfigValue;
 
@@ -34,9 +36,6 @@ public:
 	/// @brief Sets a new channel for this user.
 	void SetChannel(int channel_id);
 
-	/// @brief Returns the UDP port used by this user.
-	int UdpPort() const;
-
 	/// @brief Returns the TCP socket for this user.
 	QTcpSocket* Socket();
 
@@ -50,12 +49,6 @@ private slots:
 	void ReadyRead();
 
 private:
-	typedef void (User::*MessageCallback)(const ConfigValue&);
-
-	/// @brief Registers a callback for the specified message type.
-	///	The registered callback will be called every time we recieve a packet of the specified type.
-	void RegisterCallback(const std::string& msg_type, MessageCallback callback);
-
 	/// @brief Processes a message.
 	void ProcessMessage(const std::string& message);
 
@@ -83,7 +76,7 @@ private:
 	bool _authed;
 	std::string _name;
 
-	std::map<std::string, MessageCallback> _message_callbacks;
+	MessageCallbackHandler<User> _callback_handler;
 };
 
 

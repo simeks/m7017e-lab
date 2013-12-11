@@ -2,6 +2,9 @@
 #define __CHANNEL_H__
 
 class User;
+class Server;
+class ChannelPipeline;
+
 class Channel
 {
 public:

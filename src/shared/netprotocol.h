@@ -78,7 +78,9 @@ namespace net_client
 	/// @brief Formats a chat message.
 	/// @param msg_object This is the object that will contain the message.
 	/// @param message The actual chat message.
-	void CreateChatMsg(ConfigValue& msg_object, const std::string& message);
+	void CreateChatMsg(ConfigValue& msg_object, const std::string& username, const std::string& message);
+	
+	void CreateUserStateMsg(ConfigValue& msg_object, const std::string& username, const std::string& prevChannel, const std::string& newChannel);
 	
 };
 

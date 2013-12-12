@@ -24,10 +24,11 @@ Client::Client(MainWindow* window) :
     _socket = new QTcpSocket(this);
 
 	// Register callbacks
-	_callback_handler.RegisterCallback("NET_WELCOME", &Client::OnWelcomeMsg);
+    _callback_handler.RegisterCallback("NET_WELCOME", &Client::OnWelcomeMsg);
 	_callback_handler.RegisterCallback("NET_CHAT_MSG", &Client::OnChatMsg);
 	_callback_handler.RegisterCallback("NET_SERVER_STATE", &Client::OnServerState);
-	_callback_handler.RegisterCallback("NET_USER_STATE", &Client::OnUserState);
+    _callback_handler.RegisterCallback("NET_USER_STATE", &Client::OnUserState);
+
 
 	// Registers a timer which will update our pipeline at a regular interval.
 	_tick_timer.setInterval(25);
@@ -50,21 +51,21 @@ void Client::ConnectClicked()
 {
 	if(_socket->isOpen()) // Already connected
 	{
-		_window->OnMessageRecieved("[Warning] Already connected to a server!");
+        _window->OnMessageRecieved("[Warning]", "Already connected to a server!");
 		return;
-	}
+    }
 	
-	connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
-	connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
-	connect(_socket, SIGNAL(connected()), this, SLOT(Connected()));
+    connect(_socket, SIGNAL(readyRead()), this, SLOT(ReadyRead()));
+    connect(_socket, SIGNAL(disconnected()), this, SLOT(Disconnected()));
+    connect(_socket, SIGNAL(connected()), this, SLOT(Connected()));
 	
     _socket->connectToHost(_server_ip, _server_tcp_port);
 
     if(!_socket->waitForConnected(500))
     {
-		_window->OnMessageRecieved("Failed to connect to server.");
-		_socket->close();
-	}
+        _window->OnMessageRecieved("", "Failed to connect to server.");
+        _socket->close();
+    }
 }
 
 void Client::SetServerIp(QString serverIP)
@@ -91,7 +92,9 @@ void Client::SendMessage(const ConfigValue& msg_object)
     json_writer.Write(msg_object, ss, false);
 
     std::string data = ss.str();
-	
+
+    // _window->OnMessageRecieved("", data.c_str());     //test för att se att rätt data skickas
+
     _socket->write(data.c_str(), data.size()+1);
 }
 
@@ -104,12 +107,13 @@ void Client::SendHelloMessage(const QString &username)
     SendMessage(msg_object);
 }
 
-void Client::SendChatMessage(const QString &message)
+void Client::SendChatMessage(const QString &username, const QString &message)
  {
     ConfigValue msg_object;
     std::string mess = message.toStdString();
+    std::string uname = username.toStdString();
 
-    net_client::CreateChatMsg(msg_object, mess.c_str());
+    net_client::CreateChatMsg(msg_object, uname.c_str(), mess.c_str());
     SendMessage(msg_object);
  }
 
@@ -124,6 +128,7 @@ void Client::MuteVolume(bool toggled)
 }
 void Client::Connected()
 {
+    _window->SetUserName(_user_name);
 	_window->Connected();
     SendHelloMessage(_user_name);
 }
@@ -141,7 +146,7 @@ void Client::Disconnected()
 		_receiver_pipeline = NULL;
 	}
 	
-	_window->OnMessageRecieved("Disconnected from server.");
+    _window->OnMessageRecieved("", "Disconnected from server.");
 	_window->Disconnected();
 	_socket->close();
 }
@@ -200,9 +205,9 @@ void Client::OnWelcomeMsg(const ConfigValue& msg_object)
 		_listen_udp_port = msg_object["udp_port"].AsInt();
 
 	std::stringstream ss;
-	ss << "[Server] You're now connnected successfully. UDP port: " << _listen_udp_port;
+    ss << "You're now connnected successfully. UDP port: " << _listen_udp_port;
 
-	_window->OnMessageRecieved(QString::fromStdString(ss.str()));
+    _window->OnMessageRecieved("[Server]", QString::fromStdString(ss.str()));
 
 	// Create our pipelines
 	if(!_receiver_pipeline)
@@ -221,13 +226,18 @@ void Client::OnWelcomeMsg(const ConfigValue& msg_object)
 void Client::OnChatMsg(const ConfigValue& msg_object)
 {
     std::string message = "";
+    std::string _u_name = "";
 
     if(msg_object["chat_msg"].IsString())
         message = msg_object["chat_msg"].AsString();
 
-    QString mess = QString::fromStdString(message);
+    if(msg_object["username"].IsString())
+        _u_name = msg_object["username"].AsString();
 
-    _window->OnMessageRecieved(mess);
+    QString mess = QString::fromStdString(message);
+    QString uname = QString::fromStdString(_u_name);
+
+    _window->OnMessageRecieved(uname, mess);
 }
 
 void Client::OnServerState(const ConfigValue& msg_object)
@@ -237,5 +247,34 @@ void Client::OnServerState(const ConfigValue& msg_object)
 
 void Client::OnUserState(const ConfigValue& msg_object)
 {
+    std::string _u_name = "";
+    std::string _p_channel = "";
+    std::string _n_channel = "";
 
+    if(msg_object["username"].IsString())
+        _u_name = msg_object["username"].AsString();
+
+    if(msg_object["prev_channel"].IsString())
+        _p_channel = msg_object["prev_channel"].AsString();
+
+    if(msg_object["new_channel"].IsString())
+        _n_channel = msg_object["new_channel"].AsString();
+
+    QString uname = QString::fromStdString(_u_name);
+    QString _prev_channel = QString::fromStdString(_p_channel);
+    QString _new_channel = QString::fromStdString(_n_channel);
+
+    _window->OnUserStateChanged(uname, _prev_channel, _new_channel);
+}
+
+void Client::ChangeUserState(const QString &username, const QString &prevChannel, const QString &newChannel)
+{
+    ConfigValue msg_object;
+    std::string _prev_channel = prevChannel.toStdString();
+    std::string _new_channel = newChannel.toStdString();
+    std::string _u_name = username.toStdString();
+
+    net_client::CreateUserStateMsg(msg_object, _u_name.c_str(), _prev_channel.c_str(), _new_channel.c_str());
+
+    SendMessage(msg_object);
 }

@@ -48,31 +48,23 @@
         <property name="text">
          <string>Room 1</string>
         </property>
-        <item>
-         <property name="text">
-          <string>Person 1</string>
-         </property>
-        </item>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
        </item>
        <item>
         <property name="text">
          <string>Room 2</string>
         </property>
-        <item>
-         <property name="text">
-          <string>Person 2</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Person 3</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Person 4</string>
-         </property>
-        </item>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
        </item>
       </widget>
       <widget class="QWidget" name="layoutWidget">

@@ -9,7 +9,6 @@
 #include <QDebug>
 #include <QTimer>
 
-
 #include "shared/messagecallbackhandler.h"
 
 class MainWindow;
@@ -32,11 +31,12 @@ public:
     void SetServerIp(QString serverIP);
     void SetUserName(QString userName);
     void SetServerPort(int port);
-    void SendChatMessage(const QString &message);
+    void SendChatMessage(const QString &username, const QString &message);
     void SendHelloMessage(const QString &message);
     void SendMessage(const ConfigValue& msg_object);
     void MuteVolume(bool toggled);
     void MuteMic(bool toggled);
+    void ChangeUserState(const QString &username, const QString &prevChannel, const QString &newChannel);
 
 private slots:
 	/// @brief The socket successfully connected

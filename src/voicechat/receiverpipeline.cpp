@@ -34,9 +34,14 @@ namespace receiver_pipeline
 
 		gst_pad_link(new_pad, sinkpad);
 		gst_object_unref(sinkpad);
-		
+
+
 	}
 
+	static void on_ssrc_active_cb (GstElement * rtpbin, guint sessid, guint ssrc, gpointer user_data)
+	{
+		debug::Printf("RTCP: session %u, SSRC %u\n", sessid, ssrc);
+	}
 };
 
 ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
@@ -44,16 +49,16 @@ ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
     // Create the pipeline
     _pipeline = gst_pipeline_new ("receiver_pipeline");
 	
-	std::stringstream uri;
-	uri << "udp://::1:" << udp_port;
+	std::stringstream rtp_uri;
+	rtp_uri << "udp://::1:" << udp_port;
 
     GstElement* udpsrc = gst_element_factory_make("udpsrc", NULL);
-	g_object_set(G_OBJECT(udpsrc), "uri", uri.str().c_str(), NULL); 
+	g_object_set(G_OBJECT(udpsrc), "uri", rtp_uri.str().c_str(), NULL); 
 
     GstElement* rtpbin = gst_element_factory_make("gstrtpbin", NULL); 
 	GstElement* queue = gst_element_factory_make("queue", NULL);
 
-	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44000, encoding-name=(string)SPEEX");
+	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44100, encoding-name=(string)SPEEX");
  	g_object_set(G_OBJECT(udpsrc), "caps", caps, NULL);
     gst_caps_unref(caps);
 
@@ -69,6 +74,33 @@ ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
 	gst_object_unref(sinkpad);
 
 
+	//std::stringstream rtcp_uri;
+	//rtcp_uri << "udp://::1:" << (int)12346;
+
+	//GstElement* rtcp_src = gst_element_factory_make("udpsrc", NULL);
+	//g_object_set(G_OBJECT(rtcp_src), "uri", rtcp_uri.str().c_str(), NULL); 
+
+	//GstElement* rtcp_sink = gst_element_factory_make("udpsink", NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "port", 12347, NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "host", "::1", NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "async", FALSE, NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "sync", FALSE, NULL);
+
+	//gst_bin_add_many(GST_BIN(_pipeline), rtcp_src, rtcp_sink, NULL);
+
+	//srcpad = gst_element_get_static_pad(rtcp_src, "src");
+	//sinkpad = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_0");
+	//gst_pad_link(srcpad, sinkpad);
+	//gst_object_unref(srcpad);
+	//gst_object_unref(sinkpad);
+
+	//srcpad = gst_element_get_request_pad(rtpbin, "send_rtcp_src_0");
+	//sinkpad = gst_element_get_static_pad(rtcp_sink, "sink");
+	//gst_pad_link(srcpad, sinkpad);
+	//gst_object_unref(srcpad);
+	//gst_object_unref(sinkpad);
+
+
     // Get the bus for the newly created pipeline.
     GstBus* bus = gst_element_get_bus(_pipeline);
 
@@ -80,6 +112,7 @@ ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
     gst_object_unref(bus);
 	
     g_signal_connect(rtpbin, "pad-added", G_CALLBACK (receiver_pipeline::pad_added_cb), _pipeline);
+	//g_signal_connect(rtpbin, "on-ssrc-active", G_CALLBACK (receiver_pipeline::on_ssrc_active_cb), _pipeline);
 
 	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
 }

@@ -40,7 +40,7 @@ template<typename T>
 void MessageCallbackHandler<T>::InvokeCallback(MessageType msg_type, const ConfigValue& msg_object)
 {
 	// Call any callbacks notifying them about the new message
-	std::map<std::string, MessageCallback>::iterator it = _callbacks.find(msg_type);
+	typename std::map<std::string, MessageCallback>::iterator it = _callbacks.find(msg_type);
 	if (it != _callbacks.end())
 	{
 		// Callback found, invoke it

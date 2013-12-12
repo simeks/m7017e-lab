@@ -1,5 +1,8 @@
 #include "senderpipeline.h"
-#include "../shared/common.h"
+#include "shared/common.h"
+
+#include <sstream>
+
 
 SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 {
@@ -7,21 +10,68 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
     _pipeline = gst_pipeline_new ("sender_pipeline");
 
     // Create the elements
-    _queue = gst_element_factory_make("queue", NULL);
-    _queue2 = gst_element_factory_make("queue", NULL);
-    _udpsink = gst_element_factory_make("udpsink", NULL);
-    _encoder = gst_element_factory_make("ffenc_mp2", NULL);
-    _audio_src = gst_element_factory_make("audiotestsrc", NULL);
+    GstElement* audio_src = gst_element_factory_make("audiotestsrc", NULL);
+    GstElement* udpsink = gst_element_factory_make("udpsink", NULL);
+	GstElement* rtpbin = gst_element_factory_make("gstrtpbin", NULL);
+	GstElement* encoder = gst_element_factory_make("speexenc", NULL);
+	GstElement* rtppay = gst_element_factory_make("rtpspeexpay", NULL);
 	
-	g_object_set(G_OBJECT(_udpsink), "host", host.c_str(), NULL);
-	g_object_set(G_OBJECT(_udpsink), "port", udp_port, NULL);
+	g_object_set(G_OBJECT(rtppay), "ssrc", (uint32_t)112345, NULL);
+
+	g_object_set(G_OBJECT(udpsink), "host", host.c_str(), NULL);
+	g_object_set(G_OBJECT(udpsink), "port", udp_port, NULL);
+	g_object_set(G_OBJECT(udpsink), "sync", FALSE, NULL);
+	g_object_set(G_OBJECT(udpsink), "async", FALSE, NULL);
 
     // Add the elements to the pipeline and link them together
-    //gst_bin_add_many (GST_BIN (_pipeline), _audio_src, _queue, _encoder, _queue2, _udpsink, NULL);
-    //gst_element_link_many (_audio_src, _queue, _encoder, _queue2, _udpsink, NULL);
+    gst_bin_add_many (GST_BIN (_pipeline), audio_src, encoder, rtppay, rtpbin, udpsink, NULL);
+	// Connect audio src tp rtppay
+    gst_element_link_many(audio_src, encoder, rtppay, NULL);
+	// Connect rtppay src to the sink for session 0 in the rtpbin
+	GstPad* sinkpad = gst_element_get_request_pad(rtpbin, "send_rtp_sink_0");
+	GstPad* srcpad = gst_element_get_static_pad(rtppay, "src");
+
+	gst_pad_link(srcpad, sinkpad);
+
+	gst_object_unref(srcpad);
+	gst_object_unref(sinkpad);
 	
-    gst_bin_add_many (GST_BIN (_pipeline), _audio_src, _udpsink, NULL);
-    gst_element_link_many (_audio_src, _udpsink, NULL);
+	// Then connect the rtpbin src to the udpsink
+	sinkpad = gst_element_get_static_pad(udpsink, "sink");
+	srcpad = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
+	gst_pad_link(srcpad, sinkpad);
+	
+	gst_object_unref(srcpad);
+	gst_object_unref(sinkpad);
+
+
+
+	//GstElement* rtcp_src = gst_element_factory_make("udpsrc", NULL);
+	//std::stringstream uri;
+	//uri << "udp://::1:" << (int)12347;
+	//g_object_set(G_OBJECT(rtcp_src), "uri", uri.str().c_str(), NULL); 
+
+	//GstElement* rtcp_sink = gst_element_factory_make("udpsink", NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "port", 12346, NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "host", "::1", NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "async", FALSE, NULL);
+	//g_object_set(G_OBJECT(rtcp_sink), "sync", FALSE, NULL);
+
+	//gst_bin_add_many(GST_BIN(_pipeline), rtcp_src, rtcp_sink, NULL);
+
+	//srcpad = gst_element_get_static_pad(rtcp_src, "src");
+	//sinkpad = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_0");
+	//gst_pad_link(srcpad, sinkpad);
+	//gst_object_unref(srcpad);
+	//gst_object_unref(sinkpad);
+
+	//srcpad = gst_element_get_request_pad(rtpbin, "send_rtcp_src_0");
+	//sinkpad = gst_element_get_static_pad(rtcp_sink, "sink");
+	//gst_pad_link(srcpad, sinkpad);
+	//gst_object_unref(srcpad);
+	//gst_object_unref(sinkpad);
+
+
 
     // Get the bus for the newly created pipeline.
     GstBus* bus = gst_element_get_bus(_pipeline);
@@ -32,8 +82,9 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 
     // Unreference the bus here, all further use of the bus will be from the Bus object.
     gst_object_unref(bus);
-	
 	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
+
+
 }
 SenderPipeline::~SenderPipeline()
 {

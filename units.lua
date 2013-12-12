@@ -227,7 +227,7 @@ Program {
 	},
 	Libs = program_lib, 
 
-	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
+	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL", "QtNetwork"  },
 
 }
 

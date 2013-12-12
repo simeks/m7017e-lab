@@ -119,7 +119,6 @@ void Server::MoveUser(int user_id, int channel_id)
 	if(channel_id >= 0)
 	{
 		Channel* old_channel = GetChannel(channel_id);
-		assert(old_channel);
 
 		old_channel->RemoveUser(user);
 	}

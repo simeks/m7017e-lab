@@ -3,6 +3,7 @@
 
 #include <sstream>
 
+
 SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 {
     // Create the pipeline
@@ -10,26 +11,24 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 
     // Create the elements
     GstElement* audio_src = gst_element_factory_make("audiotestsrc", NULL);
-    GstElement* convert = gst_element_factory_make("audioconvert", NULL);
     GstElement* udpsink = gst_element_factory_make("udpsink", NULL);
 	GstElement* rtpbin = gst_element_factory_make("gstrtpbin", NULL);
-	GstElement* rtppay = gst_element_factory_make("rtpL16pay", NULL);
+	GstElement* rtppay = gst_element_factory_make("rtpspeexpay", NULL);
+	GstElement* encoder = gst_element_factory_make("speexenc", NULL);
 
 	g_object_set(G_OBJECT(udpsink), "host", host.c_str(), NULL);
-	g_object_set(G_OBJECT(udpsink), "port", 12345, NULL);
+	g_object_set(G_OBJECT(udpsink), "port", udp_port, NULL);
 	g_object_set(G_OBJECT(udpsink), "sync", FALSE, NULL);
 	g_object_set(G_OBJECT(udpsink), "async", FALSE, NULL);
 
     // Add the elements to the pipeline and link them together
-    gst_bin_add_many (GST_BIN (_pipeline), audio_src, convert, rtppay, rtpbin, udpsink, NULL);
+    gst_bin_add_many (GST_BIN (_pipeline), audio_src, encoder, rtppay, rtpbin, udpsink, NULL);
 	// Connect audio src tp rtppay
-    gst_element_link_many(audio_src, convert, rtppay, NULL);
+    gst_element_link_many(audio_src, encoder, rtppay, NULL);
 	// Connect rtppay src to the sink for session 0 in the rtpbin
 	GstPad* sinkpad = gst_element_get_request_pad(rtpbin, "send_rtp_sink_0");
 	GstPad* srcpad = gst_element_get_static_pad(rtppay, "src");
 	gst_pad_link(srcpad, sinkpad);
-	
-	debug::Printf("srcpadcaps %s\n", gst_caps_to_string (gst_pad_get_caps (srcpad)));
 
 	gst_object_unref(srcpad);
 	gst_object_unref(sinkpad);
@@ -39,32 +38,6 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 	srcpad = gst_element_get_static_pad(rtpbin, "send_rtp_src_0");
 	gst_pad_link(srcpad, sinkpad);
 	
-	gst_object_unref(srcpad);
-	gst_object_unref(sinkpad);
-
-
-	GstElement* rtcp_src = gst_element_factory_make("udpsrc", NULL);
-	std::stringstream uri;
-	uri << "udp://localhost:" << (int)12347;
-	g_object_set(G_OBJECT(rtcp_src), "uri", uri.str().c_str(), NULL); 
-
-	GstElement* rtcp_sink = gst_element_factory_make("udpsink", NULL);
-	g_object_set(G_OBJECT(rtcp_sink), "port", 12346, NULL);
-	g_object_set(G_OBJECT(rtcp_sink), "host", "localhost", NULL);
-	g_object_set(G_OBJECT(rtcp_sink), "async", FALSE, NULL);
-	g_object_set(G_OBJECT(rtcp_sink), "sync", FALSE, NULL);
-
-	gst_bin_add_many(GST_BIN(_pipeline), rtcp_src, rtcp_sink, NULL);
-
-	srcpad = gst_element_get_static_pad(rtcp_src, "src");
-	sinkpad = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_0");
-	gst_pad_link(srcpad, sinkpad);
-	gst_object_unref(srcpad);
-	gst_object_unref(sinkpad);
-
-	srcpad = gst_element_get_request_pad(rtpbin, "send_rtcp_src_0");
-	sinkpad = gst_element_get_static_pad(rtcp_sink, "sink");
-	gst_pad_link(srcpad, sinkpad);
 	gst_object_unref(srcpad);
 	gst_object_unref(sinkpad);
 

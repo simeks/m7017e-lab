@@ -2,7 +2,8 @@
 #define RECIEVERPIPELINE_H
 
 #include <gst/gst.h>
-#include "../shared/bus.h"
+#include "shared/bus.h"
+
 
 class ReceiverPipeline : public PipelineListener
 {
@@ -17,7 +18,7 @@ public:
 private:
     GstElement* _pipeline;
     Bus* _bus;
-
+	
 };
 
 #endif // RECIEVERPIPELINE_H

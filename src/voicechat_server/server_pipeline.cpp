@@ -17,7 +17,7 @@ ServerPipeline::ServerPipeline(int udp_port)
 	GstElement* udpsrc = gst_element_factory_make("udpsrc", NULL);
 	g_object_set(G_OBJECT(udpsrc), "uri", uri.str().c_str(), NULL);    
 	
-	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)1, channels=(int)1, payload=(int)96");
+	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44000, encoding-name=(string)SPEEX");
 	g_object_set(G_OBJECT(udpsrc), "caps", caps, NULL);
     gst_caps_unref (caps);
 

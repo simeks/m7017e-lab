@@ -2,7 +2,13 @@
 #define SENDERPIPELINE_H
 
 #include <gst/gst.h>
-#include "../shared/bus.h"
+#include "shared/bus.h"
+
+
+#ifdef _WIN32
+#include <WinSock2.h>
+#endif
+
 
 class SenderPipeline : public PipelineListener
 {
@@ -18,6 +24,8 @@ public:
 private:
     GstElement* _pipeline;
     Bus* _bus;
+
+	SOCKET _rtcp_socket;
 };
 
 #endif // SENDERPIPELINE_H

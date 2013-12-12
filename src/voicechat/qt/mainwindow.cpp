@@ -101,15 +101,19 @@ void MainWindow::OnUserStateChanged(const QString &username, const QString &prev
 
             if(ui->treeWidget->topLevelItem(i)->text(0) == newChannel)
                 _new_channel = ui->treeWidget->topLevelItem(i);
+        }
 
-            for(int i = 0; i < _prev_channel->childCount(); i++)
+        for(int i = 0; i < _prev_channel->childCount(); i++)
+        {
+            if(_prev_channel->child(i)->text(0) == username)
             {
-                if(_prev_channel->child(i)->text(0) == username)
-                {
-                    _new_channel->addChild(_prev_channel->child(i));
-                    _prev_channel->removeChild(_prev_channel->child(i));
+                _prev_channel->removeChild(_prev_channel->child(i));
+                QTreeWidgetItem* user = new QTreeWidgetItem(0);
+                user->setText(0, username);
+                user->setDisabled(true);
+                user->setTextColor(0, Qt::color1);
 
-                }
+                _new_channel->addChild(user);
             }
         }
     }

@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->lineEdit->setDisabled(true);
     ui->treeWidget->hideColumn(0);
-
+	ui->treeWidget->setExpandsOnDoubleClick(false);
 }
 
 MainWindow::~MainWindow()

@@ -22,6 +22,7 @@ User::User(int user_id, Server* server, QTcpSocket* socket, int udp_port)
 	// Register callbacks
 	_callback_handler.RegisterCallback("NET_HELLO", &User::OnHelloMsg);
 	_callback_handler.RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
+	_callback_handler.RegisterCallback("NET_CHANGE_CHANNEL", &User::OnChangeChannel);
 }
 User::~User()
 {
@@ -37,9 +38,7 @@ void User::SendMessage(const ConfigValue& msg_object)
 	json_writer.Write(msg_object, ss, false); // Convert our message to json
 
 	std::string data = ss.str(); // The data to send.
-
 	_socket->write(data.c_str(), data.size()+1); // +1 for the terminator (\0)
-	_socket->flush();
 }
 
 const std::string& User::Name() const
@@ -80,7 +79,11 @@ void User::ReadyRead()
 	while(_socket->read(&c, 1))
 	{
 		if(c == '\0')
+		{
 			ProcessMessage(msg);
+			msg.clear();
+			continue;
+		}
 
 		msg += c;
 	}
@@ -113,14 +116,6 @@ void User::ProcessMessage(const std::string& message)
 	_callback_handler.InvokeCallback(msg_type, msg_object);
 }
 
-void User::SendWelcomeMsg()
-{
-	ConfigValue msg_object;
-
-	net_server::CreateWelcomeMsg(msg_object, _udp_port);
-
-	SendMessage(msg_object);
-}
 
 void User::OnHelloMsg(const ConfigValue& msg_object)
 {
@@ -132,8 +127,8 @@ void User::OnHelloMsg(const ConfigValue& msg_object)
 
 	debug::Printf("User authed: %s\n", _name.c_str());
 
-	// Send a welcome message to the new client
-	SendWelcomeMsg();
+	// Welcomes the user
+	_server->WelcomeUser(this);
 }
 
 void User::OnChatMsg(const ConfigValue& msg_object)
@@ -151,6 +146,14 @@ void User::OnChatMsg(const ConfigValue& msg_object)
 		net_server::CreateChatMsg(msg_object, _name, message);
 
 		_server->BroadcastMessage(msg_object);
+	}
+}
+void User::OnChangeChannel(const ConfigValue& msg_object)
+{
+	if(msg_object["channel_id"].IsNumber())
+	{
+		int new_channel = msg_object["channel_id"].AsInt();
+		_server->MoveUser(_user_id, new_channel);
 	}
 }
 

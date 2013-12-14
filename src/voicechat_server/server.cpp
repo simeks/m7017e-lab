@@ -16,7 +16,11 @@ Server::Server(int tcp_port, int udp_port)
 	_tick_timer(this)
 {
 	// Create our root channel, which will get ID 0
-	CreateChannel("root", (uint32_t)-1); // -1 indicates that there is no parent channel
+	CreateChannel("root", -1); // -1 indicates that there is no parent channel
+	CreateChannel("Room 1", 0);
+	CreateChannel("Room 2", 0);
+	CreateChannel("Room 3", 0);
+
 
 	_tcp_server = new QTcpServer(this);
 
@@ -71,7 +75,7 @@ void Server::UserDisconnected(User* user)
 	
 	// Broadcast that a user disconnected.
 	ConfigValue msg;
-	net_server::CreateUserStateMsg(msg, user, false);
+	net_server::CreateUserDisconnectedMsg(msg, user);
 
 	BroadcastMessage(msg);
 
@@ -102,6 +106,7 @@ void Server::CreateChannel(const std::string& name, int parent_channel)
 void Server::MoveUser(int user_id, int channel_id)
 {
 	User* user = GetUser(user_id);
+
 	if(!user)
 	{
 		debug::Printf("[Error] Server::MoveUser: No user with id %d.", user_id);
@@ -114,19 +119,47 @@ void Server::MoveUser(int user_id, int channel_id)
 		debug::Printf("[Error] Server::MoveUser: No channel with id %d.", channel_id);
 		return; // Not a valid channel, nothing to do.
 	}
+	debug::Printf("Moving user %s (ID: %d) to channel %s (ID: %d)\n", user->Name().c_str(), user_id, channel->Name().c_str(), channel_id);
 
 	// First remove the user from any old channel
-	if(channel_id >= 0)
+	if(user->Channel() >= 0)
 	{
-		Channel* old_channel = GetChannel(channel_id);
+		Channel* old_channel = GetChannel(user->Channel());
 
 		old_channel->RemoveUser(user);
 	}
+
 
 	// Then add it to the new one
 	channel->AddUser(user);
 	// Notify the user about the new channel
 	user->SetChannel(channel_id);
+
+	// Broadcast about the move
+	ConfigValue msg;
+	net_server::CreateUserChangedChannelMsg(msg, user);
+
+	BroadcastMessage(msg);
+}
+
+void Server::WelcomeUser(User* user)
+{
+	// Send welcome message
+	ConfigValue msg_object;
+	net_server::CreateWelcomeMsg(msg_object, user->Id(), _udp_port);
+	user->SendMessage(msg_object);
+
+	// We also want to send the new user a snapshot of the current server state
+	net_server::CreateServerStateMsg(msg_object, _channels, _users);
+	user->SendMessage(msg_object);
+
+	// Broadcast that we have a new user
+	net_server::CreateUserConnectedMsg(msg_object, user);
+	BroadcastMessage(msg_object);
+
+	// Move the user to the root channel
+	MoveUser(user->Id(), 0);
+
 }
 
 User* Server::GetUser(int id)
@@ -157,15 +190,6 @@ void Server::NewConnection()
 
 	User* user = new User(_next_uid++, this, client_socket, udp_port);
 	_users.push_back(user);
-
-	// Broadcast that we have a new user
-	ConfigValue msg;
-	net_server::CreateUserStateMsg(msg, user, true);
-
-	BroadcastMessage(msg);
-
-	// Move the user to the root channel
-	MoveUser(user->Id(), 0);
 
 	std::string addr = user->Socket()->peerAddress().toString().toLocal8Bit().constData();
 	if(user->Socket()->peerAddress().isLoopback()) // 127.0.0.1 doesn't seem to be working with gstreamer so we need to change to localhost (Issues with ipv4 vs ipv6 maybe?)

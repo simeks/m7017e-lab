@@ -1,7 +1,7 @@
 #include <QApplication>
 #include "qt/mainwindow.h"
 
-#include "../shared/common.h"
+#include "shared/common.h"
 
 
 #if defined(_WIN32) && !defined(DEBUG)

@@ -35,6 +35,9 @@ public:
 	/// @param channel_id Channel to move to.
 	void MoveUser(int user_id, int channel_id);
 
+	/// Welcomes a new user, sending necessary info. Also broadcasts info about the new user to all other clients.
+	void WelcomeUser(User* user);
+
 	/// @brief Returns the user with the specified id.
 	/// @return The user, NULL if no user with the specified id was found.
 	User* GetUser(int id);

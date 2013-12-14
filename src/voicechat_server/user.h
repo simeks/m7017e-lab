@@ -52,10 +52,6 @@ private:
 	/// @brief Processes a message.
 	void ProcessMessage(const std::string& message);
 
-	/// @brief Sends a welcome message to a client.
-	void SendWelcomeMsg();
-
-
 	/// Message callbacks
 
 	/// @brief Reads a hello message from the socket.
@@ -64,6 +60,8 @@ private:
 	/// @brief Reads a chat message from the socket.
 	void OnChatMsg(const ConfigValue& msg_object);
 
+	/// @brief Called when the user wants to change its channel.
+	void OnChangeChannel(const ConfigValue& msg_object);
 
 private:
 	int _user_id;

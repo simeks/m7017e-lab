@@ -1,7 +1,7 @@
-#include "common.h"
+#include "shared/common.h"
+#include "shared/configvalue.h"
 
 #include "netprotocol.h"
-#include "configvalue.h"
 
 
 
@@ -20,12 +20,10 @@ void net_client::CreateChatMsg(ConfigValue& msg_object, const std::string& usern
 	msg_object["username"].SetString(username.c_str());
 }
 
-void net_client::CreateUserStateMsg(ConfigValue& msg_object, const std::string& username, const std::string& prevChannel, const std::string& newChannel)
+void net_client::CreateChangeChannelMsg(ConfigValue& msg_object, int channel_id)
 {
 	msg_object.SetEmptyObject();
-	msg_object["msg_type"].SetString("NET_USER_STATE");
-	msg_object["username"].SetString(username.c_str());
-	msg_object["prev_channel"].SetString(prevChannel.c_str());
-	msg_object["new_channel"].SetString(newChannel.c_str());
+	msg_object["msg_type"].SetString("NET_CHANGE_CHANNEL");
+	msg_object["channel_id"].SetInt(channel_id);
 
 }

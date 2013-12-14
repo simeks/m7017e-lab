@@ -6,10 +6,11 @@
 #include "channel.h"
 
 
-void net_server::CreateWelcomeMsg(ConfigValue& msg_object, int udp_port)
+void net_server::CreateWelcomeMsg(ConfigValue& msg_object, int user_id, int udp_port)
 {
 	msg_object.SetEmptyObject();
 	msg_object["msg_type"].SetString("NET_WELCOME");
+	msg_object["user_id"].SetInt(udp_port);
 	msg_object["udp_port"].SetInt(udp_port);
 }
 
@@ -33,10 +34,12 @@ void net_server::CreateServerStateMsg(ConfigValue& msg_object, const std::vector
 		ConfigValue& channel_entry = channel_object.Append();
 		channel_entry.SetEmptyObject();
 		channel_entry["id"].SetInt((*it)->Id());
+		channel_entry["parent_id"].SetInt((*it)->ParentId());
 		channel_entry["name"].SetString((*it)->Name().c_str());
 	}
 
 	ConfigValue& user_object = msg_object["users"];
+	user_object.SetEmptyArray();
 
 	for(std::vector<User*>::const_iterator it = users.begin(); it != users.end(); ++it)
 	{
@@ -48,14 +51,26 @@ void net_server::CreateServerStateMsg(ConfigValue& msg_object, const std::vector
 	}
 
 }
-void net_server::CreateUserStateMsg(ConfigValue& msg_object, User* user, bool online)
+
+void net_server::CreateUserConnectedMsg(ConfigValue& msg_object, User* user)
 {
 	msg_object.SetEmptyObject();
-	msg_object["msg_type"].SetString("NET_USER_STATE");
+	msg_object["msg_type"].SetString("NET_USER_CONNECTED");
 	msg_object["user_id"].SetInt(user->Id());
 	msg_object["username"].SetString(user->Name().c_str());
-	msg_object["online"].SetBool(online);
-	msg_object["channel"].SetInt(user->Id());
+}
+void net_server::CreateUserDisconnectedMsg(ConfigValue& msg_object, User* user)
+{
+	msg_object.SetEmptyObject();
+	msg_object["msg_type"].SetString("NET_USER_DISCONNECTED");
+	msg_object["user_id"].SetInt(user->Id());
 
 }
+void net_server::CreateUserChangedChannelMsg(ConfigValue& msg_object, User* user)
+{
+	msg_object.SetEmptyObject();
+	msg_object["msg_type"].SetString("NET_USER_CHANGED_CHANNEL");
+	msg_object["user_id"].SetInt(user->Id());
+	msg_object["channel"].SetInt(user->Channel());
 
+}

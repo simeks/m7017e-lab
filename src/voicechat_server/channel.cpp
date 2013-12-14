@@ -31,4 +31,8 @@ int Channel::Id() const
 {
 	return _id;
 }
+int Channel::ParentId() const
+{
+	return _parent_id;
+}
 

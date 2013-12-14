@@ -1,6 +1,7 @@
 #ifndef __NET_PROTOCOL_H__
 #define __NET_PROTOCOL_H__
 
+
 /* All communication between the server and the clients through TCP are done by sending JSON messages.
 *	Below are the definitions of all these messages.
 */
@@ -12,6 +13,7 @@ Server messages:
 // Welcome message that the server sends to a user after receiving a Hello message.
 {
 	"msg_type" : "NET_WELCOME",
+	"user_id" : <Id of the new user>,
 	"udp_port" : <UDP port for gstreamer>,
 }
 
@@ -35,13 +37,24 @@ Server messages:
 	]
 }
 
-// Message indicating a change in a users state
+// Message indicating a that a new user connected.
 {
-	"msg_type" : "NET_USER_STATE",
+	"msg_type" : "NET_USER_CONNECTED",
 	"user_id" : <user id>,
 	"username" : "<username>",
-	"online" : <true/false>, 
-	"channel" : <channel id>
+}
+
+// Message indicating a user disconnecting.
+{
+	"msg_type" : "NET_USER_DISCONNECTED",
+	"user_id" : <user id>,
+}
+
+// Message indicating a user changing channel.
+{
+	"msg_type" : "NET_USER_CHANGED_CHANNEL",
+	"user_id" : <user id>,
+	"channel" : <channel id>,
 }
 
 */
@@ -61,27 +74,13 @@ Client messages:
 	"chat_msg" : "<chat message>",
 }
 
+// Message the client sends when it wants to change to another channel.
+{
+	"msg_type" : "NET_CHANGE_CHANNEL",
+	"channel_id" : <channel_id>
+}
+
 */
 
-
-class ConfigValue;
-
-
-/// @brief Message definitions for messages from the client.
-namespace net_client
-{
-	/// @brief Formats a welcome message.
-	/// @param msg_object This is the object that will contain the message.
-	/// @param username Requested user name.
-	void CreateHelloMsg(ConfigValue& msg_object, const std::string& username);
-
-	/// @brief Formats a chat message.
-	/// @param msg_object This is the object that will contain the message.
-	/// @param message The actual chat message.
-	void CreateChatMsg(ConfigValue& msg_object, const std::string& username, const std::string& message);
-	
-	void CreateUserStateMsg(ConfigValue& msg_object, const std::string& username, const std::string& prevChannel, const std::string& newChannel);
-	
-};
 
 #endif // __NET_PROTOCOL_H__

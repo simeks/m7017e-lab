@@ -26,6 +26,9 @@ public:
 
 	/// @brief Returns the channels unique ID.
 	int Id() const;
+	
+	/// Returns the unique ID of this channels parent. Returns -1 if there's no parent.
+	int ParentId() const;
 
 private:
 	Server* _server;

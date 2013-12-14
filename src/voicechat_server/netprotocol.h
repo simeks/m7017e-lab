@@ -11,8 +11,9 @@ namespace net_server
 {
 	/// @brief Formats a welcome message.
 	/// @param msg_object This is the object that will contain the message.
+	/// @param user_id Unique ID for the new user.
 	/// @param udp_port The UDP port used for streaming audio.
-	void CreateWelcomeMsg(ConfigValue& msg_object, int udp_port);
+	void CreateWelcomeMsg(ConfigValue& msg_object, int user_id, int udp_port);
 
 	/// @brief Formats a chat message.
 	/// @param msg_object This is the object that will contain the message.
@@ -26,12 +27,20 @@ namespace net_server
 	/// @param users A list of all users.
 	void CreateServerStateMsg(ConfigValue& msg_object, const std::vector<Channel*>& channels, const std::vector<User*>& users);
 
-	/// @brief Formats a user state message
+	/// @brief Formats a user connected message
 	/// @param msg_object This is the object that will contain the message.
-	/// @param user The updated user.
-	/// @param online Indicates whether the user is online or not, 
-	///			setting this to false indicates to the clients that this user have gone offline.
-	void CreateUserStateMsg(ConfigValue& msg_object, User* user, bool online);
+	/// @param user The connected user.
+	void CreateUserConnectedMsg(ConfigValue& msg_object, User* user);
+
+	/// @brief Formats a user disconnected message
+	/// @param msg_object This is the object that will contain the message.
+	/// @param user The disconnected user.
+	void CreateUserDisconnectedMsg(ConfigValue& msg_object, User* user);
+
+	/// @brief Formats a user changed channel message
+	/// @param msg_object This is the object that will contain the message.
+	/// @param user The user that changed channel.
+	void CreateUserChangedChannelMsg(ConfigValue& msg_object, User* user);
 
 };
 

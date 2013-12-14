@@ -19,7 +19,8 @@ Client::Client(MainWindow* window) :
 	_server_udp_port(25011),
 	_server_tcp_port(25010),
 	_receiver_pipeline(NULL),
-	_sender_pipeline(NULL)
+	_sender_pipeline(NULL),
+	_user_id(-1)
 {
     _socket = new QTcpSocket(this);
 
@@ -27,7 +28,9 @@ Client::Client(MainWindow* window) :
     _callback_handler.RegisterCallback("NET_WELCOME", &Client::OnWelcomeMsg);
 	_callback_handler.RegisterCallback("NET_CHAT_MSG", &Client::OnChatMsg);
 	_callback_handler.RegisterCallback("NET_SERVER_STATE", &Client::OnServerState);
-    _callback_handler.RegisterCallback("NET_USER_STATE", &Client::OnUserState);
+    _callback_handler.RegisterCallback("NET_USER_CONNECTED", &Client::OnUserConnected);
+    _callback_handler.RegisterCallback("NET_USER_DISCONNECTED", &Client::OnUserDisconnected);
+    _callback_handler.RegisterCallback("NET_USER_CHANGED_CHANNEL", &Client::OnUserChangedChannel);
 
 
 	// Registers a timer which will update our pipeline at a regular interval.
@@ -52,7 +55,7 @@ void Client::ConnectClicked()
 {
 	if(_socket->isOpen()) // Already connected
 	{
-        _window->OnMessageRecieved("[Warning]", "Already connected to a server!");
+        _window->AppendMessage("[Warning] Already connected to a server!");
 		return;
     }
 	
@@ -64,7 +67,7 @@ void Client::ConnectClicked()
 
     if(!_socket->waitForConnected(500))
     {
-        _window->OnMessageRecieved("", "Failed to connect to server.");
+        _window->AppendMessage("Failed to connect to server.");
         _socket->close();
     }
 }
@@ -93,8 +96,6 @@ void Client::SendMessage(const ConfigValue& msg_object)
     json_writer.Write(msg_object, ss, false);
 
     std::string data = ss.str();
-
-    // _window->OnMessageRecieved("", data.c_str());     //test för att se att rätt data skickas
 
     _socket->write(data.c_str(), data.size()+1);
 }
@@ -147,7 +148,7 @@ void Client::Disconnected()
 		_receiver_pipeline = NULL;
 	}
 	
-    _window->OnMessageRecieved("", "Disconnected from server.");
+    _window->AppendMessage("Disconnected from server.");
 	_window->Disconnected();
 	_socket->close();
 }
@@ -160,7 +161,11 @@ void Client::ReadyRead()
 	while(_socket->read(&c, 1))
 	{
 		if(c == '\0')
+		{
 			ProcessMessage(msg);
+			msg.clear();
+			continue;
+		}
 
 		msg += c;
 	}
@@ -178,6 +183,7 @@ void Client::ProcessMessage(const std::string& message)
 {
 	if(message.empty())
 		return;
+
 
 	// Read the json formatted message
 	json::Reader json_reader;
@@ -202,13 +208,16 @@ void Client::ProcessMessage(const std::string& message)
 
 void Client::OnWelcomeMsg(const ConfigValue& msg_object)
 {
+	if(msg_object["user_id"].IsNumber())
+		_user_id = msg_object["user_id"].AsInt();
+
 	if(msg_object["udp_port"].IsNumber())
 		_listen_udp_port = msg_object["udp_port"].AsInt();
 
 	std::stringstream ss;
-    ss << "You're now connnected successfully. UDP port: " << _listen_udp_port;
+    ss << "[Server] You're now connnected successfully. UDP port: " << _listen_udp_port;
 
-    _window->OnMessageRecieved("[Server]", QString::fromStdString(ss.str()));
+    _window->AppendMessage(QString::fromStdString(ss.str()));
 
 	// Create our pipelines
 	if(!_receiver_pipeline)
@@ -238,44 +247,81 @@ void Client::OnChatMsg(const ConfigValue& msg_object)
     QString mess = QString::fromStdString(message);
     QString uname = QString::fromStdString(_u_name);
 
-    _window->OnMessageRecieved(uname, mess);
+	QString chat_output = uname + ": " + mess;
+	_window->AppendMessage(chat_output);
 }
 
 void Client::OnServerState(const ConfigValue& msg_object)
 {
-
+	_window->ClearTree();
+	_window->SetChannels(msg_object["channels"]);
+	_window->SetUsers(msg_object["users"]);
 }
 
-void Client::OnUserState(const ConfigValue& msg_object)
+void Client::OnUserConnected(const ConfigValue& msg_object)
 {
-    std::string _u_name = "";
-    std::string _p_channel = "";
-    std::string _n_channel = "";
+	if(!msg_object["user_id"].IsNumber())
+	{
+		debug::Printf("No user id specified in USER_STATE message\n");
+		return;
+	}
+	int user_id;
+	user_id = msg_object["user_id"].AsInt();
+	
+	if(user_id == _user_id) // Ignore the message if it refers to ourself
+		return;
 
-    if(msg_object["username"].IsString())
-        _u_name = msg_object["username"].AsString();
+	int channel_id = -1;
+	if(msg_object["channel"].IsNumber())
+		channel_id = msg_object["channel"].AsInt();
 
-    if(msg_object["prev_channel"].IsString())
-        _p_channel = msg_object["prev_channel"].AsString();
+	std::string username = "<Unnamed>";
+	if(msg_object["username"].IsString())
+		username = msg_object["username"].AsString();
 
-    if(msg_object["new_channel"].IsString())
-        _n_channel = msg_object["new_channel"].AsString();
+	_window->AddUser(user_id, username, channel_id);
+}
+void Client::OnUserDisconnected(const ConfigValue& msg_object)
+{
+	if(!msg_object["user_id"].IsNumber())
+	{
+		debug::Printf("No user id specified in USER_STATE message\n");
+		return;
+	}
+	int user_id;
+	user_id = msg_object["user_id"].AsInt();
+	
+	if(user_id == _user_id) // Ignore the message if it refers to ourself
+		return;
 
-    QString uname = QString::fromStdString(_u_name);
-    QString _prev_channel = QString::fromStdString(_p_channel);
-    QString _new_channel = QString::fromStdString(_n_channel);
+	int channel_id = -1;
+	if(msg_object["channel"].IsNumber())
+		channel_id = msg_object["channel"].AsInt();
 
-    _window->OnUserStateChanged(uname, _prev_channel, _new_channel);
+	_window->RemoveUser(user_id);
+}
+void Client::OnUserChangedChannel(const ConfigValue& msg_object)
+{
+	if(!msg_object["user_id"].IsNumber())
+	{
+		debug::Printf("No user id specified in USER_STATE message\n");
+		return;
+	}
+	int user_id;
+	user_id = msg_object["user_id"].AsInt();
+
+	int channel_id = -1;
+	if(msg_object["channel"].IsNumber())
+		channel_id = msg_object["channel"].AsInt();
+
+	_window->ChangeUserChannel(user_id, channel_id);
 }
 
-void Client::ChangeUserState(const QString &username, const QString &prevChannel, const QString &newChannel)
+
+void Client::ChangeChannel(int new_channel)
 {
     ConfigValue msg_object;
-    std::string _prev_channel = prevChannel.toStdString();
-    std::string _new_channel = newChannel.toStdString();
-    std::string _u_name = username.toStdString();
-
-    net_client::CreateUserStateMsg(msg_object, _u_name.c_str(), _prev_channel.c_str(), _new_channel.c_str());
+    net_client::CreateChangeChannelMsg(msg_object, new_channel);
 
     SendMessage(msg_object);
 }

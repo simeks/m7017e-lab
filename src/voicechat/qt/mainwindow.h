@@ -13,6 +13,7 @@ class MainWindow;
 
 class Client;
 class ConnectDialog;
+class ConfigValue;
 
 class MainWindow : public QMainWindow
 {
@@ -28,12 +29,30 @@ public:
     /// @brief Called when a user has disconnected from the server.
 	void Disconnected();
 
-    /// Called when a message is received and writes the message to the chat.
-    void OnMessageRecieved(QString from, QString text);
+	/// @brief Fills the window with the channel layout.
+	void SetChannels(const ConfigValue& channels);
+	
+	/// @brief Fills the window with the server users.
+	void SetUsers(const ConfigValue& users);
+
+	/// @brief Clears the complete tree view
+	void ClearTree();
+
+    /// Appends a message to the chat window
+    void AppendMessage(QString text);
 
     void SetUserName(const QString &username);
 
-    void OnUserStateChanged(const QString &username, const QString &prevChannel, const QString &newChannel);
+	/// @brief Changes the channel for a specified user.
+	/// @param user_id The unique id for the user that have changed its channel.
+	/// @param channel_id The id of the new channel.
+    void ChangeUserChannel(int user_id, int channel_id);
+	
+	/// @brief Adds the specified user from the tree
+	void AddUser(int user_id, const std::string& name, int channel_id);
+
+	/// @brief Removes the specified user from the tree
+	void RemoveUser(int user_id);
 
 private slots:
 
@@ -56,9 +75,11 @@ private:
     Ui::MainWindow *ui;
     ConnectDialog* _connect_dialog;
     Client* _client;
-    QTreeWidgetItem* _current_channel;
     QTreeWidgetItem* name;
     QString _user_name;
+
+	std::map<int, QTreeWidgetItem*> _channels; // channel_id => WidgetItem 
+	std::map<int, QTreeWidgetItem*> _users; // user_id => WidgetItem 
 };
 
 #endif // MAINWINDOW_H

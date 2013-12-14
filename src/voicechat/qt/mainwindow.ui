@@ -44,28 +44,6 @@
          <string>Rooms</string>
         </property>
        </column>
-       <item>
-        <property name="text">
-         <string>Room 1</string>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Room 2</string>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-       </item>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">

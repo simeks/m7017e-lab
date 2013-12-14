@@ -2,7 +2,7 @@
 #define CLIENT_H
 
 #include "qt/mainwindow.h"
-#include "shared/netprotocol.h"
+#include "netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
 #include "shared/bus.h"
@@ -36,7 +36,7 @@ public:
     void SendMessage(const ConfigValue& msg_object);
     void MuteVolume(bool toggled);
     void MuteMic(bool toggled);
-    void ChangeUserState(const QString &username, const QString &prevChannel, const QString &newChannel);
+    void ChangeChannel(int new_channel);
 
 private slots:
 	/// @brief The socket successfully connected
@@ -67,7 +67,9 @@ private:
 	void OnWelcomeMsg(const ConfigValue& msg_object);
 	void OnChatMsg(const ConfigValue& msg_object);
 	void OnServerState(const ConfigValue& msg_object);
-	void OnUserState(const ConfigValue& msg_object);
+	void OnUserConnected(const ConfigValue& msg_object);
+	void OnUserDisconnected(const ConfigValue& msg_object);
+	void OnUserChangedChannel(const ConfigValue& msg_object);
 
 
 private:
@@ -79,6 +81,7 @@ private:
     int _listen_udp_port; // The port for receiving audio from.
     QTcpSocket* _socket;
 	QTimer _tick_timer;
+	int _user_id; // This clients user id, -1 if not connected or not authed.
 	
 	ReceiverPipeline* _receiver_pipeline;
 	SenderPipeline* _sender_pipeline;

@@ -64,7 +64,7 @@ void ChannelPipeline::RemoveReceiver(int user_id)
 		if(it->user_id == user_id)
 		{
 			_receivers.erase(it);
-			return;
+			break;
 		}
 	}
 	UpdateReceivers();

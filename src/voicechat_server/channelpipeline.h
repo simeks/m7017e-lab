@@ -40,6 +40,7 @@ private:
 		int port;
 
 		int user_id;
+	
 	};
 
 	GstElement* _pipeline;

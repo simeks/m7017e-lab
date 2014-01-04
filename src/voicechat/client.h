@@ -83,10 +83,10 @@ private:
 	QTimer _tick_timer;
 	int _user_id; // This clients user id, -1 if not connected or not authed.
 	int _current_channel;
+	int _channel_udp_port;
 
 	ReceiverPipeline* _receiver_pipeline;
 	SenderPipeline* _sender_pipeline;
-	bool _ssrc_sent;
 
 	MessageCallbackHandler<Client> _callback_handler;
 };

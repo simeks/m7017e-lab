@@ -27,19 +27,20 @@ void SenderPipeline::new_ssrc_pad_cb(GstRtpSsrcDemux*, guint ssrc, GstPad *pad, 
 	g_object_unref(sinkpad);
 
 	debug::Printf("SenderPipeline: My SSRC %u\n", ssrc);
-	pipeline->_ssrc = ssrc;
-	pipeline->_ssrc_set = true;
+	pipeline->_receier_pipeline->SetSSRC(ssrc);
 
 	gst_element_sync_state_with_parent(udpsink);
 	gst_element_set_state(pipeline->_pipeline, GST_STATE_PLAYING);
 
 }
 
-SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
-	: _dest_host(host),
-	_dest_port(udp_port),
-	_ssrc_set(false)
+SenderPipeline::SenderPipeline(const std::string& host, int udp_port, ReceiverPipeline* receiver_pipeline)
+	: _receier_pipeline(receiver_pipeline),
+	_dest_host(host),
+	_dest_port(udp_port)
 {
+	debug::Printf("SenderPipeline: %s : %d\n", host.c_str(), udp_port);
+	
     // Create the pipeline
     _pipeline = gst_pipeline_new ("sender_pipeline");
 
@@ -50,9 +51,9 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port)
 	GstElement* rtppay = gst_element_factory_make("rtpspeexpay", NULL);
 	
 	// Generate a test signal with random frequency
-	srand((int)_pipeline);
-	int v = 200 + (rand() % 5000);
-	g_object_set(audio_src, "freq", (float)200, NULL);
+	//srand((int)_pipeline);
+	//int v = 200 + (rand() % 5000);
+	//g_object_set(audio_src, "freq", (float)200, NULL);
 
 
     // Add the elements to the pipeline and link them together
@@ -108,7 +109,7 @@ SenderPipeline::~SenderPipeline()
 
     if(_pipeline)
     {
-		gst_element_send_event(_pipeline, gst_event_new_eos());
+        gst_element_set_state(_pipeline, GST_STATE_PAUSED);
         gst_element_set_state(_pipeline, GST_STATE_NULL);
         gst_object_unref(_pipeline);
         _pipeline = NULL;

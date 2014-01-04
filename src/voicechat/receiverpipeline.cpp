@@ -16,7 +16,8 @@ void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user
 	}
 	
 	ReceiverPipeline* receiver_pipeline = (ReceiverPipeline*)user_data;
-	
+	gst_element_set_state(receiver_pipeline->_pipeline, GST_STATE_PAUSED);
+
 	// Pad names look like this: recv_rtp_src_<session-id>_<ssrc>_<payload>
 	std::string ssrc_str = pad_name.substr(13);
 	ssrc_str = ssrc_str.substr(ssrc_str.find('_')+1);
@@ -89,6 +90,7 @@ void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user
 		gst_object_unref(sinkpad);
 
 	}
+	gst_element_set_state(receiver_pipeline->_pipeline, GST_STATE_PLAYING);
 }
 ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL), _adder(NULL), _ssrc(-1)
 {
@@ -144,6 +146,7 @@ ReceiverPipeline::~ReceiverPipeline ()
 
     if(_pipeline)
     {
+        gst_element_set_state(_pipeline, GST_STATE_PAUSED);
         gst_element_set_state(_pipeline, GST_STATE_NULL);
         gst_object_unref(_pipeline);
         _pipeline = NULL;

@@ -22,8 +22,7 @@ Client::Client(MainWindow* window) :
 	_receiver_pipeline(NULL),
 	_sender_pipeline(NULL),
 	_user_id(-1),
-	_current_channel(-1),
-	_ssrc_sent(false)
+	_current_channel(-1)
 {
     _socket = new QTcpSocket(this);
 
@@ -179,11 +178,6 @@ void Client::TimerTick()
 
 	_receiver_pipeline->Tick();
 	_sender_pipeline->Tick();
-
-	if(!_ssrc_sent && _sender_pipeline->IsSSRCSet())
-	{
-		_receiver_pipeline->SetSSRC(_sender_pipeline->SSRC());
-	}
 }
 
 
@@ -293,7 +287,22 @@ void Client::OnUserDisconnected(const ConfigValue& msg_object)
 		channel_id = msg_object["channel"].AsInt();
 
 	_window->RemoveUser(user_id);
+		
+	// Reset our pipeline if a user entered/left our current channel
+	if(_receiver_pipeline)
+	{
+		delete _receiver_pipeline;
+		_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
+	}
+	if(_sender_pipeline)
+	{
+		std::string host = _socket->peerAddress().toString().toStdString();
+		if(_socket->peerAddress().isLoopback())
+			host = "localhost";
 
+		delete _sender_pipeline;
+		_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);
+	}
 }
 void Client::OnUserChangedChannel(const ConfigValue& msg_object)
 {
@@ -311,7 +320,23 @@ void Client::OnUserChangedChannel(const ConfigValue& msg_object)
 
 	_window->ChangeUserChannel(user_id, channel_id);
 
+	// Reset our pipeline if a user entered/left our current channel
+	if(_receiver_pipeline)
+	{
+		delete _receiver_pipeline;
+		_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
+	}
+	if(_sender_pipeline)
+	{
+		std::string host = _socket->peerAddress().toString().toStdString();
+		if(_socket->peerAddress().isLoopback())
+			host = "localhost";
+
+		delete _sender_pipeline;
+		_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);
+	}
 }
+
 void Client::OnChannelInfo(const ConfigValue& msg_object)
 {
 	if(_sender_pipeline)
@@ -319,12 +344,14 @@ void Client::OnChannelInfo(const ConfigValue& msg_object)
 	if(_receiver_pipeline)
 		delete _receiver_pipeline;
 
+	_channel_udp_port = msg_object["udp_port"].AsInt();
+
 	std::string host = _socket->peerAddress().toString().toStdString();
 	if(_socket->peerAddress().isLoopback())
 		host = "localhost";
-
-	_sender_pipeline = new SenderPipeline(host, msg_object["udp_port"].AsInt());
+	
 	_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
+	_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);
 }
 
 void Client::ChangeChannel(int new_channel)

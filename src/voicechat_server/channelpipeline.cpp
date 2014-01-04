@@ -1,10 +1,10 @@
 #include "shared/common.h"
 
-#include "server_pipeline.h"
+#include "channelpipeline.h"
 
 #include <sstream>
 
-ServerPipeline::ServerPipeline(int udp_port)
+ChannelPipeline::ChannelPipeline(int udp_port)
 {
 	_pipeline = gst_pipeline_new("channel_pipeline");
 	
@@ -35,18 +35,18 @@ ServerPipeline::ServerPipeline(int udp_port)
 	
 	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
 }
-ServerPipeline::~ServerPipeline()
+ChannelPipeline::~ChannelPipeline()
 {
 	if(_pipeline)
 		g_object_unref(_pipeline);
 
 	delete _bus;
 }
-void ServerPipeline::Tick()
+void ChannelPipeline::Tick()
 {
 	_bus->Poll();
 }
-void ServerPipeline::AddReceiver(int user_id, const std::string& addr, int port)
+void ChannelPipeline::AddReceiver(int user_id, const std::string& addr, int port)
 {
 	Receiver recv;
 	recv.user_id = user_id;
@@ -57,7 +57,7 @@ void ServerPipeline::AddReceiver(int user_id, const std::string& addr, int port)
 
 	UpdateReceivers();
 }
-void ServerPipeline::RemoveReceiver(int user_id)
+void ChannelPipeline::RemoveReceiver(int user_id)
 {
 	for(std::vector<Receiver>::iterator it = _receivers.begin(); it != _receivers.end(); ++it)
 	{
@@ -70,12 +70,12 @@ void ServerPipeline::RemoveReceiver(int user_id)
 	UpdateReceivers();
 }
 
-void ServerPipeline::Error(const std::string& error)
+void ChannelPipeline::Error(const std::string& error)
 {
 	debug::Printf("[Error] ChannelPipeline: %s\n", error.c_str());
 }
 
-void ServerPipeline::UpdateReceivers()
+void ChannelPipeline::UpdateReceivers()
 {
 	std::stringstream ss;
 	for(std::vector<Receiver>::iterator it = _receivers.begin(); it != _receivers.end(); ++it)

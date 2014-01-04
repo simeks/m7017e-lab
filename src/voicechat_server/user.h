@@ -3,6 +3,7 @@
 
 #include <QTcpSocket>
 
+#include "shared/common.h"
 #include "shared/messagecallbackhandler.h"
 
 class Server;
@@ -28,7 +29,10 @@ public:
 
 	/// @brief Returns the unique ID of the user.
 	int Id() const;
-	
+
+	/// @brief Returns the gstreamer destination port for this user.
+	int UdpPort() const;
+
 	/// Returns the id of the channel that currently holds the user.
 	/// @return Channel id, -1 if currently not in any channel.
 	int Channel() const; 
@@ -39,7 +43,7 @@ public:
 	/// @brief Returns the TCP socket for this user.
 	QTcpSocket* Socket();
 
-
+	uint32_t SSRC() const;
 
 private slots:
 	/// @brief The socket disconnected.
@@ -63,6 +67,9 @@ private:
 	/// @brief Called when the user wants to change its channel.
 	void OnChangeChannel(const ConfigValue& msg_object);
 
+	/// @brief Called when the user sends its SSRC identifier
+	void OnUserSSRC(const ConfigValue& msg_object);
+
 private:
 	int _user_id;
 	int _channel_id;
@@ -73,6 +80,8 @@ private:
 	int _udp_port;
 	bool _authed;
 	std::string _name;
+
+	uint32_t _ssrc; // SSRC for RTP
 
 	MessageCallbackHandler<User> _callback_handler;
 };

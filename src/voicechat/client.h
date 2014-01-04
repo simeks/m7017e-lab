@@ -2,7 +2,6 @@
 #define CLIENT_H
 
 #include "qt/mainwindow.h"
-#include "netprotocol.h"
 #include <QObject>
 #include <QTcpSocket>
 #include "shared/bus.h"
@@ -70,6 +69,7 @@ private:
 	void OnUserConnected(const ConfigValue& msg_object);
 	void OnUserDisconnected(const ConfigValue& msg_object);
 	void OnUserChangedChannel(const ConfigValue& msg_object);
+	void OnChannelInfo(const ConfigValue& msg_object);
 
 
 private:
@@ -82,9 +82,11 @@ private:
     QTcpSocket* _socket;
 	QTimer _tick_timer;
 	int _user_id; // This clients user id, -1 if not connected or not authed.
-	
+	int _current_channel;
+
 	ReceiverPipeline* _receiver_pipeline;
 	SenderPipeline* _sender_pipeline;
+	bool _ssrc_sent;
 
 	MessageCallbackHandler<Client> _callback_handler;
 };

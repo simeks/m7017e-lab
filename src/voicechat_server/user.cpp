@@ -23,6 +23,7 @@ User::User(int user_id, Server* server, QTcpSocket* socket, int udp_port)
 	_callback_handler.RegisterCallback("NET_HELLO", &User::OnHelloMsg);
 	_callback_handler.RegisterCallback("NET_CHAT_MSG", &User::OnChatMsg);
 	_callback_handler.RegisterCallback("NET_CHANGE_CHANNEL", &User::OnChangeChannel);
+	_callback_handler.RegisterCallback("NET_SET_SSRC", &User::OnUserSSRC);
 }
 User::~User()
 {
@@ -51,6 +52,11 @@ int User::Id() const
 	return _user_id;
 }
 
+int User::UdpPort() const
+{
+	return _udp_port;
+}
+
 int User::Channel() const
 {
 	return _channel_id;
@@ -59,6 +65,10 @@ int User::Channel() const
 void User::SetChannel(int channel_id)
 {
 	_channel_id = channel_id;
+}
+uint32_t User::SSRC() const
+{
+	return _ssrc;
 }
 
 QTcpSocket* User::Socket()
@@ -157,3 +167,12 @@ void User::OnChangeChannel(const ConfigValue& msg_object)
 	}
 }
 
+void User::OnUserSSRC(const ConfigValue& msg_object)
+{
+	_ssrc = msg_object["ssrc"].AsUInt();
+
+	debug::Printf("User %i, SSRC: %u\n", _user_id, _ssrc);
+
+	// We do this to make sure to update all other clients about the new SSRC
+	_server->MoveUser(_user_id, _channel_id);
+}

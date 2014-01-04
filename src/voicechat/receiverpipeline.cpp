@@ -1,105 +1,127 @@
-#include "receiverpipeline.h"
 #include "shared/common.h"
+#include "receiverpipeline.h"
 
 #include <sstream>
 
-
-namespace receiver_pipeline
+// Called when there's a new pad that needs to be connected in our rtpbin
+void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user_data)
 {
-	// Called when there's a new pad that needs to be connected in our rtpbin
-	static void pad_added_cb(GstElement* rtpbin, GstPad* new_pad, gpointer user_data)
+	debug::Printf("New pad: %s\n", gst_pad_get_name(new_pad));
+	std::string pad_name = gst_pad_get_name(new_pad);
+	if(pad_name == "recv_rtp_sink_0" ||
+		pad_name == "send_rtp_sink_0" || 
+		pad_name == "send_rtp_src_0")
 	{
-		debug::Printf("New pad: %s", gst_pad_get_name(new_pad));
+		return;
+	}
+	
+	ReceiverPipeline* receiver_pipeline = (ReceiverPipeline*)user_data;
+	
+	// Pad names look like this: recv_rtp_src_<session-id>_<ssrc>_<payload>
+	std::string ssrc_str = pad_name.substr(13);
+	ssrc_str = ssrc_str.substr(ssrc_str.find('_')+1);
+	uint32_t ssrc = strtoul(ssrc_str.c_str(), NULL, 0);
+	
+	if(receiver_pipeline->_ssrc != ssrc)
+	{
+		if(!receiver_pipeline->_adder)
+		{
+			receiver_pipeline->_adder = gst_element_factory_make("adder", NULL);
 
-		GstElement* pipeline = (GstElement*)user_data;
-		
-		GstElement* depay = gst_element_factory_make("rtpspeexdepay", NULL);
-		GstElement* decoder = gst_element_factory_make("speexdec", NULL);
-		GstElement* audiosink = gst_element_factory_make("autoaudiosink", NULL);
-		g_object_set(G_OBJECT(audiosink), "sync", FALSE, NULL);
+		#ifdef _WIN32
+			// Use directsound directly on win32 because autoaudiosink only causes stuttering.
+			GstElement* audiosink = gst_element_factory_make("directsoundsink", NULL); 
+			g_object_set(G_OBJECT(audiosink), "sync", FALSE, NULL);
+		#else
+			GstElement* audiosink = gst_element_factory_make("autoaudiosink", NULL);
+		#endif
+	
+			// Add the elements to our pipeline
+			gst_bin_add_many(GST_BIN(receiver_pipeline->_pipeline), audiosink, receiver_pipeline->_adder, NULL);
+			gst_element_sync_state_with_parent(audiosink);
+			gst_element_sync_state_with_parent(receiver_pipeline->_adder);
 
-		// Add the elements to our pipeline
-		gst_bin_add_many(GST_BIN(pipeline), depay, decoder, audiosink, NULL);
-		
-		// Change the state of our new elements
-		gst_element_sync_state_with_parent(depay);
-		gst_element_sync_state_with_parent(decoder);
-		gst_element_sync_state_with_parent(audiosink);
+			// Link the elements
+			// [Adder] -> [Audiosink]
+			gst_element_link(receiver_pipeline->_adder, audiosink);
 
-		// Link the elements
-		gst_element_link_many(depay, decoder, audiosink, NULL);
+			GstElement* depay = gst_element_factory_make("rtpspeexdepay", NULL);
+			GstElement* decoder = gst_element_factory_make("speexdec", NULL);
+			GstElement* queue = gst_element_factory_make("queue", NULL);
+			gst_bin_add_many(GST_BIN(receiver_pipeline->_pipeline), depay, decoder, NULL);
+			gst_element_sync_state_with_parent(depay);
+			gst_element_sync_state_with_parent(decoder);
 
-		// Connect the new rtp src to to the depay sink
-		GstPad* sinkpad = gst_element_get_static_pad(depay, "sink");
+			// [Depay] -> [Decoder] -> [Adder] 
+			gst_element_link_many(depay, decoder, receiver_pipeline->_adder, NULL);
 
+			GstPad* sinkpad = gst_element_get_static_pad(depay, "sink");
+
+			// [RtpBin] -> [Depay] 
+			gst_pad_link(new_pad, sinkpad);
+			gst_object_unref(sinkpad);
+		}
+		else
+		{
+			GstElement* depay = gst_element_factory_make("rtpspeexdepay", NULL);
+			GstElement* decoder = gst_element_factory_make("speexdec", NULL);
+			gst_bin_add_many(GST_BIN(receiver_pipeline->_pipeline), depay, decoder, NULL);
+			gst_element_sync_state_with_parent(depay);
+			gst_element_sync_state_with_parent(decoder);
+			
+			// [Depay] -> [Decoder] -> [Adder]
+			gst_element_link_many(depay, decoder, receiver_pipeline->_adder, NULL);
+
+			GstPad* sinkpad = gst_element_get_static_pad(depay, "sink");
+
+			// [RtpBin] -> [Depay] -> [Decoder] -> [Adder]
+			gst_pad_link(new_pad, sinkpad);
+			gst_object_unref(sinkpad);
+		}
+	}
+	else
+	{
+		GstElement* fakesink = gst_element_factory_make("fakesink", NULL);
+		gst_bin_add_many(GST_BIN(receiver_pipeline->_pipeline), fakesink, NULL);
+
+		GstPad* sinkpad = gst_element_get_static_pad(fakesink, "sink");
 		gst_pad_link(new_pad, sinkpad);
 		gst_object_unref(sinkpad);
 
-
 	}
-
-	static void on_ssrc_active_cb (GstElement * rtpbin, guint sessid, guint ssrc, gpointer user_data)
-	{
-		debug::Printf("RTCP: session %u, SSRC %u\n", sessid, ssrc);
-	}
-};
-
-ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
+}
+ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL), _adder(NULL), _ssrc(-1)
 {
     // Create the pipeline
     _pipeline = gst_pipeline_new ("receiver_pipeline");
-	
+
 	std::stringstream rtp_uri;
 	rtp_uri << "udp://::1:" << udp_port;
-
+	
+	_rtpbin = gst_element_factory_make("gstrtpbin", NULL);
+	GstElement* queue = gst_element_factory_make("queue", NULL);
     GstElement* udpsrc = gst_element_factory_make("udpsrc", NULL);
 	g_object_set(G_OBJECT(udpsrc), "uri", rtp_uri.str().c_str(), NULL); 
 
-    GstElement* rtpbin = gst_element_factory_make("gstrtpbin", NULL); 
-	GstElement* queue = gst_element_factory_make("queue", NULL);
 
 	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44100, encoding-name=(string)SPEEX");
  	g_object_set(G_OBJECT(udpsrc), "caps", caps, NULL);
     gst_caps_unref(caps);
 
     // Add the elements to the pipeline and link them together
-    gst_bin_add_many (GST_BIN (_pipeline), udpsrc, queue, rtpbin, NULL);
+    gst_bin_add_many (GST_BIN (_pipeline), _rtpbin, udpsrc, queue, NULL);
 	gst_element_link(udpsrc, queue);
-
-	// Connect udpsrc to the sink for session0 in the rtpbin
+	
+	// Retrieve the sink from the rtpbin for the specified session.
+	GstPad* sinkpad = gst_element_get_request_pad(_rtpbin, "recv_rtp_sink_0");
+	
+	// Connect udpsrc to the sink for specfied session in the rtpbin
 	GstPad* srcpad = gst_element_get_static_pad(queue, "src");
-	GstPad* sinkpad = gst_element_get_request_pad(rtpbin, "recv_rtp_sink_0");
+
+	// Link: [queue] -> [rtpbin.recv_rtp_sink_0]
 	gst_pad_link(srcpad, sinkpad);
 	gst_object_unref(srcpad);
 	gst_object_unref(sinkpad);
-
-
-	//std::stringstream rtcp_uri;
-	//rtcp_uri << "udp://::1:" << (int)12346;
-
-	//GstElement* rtcp_src = gst_element_factory_make("udpsrc", NULL);
-	//g_object_set(G_OBJECT(rtcp_src), "uri", rtcp_uri.str().c_str(), NULL); 
-
-	//GstElement* rtcp_sink = gst_element_factory_make("udpsink", NULL);
-	//g_object_set(G_OBJECT(rtcp_sink), "port", 12347, NULL);
-	//g_object_set(G_OBJECT(rtcp_sink), "host", "::1", NULL);
-	//g_object_set(G_OBJECT(rtcp_sink), "async", FALSE, NULL);
-	//g_object_set(G_OBJECT(rtcp_sink), "sync", FALSE, NULL);
-
-	//gst_bin_add_many(GST_BIN(_pipeline), rtcp_src, rtcp_sink, NULL);
-
-	//srcpad = gst_element_get_static_pad(rtcp_src, "src");
-	//sinkpad = gst_element_get_request_pad(rtpbin, "recv_rtcp_sink_0");
-	//gst_pad_link(srcpad, sinkpad);
-	//gst_object_unref(srcpad);
-	//gst_object_unref(sinkpad);
-
-	//srcpad = gst_element_get_request_pad(rtpbin, "send_rtcp_src_0");
-	//sinkpad = gst_element_get_static_pad(rtcp_sink, "sink");
-	//gst_pad_link(srcpad, sinkpad);
-	//gst_object_unref(srcpad);
-	//gst_object_unref(sinkpad);
-
 
     // Get the bus for the newly created pipeline.
     GstBus* bus = gst_element_get_bus(_pipeline);
@@ -111,22 +133,26 @@ ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL)
     // Unreference the bus here, all further use of the bus will be from the Bus object.
     gst_object_unref(bus);
 	
-    g_signal_connect(rtpbin, "pad-added", G_CALLBACK (receiver_pipeline::pad_added_cb), _pipeline);
-	//g_signal_connect(rtpbin, "on-ssrc-active", G_CALLBACK (receiver_pipeline::on_ssrc_active_cb), _pipeline);
+    g_signal_connect(_rtpbin, "pad-added", G_CALLBACK (pad_added_cb), this);
 
 	gst_element_set_state(_pipeline, GST_STATE_PLAYING);
 }
 ReceiverPipeline::~ReceiverPipeline ()
 {
     delete _bus;
-        _bus = NULL;
+    _bus = NULL;
 
-        if(_pipeline)
-        {
-            gst_element_set_state(_pipeline, GST_STATE_NULL);
-            gst_object_unref(_pipeline);
-            _pipeline = NULL;
-        }
+    if(_pipeline)
+    {
+        gst_element_set_state(_pipeline, GST_STATE_NULL);
+        gst_object_unref(_pipeline);
+        _pipeline = NULL;
+    }
+}
+
+void ReceiverPipeline::SetSSRC(uint32_t ssrc)
+{
+	_ssrc = ssrc;
 }
 
 void ReceiverPipeline::Tick()

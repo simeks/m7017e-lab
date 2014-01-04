@@ -4,9 +4,10 @@
 #include "qt/mainwindow.h"
 #include "shared/configvalue.h"
 #include "shared/json.h"
+#include "netprotocol.h"
 
-#include "receiverpipeline.h"
 #include "senderpipeline.h"
+#include "receiverpipeline.h"
 
 #include <sstream>
 
@@ -20,7 +21,9 @@ Client::Client(MainWindow* window) :
 	_server_tcp_port(25010),
 	_receiver_pipeline(NULL),
 	_sender_pipeline(NULL),
-	_user_id(-1)
+	_user_id(-1),
+	_current_channel(-1),
+	_ssrc_sent(false)
 {
     _socket = new QTcpSocket(this);
 
@@ -31,6 +34,7 @@ Client::Client(MainWindow* window) :
     _callback_handler.RegisterCallback("NET_USER_CONNECTED", &Client::OnUserConnected);
     _callback_handler.RegisterCallback("NET_USER_DISCONNECTED", &Client::OnUserDisconnected);
     _callback_handler.RegisterCallback("NET_USER_CHANGED_CHANNEL", &Client::OnUserChangedChannel);
+    _callback_handler.RegisterCallback("NET_CHANNEL_INFO", &Client::OnChannelInfo);
 
 
 	// Registers a timer which will update our pipeline at a regular interval.
@@ -43,12 +47,10 @@ Client::~Client()
 	if(_socket)
 		delete _socket;
 	
-	if(_sender_pipeline)
-		delete _sender_pipeline;
-
 	if(_receiver_pipeline)
 		delete _receiver_pipeline;
-
+	if(_sender_pipeline)
+		delete _sender_pipeline;
 }
 
 void Client::ConnectClicked()
@@ -137,15 +139,15 @@ void Client::Connected()
 void Client::Disconnected()
 {
 	// Remove our pipelines
-	if(_sender_pipeline)
-	{
-		delete _sender_pipeline;
-		_sender_pipeline = NULL;
-	}
 	if(_receiver_pipeline)
 	{
 		delete _receiver_pipeline;
 		_receiver_pipeline = NULL;
+	}
+	if(_sender_pipeline)
+	{
+		delete _sender_pipeline;
+		_sender_pipeline = NULL;
 	}
 	
     _window->AppendMessage("Disconnected from server.");
@@ -172,10 +174,16 @@ void Client::ReadyRead()
 }
 void Client::TimerTick()
 {
-	if(_receiver_pipeline)
-		_receiver_pipeline->Tick();
-	if(_sender_pipeline)
-		_sender_pipeline->Tick();
+	if(!_receiver_pipeline || !_sender_pipeline)
+		return;
+
+	_receiver_pipeline->Tick();
+	_sender_pipeline->Tick();
+
+	if(!_ssrc_sent && _sender_pipeline->IsSSRCSet())
+	{
+		_receiver_pipeline->SetSSRC(_sender_pipeline->SSRC());
+	}
 }
 
 
@@ -183,7 +191,6 @@ void Client::ProcessMessage(const std::string& message)
 {
 	if(message.empty())
 		return;
-
 
 	// Read the json formatted message
 	json::Reader json_reader;
@@ -218,19 +225,6 @@ void Client::OnWelcomeMsg(const ConfigValue& msg_object)
     ss << "[Server] You're now connnected successfully. UDP port: " << _listen_udp_port;
 
     _window->AppendMessage(QString::fromStdString(ss.str()));
-
-	// Create our pipelines
-	if(!_receiver_pipeline)
-		_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
-	
-	if(!_sender_pipeline)
-	{
-		std::string host = _socket->peerAddress().toString().toStdString();
-		if(_socket->peerAddress().isLoopback())
-			host = "localhost";
-
-		_sender_pipeline = new SenderPipeline(host, _server_udp_port);
-	}
 }
 
 void Client::OnChatMsg(const ConfigValue& msg_object)
@@ -299,6 +293,7 @@ void Client::OnUserDisconnected(const ConfigValue& msg_object)
 		channel_id = msg_object["channel"].AsInt();
 
 	_window->RemoveUser(user_id);
+
 }
 void Client::OnUserChangedChannel(const ConfigValue& msg_object)
 {
@@ -315,11 +310,27 @@ void Client::OnUserChangedChannel(const ConfigValue& msg_object)
 		channel_id = msg_object["channel"].AsInt();
 
 	_window->ChangeUserChannel(user_id, channel_id);
-}
 
+}
+void Client::OnChannelInfo(const ConfigValue& msg_object)
+{
+	if(_sender_pipeline)
+		delete _sender_pipeline;
+	if(_receiver_pipeline)
+		delete _receiver_pipeline;
+
+	std::string host = _socket->peerAddress().toString().toStdString();
+	if(_socket->peerAddress().isLoopback())
+		host = "localhost";
+
+	_sender_pipeline = new SenderPipeline(host, msg_object["udp_port"].AsInt());
+	_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
+}
 
 void Client::ChangeChannel(int new_channel)
 {
+	_current_channel = new_channel;
+
     ConfigValue msg_object;
     net_client::CreateChangeChannelMsg(msg_object, new_channel);
 

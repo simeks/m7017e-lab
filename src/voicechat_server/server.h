@@ -9,7 +9,6 @@
 class User;
 class Channel;
 class ConfigValue;
-class ServerPipeline;
 class Server : public QObject
 {
 	Q_OBJECT;
@@ -46,6 +45,8 @@ public:
 	/// @return The channel, NULL if no channel with the specified id was found.
 	Channel* GetChannel(int id);
 
+	int UdpPort() const { return _udp_port; }
+
 private slots:
 	void NewConnection();
 	void TimerTick();
@@ -55,8 +56,6 @@ private:
 	int _udp_port;
 
 	QTimer _tick_timer;
-
-	ServerPipeline* _pipeline;
 
 	QTcpServer* _tcp_server;
 

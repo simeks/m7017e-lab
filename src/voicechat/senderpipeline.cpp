@@ -46,14 +46,15 @@ SenderPipeline::SenderPipeline(const std::string& host, int udp_port, ReceiverPi
 
 	// Create our elements for taking audio input and sending it to the server.
 	GstElement* rtpbin = gst_element_factory_make("gstrtpbin", NULL);
-    GstElement* audio_src = gst_element_factory_make("audiotestsrc", NULL);
+	
+#ifdef _WIN32
+    GstElement* audio_src = gst_element_factory_make("dshowaudiosrc", NULL);
+#else
+	GstElement* audio_src = gst_element_factory_make("autoaudiosrc", NULL);
+#endif
+	
 	GstElement* encoder = gst_element_factory_make("speexenc", NULL);
 	GstElement* rtppay = gst_element_factory_make("rtpspeexpay", NULL);
-	
-	// Generate a test signal with random frequency
-	//srand((int)_pipeline);
-	//int v = 200 + (rand() % 5000);
-	//g_object_set(audio_src, "freq", (float)200, NULL);
 
 
     // Add the elements to the pipeline and link them together

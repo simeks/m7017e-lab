@@ -5,6 +5,7 @@
 #include "shared/bus.h"
 
 #include <map>
+#include <QMutex>
 
 class ReceiverPipeline : public PipelineListener
 {
@@ -31,6 +32,8 @@ private:
     Bus* _bus;
 	
 	uint32_t _ssrc;
+
+	QMutex _pad_added_lock;
 
 };
 

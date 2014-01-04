@@ -3,6 +3,7 @@
 
 #include <sstream>
 
+
 // Called when there's a new pad that needs to be connected in our rtpbin
 void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user_data)
 {
@@ -14,8 +15,10 @@ void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user
 	{
 		return;
 	}
-	
+
 	ReceiverPipeline* receiver_pipeline = (ReceiverPipeline*)user_data;
+	receiver_pipeline->_pad_added_lock.lock();
+	
 	gst_element_set_state(receiver_pipeline->_pipeline, GST_STATE_PAUSED);
 
 	// Pad names look like this: recv_rtp_src_<session-id>_<ssrc>_<payload>
@@ -48,7 +51,6 @@ void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user
 
 			GstElement* depay = gst_element_factory_make("rtpspeexdepay", NULL);
 			GstElement* decoder = gst_element_factory_make("speexdec", NULL);
-			GstElement* queue = gst_element_factory_make("queue", NULL);
 			gst_bin_add_many(GST_BIN(receiver_pipeline->_pipeline), depay, decoder, NULL);
 			gst_element_sync_state_with_parent(depay);
 			gst_element_sync_state_with_parent(decoder);
@@ -90,7 +92,9 @@ void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user
 		gst_object_unref(sinkpad);
 
 	}
+	
 	gst_element_set_state(receiver_pipeline->_pipeline, GST_STATE_PLAYING);
+	receiver_pipeline->_pad_added_lock.unlock();
 }
 ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL), _adder(NULL), _ssrc(-1)
 {
@@ -164,5 +168,5 @@ void ReceiverPipeline::Tick()
 }
 void ReceiverPipeline::Error(const std::string& error)
 {
-	debug::Printf("[Error] SenderPipeline: %s\n", error.c_str());
+	debug::Printf("[Error] ReceiverPipeline: %s\n", error.c_str());
 }

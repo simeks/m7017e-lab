@@ -42,6 +42,11 @@ namespace net_server
 	/// @param user The user that changed channel.
 	void CreateUserChangedChannelMsg(ConfigValue& msg_object, User* user);
 
+	/// @brief Creates a message for a specific user when it enters a channel.
+	/// @param channel_id Id of the channel.
+	/// @param udp_port The udp port the client should transmit audio to.
+	void CreateChannelInfoMsg(ConfigValue& msg_object, int channel_id, int udp_port);
+
 };
 
 #endif // __SERVER_NETPROTOCOL_H__

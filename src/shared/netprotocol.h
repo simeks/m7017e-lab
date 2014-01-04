@@ -47,14 +47,21 @@ Server messages:
 // Message indicating a user disconnecting.
 {
 	"msg_type" : "NET_USER_DISCONNECTED",
-	"user_id" : <user id>,
+	"user_id" : <user id>
 }
 
 // Message indicating a user changing channel.
 {
 	"msg_type" : "NET_USER_CHANGED_CHANNEL",
 	"user_id" : <user id>,
+	"channel" : <channel id>
+}
+
+// Message send to a specific user when that user gets moved into a new channel.
+{
+	"msg_type" : "NET_CHANNEL_INFO",
 	"channel" : <channel id>,
+	"udp_port" : <udp port>
 }
 
 */

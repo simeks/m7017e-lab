@@ -1,5 +1,5 @@
-#ifndef __SERVER_PIPELINE_H__
-#define __SERVER_PIPELINE_H__
+#ifndef __CHANNELPIPELINE_H__
+#define __CHANNELPIPELINE_H__
 
 #include <gst/gst.h>
 
@@ -8,11 +8,11 @@
 class UDPSource;
 
 /// GStreamer pipeline that listens for incoming streams and passes them to the clients.
-class ServerPipeline : public PipelineListener
+class ChannelPipeline : public PipelineListener
 {
 public:
-	ServerPipeline(int udp_port);
-	~ServerPipeline();
+	ChannelPipeline(int udp_port);
+	~ChannelPipeline();
 
 	void Tick();
 
@@ -40,6 +40,7 @@ private:
 		int port;
 
 		int user_id;
+	
 	};
 
 	GstElement* _pipeline;
@@ -50,4 +51,4 @@ private:
 };
 
 
-#endif // __SERVER_PIPELINE_H__
+#endif // __CHANNELPIPELINE_H__

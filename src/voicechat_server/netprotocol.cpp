@@ -10,7 +10,7 @@ void net_server::CreateWelcomeMsg(ConfigValue& msg_object, int user_id, int udp_
 {
 	msg_object.SetEmptyObject();
 	msg_object["msg_type"].SetString("NET_WELCOME");
-	msg_object["user_id"].SetInt(udp_port);
+	msg_object["user_id"].SetInt(user_id);
 	msg_object["udp_port"].SetInt(udp_port);
 }
 
@@ -73,4 +73,11 @@ void net_server::CreateUserChangedChannelMsg(ConfigValue& msg_object, User* user
 	msg_object["user_id"].SetInt(user->Id());
 	msg_object["channel"].SetInt(user->Channel());
 
+}
+void net_server::CreateChannelInfoMsg(ConfigValue& msg_object, int channel_id, int udp_port)
+{
+	msg_object.SetEmptyObject();
+	msg_object["msg_type"].SetString("NET_CHANNEL_INFO");
+	msg_object["channel"].SetInt(channel_id);
+	msg_object["udp_port"].SetInt(udp_port);
 }

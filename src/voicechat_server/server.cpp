@@ -6,7 +6,7 @@
 #include "server.h"
 #include "user.h"
 #include "channel.h"
-#include "server_pipeline.h"
+#include "channelpipeline.h"
 
 
 Server::Server(int tcp_port, int udp_port)
@@ -30,8 +30,6 @@ Server::Server(int tcp_port, int udp_port)
 	{
 		debug::Printf("[Error] Failed to start server.\n");
 	}
-
-	_pipeline = new ServerPipeline(_udp_port);
 
 	// Registers a timer which will update our pipeline at a regular interval.
 	_tick_timer.setInterval(25);
@@ -57,7 +55,6 @@ Server::~Server()
 
 	_tcp_server->close();
 	delete _tcp_server;
-	delete _pipeline;
 }
 
 void Server::BroadcastMessage(const ConfigValue& msg_object)
@@ -84,16 +81,17 @@ void Server::UserDisconnected(User* user)
 	if(it != _users.end())
 	{
 		_users.erase(it);
-		
-		// Free the user object
-		delete user;
+		debug::Printf("User erased\n");
 	}
+	// Free the user object
+	delete user;
 }
 
 /// @brief Creates a new channel with the specified name.
 void Server::CreateChannel(const std::string& name, int parent_channel)
 {
-	Channel* channel = new Channel(_next_uid++, parent_channel, name, this);
+	int channel_id = _next_uid++;
+	Channel* channel = new Channel(channel_id, parent_channel, name, this, _udp_port+channel_id);
 	_channels.push_back(channel);
 
 	// Broadcast the changed state to all users
@@ -109,14 +107,14 @@ void Server::MoveUser(int user_id, int channel_id)
 
 	if(!user)
 	{
-		debug::Printf("[Error] Server::MoveUser: No user with id %d.", user_id);
+		debug::Printf("[Error] Server::MoveUser: No user with id %d.\n", user_id);
 		return; // Not a valid user, nothing to do.
 	}
 
 	Channel* channel = GetChannel(channel_id);
 	if(!channel)
 	{
-		debug::Printf("[Error] Server::MoveUser: No channel with id %d.", channel_id);
+		debug::Printf("[Error] Server::MoveUser: No channel with id %d.\n", channel_id);
 		return; // Not a valid channel, nothing to do.
 	}
 	debug::Printf("Moving user %s (ID: %d) to channel %s (ID: %d)\n", user->Name().c_str(), user_id, channel->Name().c_str(), channel_id);
@@ -140,13 +138,23 @@ void Server::MoveUser(int user_id, int channel_id)
 	net_server::CreateUserChangedChannelMsg(msg, user);
 
 	BroadcastMessage(msg);
+
+	std::vector<uint32_t> user_ssrc;
+	for(std::vector<User*>::iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		if((*it)->Channel() == channel_id)
+			user_ssrc.push_back((*it)->SSRC());
+	}
+
+	net_server::CreateChannelInfoMsg(msg, channel_id, channel->UdpPort());
+	user->SendMessage(msg);
 }
 
 void Server::WelcomeUser(User* user)
 {
 	// Send welcome message
 	ConfigValue msg_object;
-	net_server::CreateWelcomeMsg(msg_object, user->Id(), _udp_port);
+	net_server::CreateWelcomeMsg(msg_object, user->Id(), user->UdpPort()); 
 	user->SendMessage(msg_object);
 
 	// We also want to send the new user a snapshot of the current server state
@@ -194,13 +202,13 @@ void Server::NewConnection()
 	std::string addr = user->Socket()->peerAddress().toString().toLocal8Bit().constData();
 	if(user->Socket()->peerAddress().isLoopback()) // 127.0.0.1 doesn't seem to be working with gstreamer so we need to change to localhost (Issues with ipv4 vs ipv6 maybe?)
 		addr = "localhost";
-
-	_pipeline->AddReceiver(user->Id(), addr, _udp_port+user->Id());
 }
 void Server::TimerTick()
 {
-	if(_pipeline)
-		_pipeline->Tick();
+	for(std::vector<Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		(*it)->Tick();
+	}
 }
 
 

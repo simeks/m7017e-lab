@@ -2,16 +2,47 @@
 #include <pjsua-lib/pjsua.h>
 #include "qt/mainwindow.h"
 
+
 /*
 #define SIP_DOMAIN	"example.com"
 #define SIP_USER	"alice"
 #define SIP_PASSWD	"secret"
 */
 
+
+/// pjsip callbacks
+namespace
+{
+	Client* g_client;
+
+	// Callback called by the library upon receiving incoming call
+	void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
+					 pjsip_rx_data *rdata)
+	{
+		if(!g_client)
+			return;
+
+		g_client->OnIncomingCall(acc_id, call_id, rdata);
+	}
+
+	// Callback called by the library when call's state has changed
+	void on_call_state(pjsua_call_id call_id, pjsip_event *e)
+	{
+		if(!g_client)
+			return;
+
+		g_client->OnCallState(call_id, e);
+	}
+
+};
+
+
+
 Client::Client(MainWindow* window) :
     _window(window)
 {
-	
+	g_client = this;
+
     pjsua_acc_id acc_id;
     pj_status_t status;
 
@@ -62,35 +93,35 @@ Client::Client(MainWindow* window) :
 		//Error creating transport
 	}
 }
-
-// Callback called by the library upon receiving incoming call
-static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
-                 pjsip_rx_data *rdata)
+Client::~Client()
 {
-    pjsua_call_info call_info;
+	g_client = NULL;
+}
 
-    PJ_UNUSED_ARG(acc_id);
-    PJ_UNUSED_ARG(rdata);
 
-    pjsua_call_get_info(call_id, &call_info);
+void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
+					pjsip_rx_data *rdata)
+{
+	pjsua_call_info call_info;
 
+	PJ_UNUSED_ARG(acc_id);
+	PJ_UNUSED_ARG(rdata);
+
+	pjsua_call_get_info(call_id, &call_info);
+	
 	// öppna incoming_call_dialog
 
-    // Answer incoming calls with 200/OK
-    //pjsua_call_answer(call_id, 200, NULL, NULL);
+	// Answer incoming calls with 200/OK
+	//pjsua_call_answer(call_id, 200, NULL, NULL);
 }
-
-// Callback called by the library when call's state has changed
-static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
+void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {
-    pjsua_call_info call_info;
+	pjsua_call_info call_info;
+	
+	PJ_UNUSED_ARG(e);
 
-    PJ_UNUSED_ARG(e);
-
-    pjsua_call_get_info(call_id, &call_info);
+	pjsua_call_get_info(call_id, &call_info);
 }
-
-
 
 
 

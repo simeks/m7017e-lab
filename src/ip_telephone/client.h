@@ -12,11 +12,16 @@ class Client : public QObject
 
 public:
     Client(MainWindow* window);
-	static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id, pjsip_rx_data *rdata);
-	static void on_call_state(pjsua_call_id call_id, pjsip_event *e);
-
+	~Client();
+	
+	// Callback called by the library upon receiving incoming call
+	void OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
+					 pjsip_rx_data *rdata);
+	// Callback called by the library when call's state has changed
+	void OnCallState(pjsua_call_id call_id, pjsip_event *e);
 
 private:
+
     MainWindow* _window;
 };
 

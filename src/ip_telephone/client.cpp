@@ -2,51 +2,100 @@
 #include <pjsua-lib/pjsua.h>
 #include "qt/mainwindow.h"
 
-#define THIS_FILE	"APP"
-
+/*
 #define SIP_DOMAIN	"example.com"
 #define SIP_USER	"alice"
 #define SIP_PASSWD	"secret"
+*/
 
 Client::Client(MainWindow* window) :
     _window(window)
 {
+	
     pjsua_acc_id acc_id;
     pj_status_t status;
 
+
     // Create pjsua
     status = pjsua_create();
-    if (status != PJ_SUCCESS) error_exit("Error in pjsua_create()", status);
+    if (status != PJ_SUCCESS)
+    {
+        //Error in pjsua_create()
+        return;
+    }
 
 
-    // Init pjsua
+	// Init pjsua
     pjsua_config cfg;
-    pjsua_logging_config log_cfg;
+	pjsua_config_default(&cfg);
 
-    pjsua_config_default(&cfg);
-    cfg.cb.on_incoming_call = &on_incoming_call;
-    cfg.cb.on_call_media_state = &on_call_media_state;
-    cfg.cb.on_call_state = &on_call_state;
+	cfg.cb.on_call_state = &on_call_state;
+	cfg.cb.on_incoming_call = &on_incoming_call;
 
-    pjsua_logging_config_default(&log_cfg);
-    log_cfg.console_level = 4;
+	status = pjsua_init(&cfg, NULL, NULL);
+	if (status != PJ_SUCCESS)
+	{
+		// Error in pjsua_init()
+		pjsua_destroy();
+		return;
+	}
 
-    status = pjsua_init(&cfg, &log_cfg, NULL);
-    if (status != PJ_SUCCESS) error_exit("Error in pjsua_init()", status);
+
+	// Start pjsua
+	status = pjsua_start();
+	if (status != PJ_SUCCESS)
+	{
+		// Error starting pjsua
+		pjsua_destroy();
+		return;
+	}
 
 
-    // Add UDP transport.
-    pjsua_transport_config cfg;
+	// Add UDP transport.
+    pjsua_transport_config transport_cfg;
+    pjsua_transport_config_default(&transport_cfg);
+    transport_cfg.port = 5060;
 
-    pjsua_transport_config_default(&cfg);
-    cfg.port = 5060;
-    status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &cfg, NULL);
-    if (status != PJ_SUCCESS) error_exit("Error creating transport", status);
+    status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &transport_cfg, NULL);
+    if (status != PJ_SUCCESS)
+	{
+		//Error creating transport
+	}
+}
 
-    // Initialization is done, now start pjsua
-    status = pjsua_start();
-    if (status != PJ_SUCCESS) error_exit("Error starting pjsua", status);
+// Callback called by the library upon receiving incoming call
+static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
+                 pjsip_rx_data *rdata)
+{
+    pjsua_call_info call_info;
 
+    PJ_UNUSED_ARG(acc_id);
+    PJ_UNUSED_ARG(rdata);
+
+    pjsua_call_get_info(call_id, &call_info);
+
+	// öppna incoming_call_dialog
+
+    // Answer incoming calls with 200/OK
+    //pjsua_call_answer(call_id, 200, NULL, NULL);
+}
+
+// Callback called by the library when call's state has changed
+static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
+{
+    pjsua_call_info call_info;
+
+    PJ_UNUSED_ARG(e);
+
+    pjsua_call_get_info(call_id, &call_info);
+}
+
+
+
+
+
+
+    /*
 
     // Register to SIP server by creating SIP account.
     pjsua_acc_config cfg;
@@ -71,7 +120,7 @@ Client::Client(MainWindow* window) :
     if (status != PJ_SUCCESS) error_exit("Error making call", status);
     }
 
-    /* Wait until user press "q" to quit. */
+    //Wait until user press "q" to quit.
     for (;;) {
     char option[10];
 
@@ -88,63 +137,7 @@ Client::Client(MainWindow* window) :
         pjsua_call_hangup_all();
     }
 
-    /* Destroy pjsua */
+    // Destroy pjsua
     pjsua_destroy();
 
-}
-
-
-/* Display error and exit application */
-static void error_exit(const char *title, pj_status_t status)
-{
-    pjsua_perror(THIS_FILE, title, status);
-    pjsua_destroy();
-    exit(1);
-}
-
-/* Callback called by the library when call's media state has changed */
-static void on_call_media_state(pjsua_call_id call_id)
-{
-    pjsua_call_info ci;
-
-    pjsua_call_get_info(call_id, &ci);
-
-    if (ci.media_status == PJSUA_CALL_MEDIA_ACTIVE) {
-    // When media is active, connect call to sound device.
-    pjsua_conf_connect(ci.conf_slot, 0);
-    pjsua_conf_connect(0, ci.conf_slot);
-    }
-}
-
-/* Callback called by the library when call's state has changed */
-static void on_call_state(pjsua_call_id call_id, pjsip_event *e)
-{
-    pjsua_call_info ci;
-
-    PJ_UNUSED_ARG(e);
-
-    pjsua_call_get_info(call_id, &ci);
-    PJ_LOG(3,(THIS_FILE, "Call %d state=%.*s", call_id,
-             (int)ci.state_text.slen,
-             ci.state_text.ptr));
-}
-
-/* Callback called by the library upon receiving incoming call */
-static void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
-                 pjsip_rx_data *rdata)
-{
-    pjsua_call_info ci;
-
-    PJ_UNUSED_ARG(acc_id);
-    PJ_UNUSED_ARG(rdata);
-
-    pjsua_call_get_info(call_id, &ci);
-
-    PJ_LOG(3,(THIS_FILE, "Incoming call from %.*s!!",
-             (int)ci.remote_info.slen,
-             ci.remote_info.ptr));
-
-    /* Automatically answer incoming calls with 200/OK */
-    pjsua_call_answer(call_id, 200, NULL, NULL);
-}
-
+	*/

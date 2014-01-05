@@ -5,7 +5,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     _client(new Client(this)),
-    _call_dialog(NULL)
+    _call_dialog(NULL),
+	_incoming_call_dialog(NULL)
 {
     ui->setupUi(this);
 
@@ -20,4 +21,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     _call_dialog->open();
+}
+
+void MainWindow::ShowIncomingCallDialog()
+{
+	_incoming_call_dialog->open();
 }

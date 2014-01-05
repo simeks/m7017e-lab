@@ -287,7 +287,7 @@ Program {
 		},
 		GenerateMocSources {
 			Glob { 
-				Dir = "src/ip_telephone/qt", 
+				Dir = "src/ip_telephone", 
 				Extensions = { ".h" } 
 			}, 
 		},
@@ -326,6 +326,8 @@ Program {
 			"$(GSTREAMER_LIBS)",
 			"$(QT5_LIBS)",
 			"dependencies/pjproject-2.1.0/pjsip/lib",
+			"dependencies/pjproject-2.1.0/pjlib-util/lib",
+			"dependencies/pjproject-2.1.0/lib",
 		},
 		PROGOPTS = {
 			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
@@ -335,7 +337,7 @@ Program {
 	Libs = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
 			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
-			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "WS2_32.lib"; 
+			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "WS2_32.lib", "pjsip-core-i386-Win32-vc8-Debug.lib", "pjsip-simple-i386-Win32-vc8-Debug.lib", "pjsua-lib-i386-Win32-vc8-Debug.lib", "pjsip-ua-i386-Win32-vc8-Debug.lib", "pjlib-util-i386-Win32-vc8-Debug.lib", "libpjproject-i386-Win32-vc8-Debug.lib"; 
 			Config = { "win32-*-*" } 
 		},
 		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10";

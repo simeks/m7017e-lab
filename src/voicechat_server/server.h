@@ -14,7 +14,10 @@ class Server : public QObject
 	Q_OBJECT;
 
 public:
-	Server(int tcp_port, int udp_port);
+	/// Constructor
+	/// @param tcp_port Tcp port the server should listen to.
+	/// @param base_udp_port Base udp port for incoming audio streams.
+	Server(int tcp_port, int base_udp_port);
 	~Server();
 	
 	/// @brief Broadcasts a  message to all users.
@@ -45,7 +48,8 @@ public:
 	/// @return The channel, NULL if no channel with the specified id was found.
 	Channel* GetChannel(int id);
 
-	int UdpPort() const { return _udp_port; }
+	/// @brief Returns the base udp port for users and channels.
+	int BaseUdpPort() const { return _base_udp_port; }
 
 private slots:
 	void NewConnection();
@@ -53,7 +57,7 @@ private slots:
 
 private:
 	int _tcp_port;
-	int _udp_port;
+	int _base_udp_port;
 
 	QTimer _tick_timer;
 

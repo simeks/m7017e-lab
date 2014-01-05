@@ -59,12 +59,6 @@ private slots:
     /// @brief Called when a user has written a chat message and then pressed the return key.
     void on_lineEdit_returnPressed();
 
-    /// @brief Called when the mute-volume button is clicked on.
-    void on_muteVolume_toggled(bool toggled);
-
-    /// @brief Called when the mute-microphone button is clicked on.
-    void on_muteMic_toggled(bool toggled);
-
     /// @brief Called when the connect button is clicked on, and opens the connect dialog.
     void on_actionConnect_triggered();
 

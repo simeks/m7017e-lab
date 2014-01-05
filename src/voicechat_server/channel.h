@@ -30,6 +30,7 @@ public:
 	/// Returns the unique ID of this channels parent. Returns -1 if there's no parent.
 	int ParentId() const;
 
+	/// Returns the UDP port that this channel is listening on.
 	int UdpPort() const { return _udp_port; }
 
 	void Tick();

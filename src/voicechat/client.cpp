@@ -110,25 +110,16 @@ void Client::SendHelloMessage(const QString &username)
     SendMessage(msg_object);
 }
 
-void Client::SendChatMessage(const QString &username, const QString &message)
- {
-    ConfigValue msg_object;
-    std::string mess = message.toStdString();
-    std::string uname = username.toStdString();
-
-    net_client::CreateChatMsg(msg_object, uname.c_str(), mess.c_str());
-    SendMessage(msg_object);
- }
-
-void Client::MuteMic(bool toggled)
+void Client::SendChatMessage(const QString &message)
 {
+	ConfigValue msg_object;
+	std::string mess = message.toStdString();
+	std::string uname = _user_name.toStdString();
 
+	net_client::CreateChatMsg(msg_object, uname.c_str(), mess.c_str());
+	SendMessage(msg_object);
 }
 
-void Client::MuteVolume(bool toggled)
-{
-
-}
 void Client::Connected()
 {
     _window->SetUserName(_user_name);

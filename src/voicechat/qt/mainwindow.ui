@@ -99,33 +99,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionConnect"/>
-   <addaction name="muteVolume"/>
-   <addaction name="muteMic"/>
   </widget>
-  <action name="muteVolume">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../data/voicechat/application.qrc">
-     <normaloff>:/images/muteButton.png</normaloff>:/images/muteButton.png</iconset>
-   </property>
-   <property name="text">
-    <string>muteVolume</string>
-   </property>
-  </action>
-  <action name="muteMic">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../data/voicechat/application.qrc">
-     <normaloff>:/images/muteMic.png</normaloff>:/images/muteMic.png</iconset>
-   </property>
-   <property name="text">
-    <string>muteMic</string>
-   </property>
-  </action>
   <action name="actionConnect">
    <property name="text">
     <string>Connect</string>

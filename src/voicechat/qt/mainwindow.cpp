@@ -30,7 +30,7 @@ void MainWindow::on_lineEdit_returnPressed()
 
     if (!text.isEmpty())
     {
-        _client->SendChatMessage(_user_name ,text);
+        _client->SendChatMessage(text);
         ui->lineEdit->clear();
     }
 }
@@ -38,16 +38,6 @@ void MainWindow::on_lineEdit_returnPressed()
 void MainWindow::AppendMessage(QString text)
 {
     ui->textEdit->append(text);
-}
-
-void MainWindow::on_muteVolume_toggled(bool toggled)
-{
-    _client->MuteVolume(toggled);
-}
-
-void MainWindow::on_muteMic_toggled(bool toggled)
-{
-    _client->MuteMic(toggled);
 }
 
 void MainWindow::on_actionConnect_triggered()
@@ -168,7 +158,7 @@ void MainWindow::Disconnected()
 	ui->treeWidget->hideColumn(0);
 }
 
-void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int )
 {
 	for(std::map<int, QTreeWidgetItem*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{

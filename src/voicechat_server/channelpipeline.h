@@ -5,12 +5,13 @@
 
 #include "shared/bus.h"
 
-class UDPSource;
 
 /// GStreamer pipeline that listens for incoming streams and passes them to the clients.
 class ChannelPipeline : public PipelineListener
 {
 public:
+	/// Constructor
+	/// @param udp_port Specifies on which udp port this channel should listen for incomming audio.
 	ChannelPipeline(int udp_port);
 	~ChannelPipeline();
 

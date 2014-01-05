@@ -27,15 +27,27 @@ public:
     ~Client();
 
     void ConnectClicked();
+
+	/// Sets which the IP that the client should connect to.
     void SetServerIp(QString serverIP);
-    void SetUserName(QString userName);
+	
+	/// Sets which port on the server to connect to.
     void SetServerPort(int port);
-    void SendChatMessage(const QString &username, const QString &message);
-    void SendHelloMessage(const QString &message);
-    void SendMessage(const ConfigValue& msg_object);
-    void MuteVolume(bool toggled);
-    void MuteMic(bool toggled);
-    void ChangeChannel(int new_channel);
+
+	/// Sets the username for this client.
+    void SetUserName(QString userName);
+
+	/// Sends a chat message to the server.
+	/// @param message The message to send.
+    void SendChatMessage(const QString &message);
+    
+	/// Sends a hello message to the server identifying ourself.
+	/// @param username The requested username.
+	void SendHelloMessage(const QString &username);
+
+	/// Changes the audio channel.
+	/// @param new_channel The ID of the channel to move to.
+	void ChangeChannel(int new_channel);
 
 private slots:
 	/// @brief The socket successfully connected
@@ -52,7 +64,10 @@ private slots:
 
 private:
 	typedef void (Client::*MessageCallback)(const ConfigValue&);
-	
+
+	/// Sends the specified message object to the server.
+	void SendMessage(const ConfigValue& msg_object);
+    
 	/// @brief Registers a callback for the specified message type.
 	///	The registered callback will be called every time we recieve a packet of the specified type.
 	void RegisterCallback(const std::string& msg_type, MessageCallback callback);

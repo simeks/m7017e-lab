@@ -9,9 +9,9 @@
 #include "channelpipeline.h"
 
 
-Server::Server(int tcp_port, int udp_port)
+Server::Server(int tcp_port, int base_udp_port)
 	: _tcp_port(tcp_port),
-	_udp_port(udp_port),
+	_base_udp_port(base_udp_port),
 	_next_uid(0),
 	_tick_timer(this)
 {
@@ -81,7 +81,6 @@ void Server::UserDisconnected(User* user)
 	if(it != _users.end())
 	{
 		_users.erase(it);
-		debug::Printf("User erased\n");
 	}
 	// Free the user object
 	delete user;
@@ -91,7 +90,7 @@ void Server::UserDisconnected(User* user)
 void Server::CreateChannel(const std::string& name, int parent_channel)
 {
 	int channel_id = _next_uid++;
-	Channel* channel = new Channel(channel_id, parent_channel, name, this, _udp_port+channel_id);
+	Channel* channel = new Channel(channel_id, parent_channel, name, this, _base_udp_port+channel_id);
 	_channels.push_back(channel);
 
 	// Broadcast the changed state to all users
@@ -193,7 +192,7 @@ void Server::NewConnection()
 {
 	QTcpSocket* client_socket = _tcp_server->nextPendingConnection();
 
-	int udp_port = _udp_port+_next_uid; // We generate a unique udp port for each user, this is mostly for testing purposes on localhost
+	int udp_port = _base_udp_port+_next_uid; // We generate a unique udp port for each user, this is mostly for testing purposes on localhost
 	debug::Printf("New connection from %s. (Port: %d)\n", client_socket->peerAddress().toString().toLocal8Bit().constData(), udp_port);
 
 	User* user = new User(_next_uid++, this, client_socket, udp_port);

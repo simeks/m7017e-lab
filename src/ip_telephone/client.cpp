@@ -1,5 +1,5 @@
 #include "client.h"
-#include <E:\pjproject-2.1.0\pjsip\include\pjsua-lib\pjsua.h>   // #include <pjsua-lib/pjsua.h>
+#include <pjsua-lib/pjsua.h>
 #include "qt/mainwindow.h"
 
 #define THIS_FILE	"APP"

@@ -274,5 +274,82 @@ Program {
 	Frameworks = { "QtCore", "QtNetwork"  },	
 }
 
-Default "VoiceChat"
+Program {
+	Name = "IPTelephone",
+	Depends = { "Shared" },
+	Sources = {
+		FGlob {
+			Dir = "src/ip_telephone",
+			Extensions = { ".c", ".cpp", ".h", ".inl" },
+			Filters = {
+				{ Pattern = "win32"; Config = "win32-*-*"; },
+			},
+		},
+		GenerateMocSources {
+			Glob { 
+				Dir = "src/ip_telephone/qt", 
+				Extensions = { ".h" } 
+			}, 
+		},
+		GenerateUISources {
+			Glob { 
+				Dir = "src/ip_telephone/qt", 
+				Extensions = { ".ui" } 
+			}, 
+		},
+		GenerateQRC {
+			Input = "data/ip_telephone/application.qrc",
+			Output = "application.cpp"
+		}
+	},
+	Env = {	
+		CPPPATH = { 
+			"$(GSTREAMER_INCLUDE)",
+			"$(GSTREAMER_INCLUDE)/gstreamer-0.10",
+			"$(GSTREAMER_INCLUDE)/glib-2.0",
+			"$(GSTREAMER_INCLUDE)/libxml2",
+			"$(GSTREAMER_LIBS)/glib-2.0/include",
+			"$(QT5_INCLUDE)/QtWidgets",
+			"$(QT5_INCLUDE)/QtGui",
+			"$(QT5_INCLUDE)/QtCore", 
+			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)",
+			"src",
+			"$(OBJECTDIR)/_generated/src/ip_telephone/qt",
+			"dependencies/pjproject-2.1.0/pjlib/include",
+			"dependencies/pjproject-2.1.0/pjlib-util/include",
+			"dependencies/pjproject-2.1.0/pjmedia/include",
+			"dependencies/pjproject-2.1.0/pjnath/include",
+			"dependencies/pjproject-2.1.0/pjsip/include",
+		},
+		LIBPATH = {
+			"$(GSTREAMER_LIBS)",
+			"$(QT5_LIBS)",
+			"dependencies/pjproject-2.1.0/pjsip/lib",
+		},
+		PROGOPTS = {
+			{ "/SUBSYSTEM:WINDOWS"; Config = { "win32-*-release" } },
+			{ "/SUBSYSTEM:CONSOLE"; Config = { "win32-*-debug" } },
+		},
+	},
+	Libs = { 
+		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", 
+			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
+			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "WS2_32.lib"; 
+			Config = { "win32-*-*" } 
+		},
+		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10";
+			Config = { "macosx-*-*" } 
+		},
+		{ 	"gstreamer-0.10", "glib-2.0", "gobject-2.0", "gstinterfaces-0.10",
+			"Qt5Core", "Qt5Widgets", "Qt5Gui";
+			Config = { "linux-*-*" } 
+		}
+	},
+
+	Frameworks = { "Cocoa", "QtCore", "QtWidgets", "QtGui", "OpenGL", "AGL"  },
+
+}
+
+Default "IPTelephone"
 

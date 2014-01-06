@@ -6,12 +6,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     _client(new Client(this)),
     _call_dialog(NULL),
-    _incoming_call_dialog(NULL)
+    _incoming_call_dialog(NULL),
+    _settings_dialog(NULL)
 {
     ui->setupUi(this);
 
     _call_dialog = new Call_Dialog(_client, this);
 	_incoming_call_dialog = new Incoming_Call_Dialog(_client, this);
+    _settings_dialog = new Settings_Dialog(_client, this);
+
+    // Open the settings dialog when the application starts
+    _settings_dialog->open();
 
 }
 

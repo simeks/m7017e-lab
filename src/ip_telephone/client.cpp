@@ -3,8 +3,6 @@
 #include "qt/mainwindow.h"
 #include <QDebug>
 
-
-
 #define SIP_DOMAIN	"iptel.org"
 #define SIP_USER	"joohanforsling"
 #define SIP_PASSWD	"hejhej"
@@ -204,6 +202,10 @@ void Client::DeclineCall()
 	pjsua_call_hangup(_call_id, 0, NULL, NULL);
 }
 
+void Client::SetUser(std::string username, std::string password, std::string domain)
+{
+
+}
 
     /*
 

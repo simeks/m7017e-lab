@@ -25,6 +25,7 @@ public:
 	void InterruptCall();
 	void HangUpActiveCall();
 	void DeclineCall();
+	void SetUser(std::string username, std::string password, std::string domain);
 
 private:
 

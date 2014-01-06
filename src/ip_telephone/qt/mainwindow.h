@@ -5,6 +5,7 @@
 #include "call_dialog.h"
 #include "../client.h"
 #include "incoming_call_dialog.h"
+#include "settings_dialog.h"
 
 namespace Ui {
 class MainWindow;
@@ -13,6 +14,7 @@ class MainWindow;
 class Call_Dialog;
 class Incoming_Call_Dialog;
 class Client;
+class Settings_Dialog;
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +35,7 @@ private:
     Client* _client;
     Call_Dialog* _call_dialog;
 	Incoming_Call_Dialog* _incoming_call_dialog;
+    Settings_Dialog* _settings_dialog;
 };
 
 #endif // MAINWINDOW_H

@@ -1,9 +1,11 @@
 #include "incoming_call_dialog.h"
 #include "ui_incoming_call_dialog.h"
 
-Incoming_Call_Dialog::Incoming_Call_Dialog(QWidget *parent) :
+Incoming_Call_Dialog::Incoming_Call_Dialog(Client* client, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Incoming_Call_Dialog)
+    ui(new Ui::Incoming_Call_Dialog),
+    _client(client),
+	_active_call_dialog(NULL)
 {
     ui->setupUi(this);
 }
@@ -17,10 +19,14 @@ Incoming_Call_Dialog::~Incoming_Call_Dialog()
 void Incoming_Call_Dialog::on_pushButton_2_clicked()
 {
     this->close();
+	_client->DeclineCall();
 }
 
 // Callback for when the Answer button is clicked
 void Incoming_Call_Dialog::on_pushButton_clicked()
 {
     this->close();
+	_active_call_dialog = new Active_Call_Dialog(_client, this);
+	_active_call_dialog->open();
+    _client->AnswerIncomingCall();
 }

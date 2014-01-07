@@ -14,7 +14,7 @@ namespace
 
 	// Callback called by the library upon receiving incoming call
 	void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
-					 pjsip_rx_data *rdata)
+		pjsip_rx_data *rdata)
 	{
 		if(!g_client)
 			return;
@@ -31,12 +31,21 @@ namespace
 		g_client->OnCallState(call_id, e);
 	}
 
+	// Callback called by the library when call's media state has changed
+	void on_call_media_state(pjsua_call_id call_id)
+	{
+		if(!g_client)
+			return;
+
+		g_client->OnCallMediaState(call_id);
+	}
+
 };
 
 
 
 Client::Client(MainWindow* window) :
-    _window(window)
+	_window(window)
 {
 	g_client = this;
 
@@ -48,27 +57,70 @@ Client::~Client()
 
 
 void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
-					pjsip_rx_data *rdata)
+							pjsip_rx_data *rdata)
 {
-	pjsua_call_info call_info;
+	pjsua_call_info prev_call_info;
+	pjsua_call_get_info(_call_id, &prev_call_info);
+
+	if(prev_call_info.state == PJSIP_INV_STATE_CONFIRMED)
+	{
+		// 486/Busy
+		pjsua_call_hangup(call_id, 486, NULL, NULL);
+		qDebug() << "Busy";
+	}
 
 	_call_id = call_id;
+	pjsua_call_info call_info;
+	pjsua_call_get_info(call_id, &call_info);
 
 	PJ_UNUSED_ARG(acc_id);
 	PJ_UNUSED_ARG(rdata);
 
-	pjsua_call_get_info(call_id, &call_info);
-	
 	// Open incoming call dialog
-    _window->ShowIncomingCallPanel();
+	_window->ShowIncomingCallPanel();
 }
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {
-	pjsua_call_info call_info;
-	
 	PJ_UNUSED_ARG(e);
-
+	pjsua_call_info call_info;
 	pjsua_call_get_info(call_id, &call_info);
+
+	// When Stop, Decline or Hang Up button is clicked
+	if (call_info.state == PJSIP_INV_STATE_DISCONNECTED)
+	{
+		_window->HideIncomingCallPanel();
+		_window->HideActiveCallPanel();
+		_window->HideCallingPanel();
+
+		qDebug() << "DISCONNECTED";
+		qDebug() << "DISCONNECTED";
+		qDebug() << "DISCONNECTED";
+		qDebug() << "DISCONNECTED";
+		qDebug() << "DISCONNECTED";
+		qDebug() << "DISCONNECTED";
+	}
+
+	// When Answer button is clicked
+	if(call_info.last_status == 200 && call_info.state == PJSIP_INV_STATE_CONFIRMED)
+	{
+		qDebug() << call_info.last_status;
+		qDebug() << call_info.last_status;
+		qDebug() << call_info.last_status;
+		_window->ShowActiveCallPanel();
+		_window->HideCallingPanel();
+		_window->HideIncomingCallPanel();
+	}
+
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
 }
 
 void Client::AnswerIncomingCall()
@@ -105,6 +157,7 @@ void Client::HangUpActiveCall()
 
 void Client::DeclineCall()
 {
+	// 603/Decline
 	pjsua_call_hangup(_call_id, 0, NULL, NULL);
 }
 
@@ -120,12 +173,12 @@ void Client::SetUser(std::string username, std::string password, std::string dom
 void Client::InitializePJ()
 {
 	// Create pjsua
-    status = pjsua_create();
-    if (status != PJ_SUCCESS)
-    {
+	status = pjsua_create();
+	if (status != PJ_SUCCESS)
+	{
 		qDebug() << "Error in pjsua_create()";
-        return;
-    }
+		return;
+	}
 	else
 	{
 		qDebug() << "pjsua_create() SUCCESS";
@@ -133,11 +186,12 @@ void Client::InitializePJ()
 
 
 	// Init pjsua
-    pjsua_config cfg;
+	pjsua_config cfg;
 	pjsua_config_default(&cfg);
 
 	cfg.cb.on_call_state = &on_call_state;
 	cfg.cb.on_incoming_call = &on_incoming_call;
+	cfg.cb.on_call_media_state = &on_call_media_state;
 
 	status = pjsua_init(&cfg, NULL, NULL);
 	if (status != PJ_SUCCESS)
@@ -175,12 +229,12 @@ void Client::InitializePJ()
 void Client::AddTransportPJ()
 {
 	// Add UDP transport.
-    pjsua_transport_config transport_cfg;
-    pjsua_transport_config_default(&transport_cfg);
-    transport_cfg.port = 5060;
+	pjsua_transport_config transport_cfg;
+	pjsua_transport_config_default(&transport_cfg);
+	transport_cfg.port = 5060;
 
-    status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &transport_cfg, NULL);
-    if (status != PJ_SUCCESS)
+	status = pjsua_transport_create(PJSIP_TRANSPORT_UDP, &transport_cfg, NULL);
+	if (status != PJ_SUCCESS)
 	{
 		qDebug() << "Error creating transport";
 		return;
@@ -222,5 +276,18 @@ void Client::CreateSipAccount()
 	else
 	{
 		qDebug() << "Adding account SUCCESS";
+	}
+}
+
+void Client::OnCallMediaState(pjsua_call_id call_id)
+{
+	pjsua_call_info call_info;
+	pjsua_call_get_info(call_id, &call_info);
+
+	if (call_info.media_status == PJSUA_CALL_MEDIA_ACTIVE) 
+	{
+		// Connect the call to the sound device when media is active.
+		pjsua_conf_connect(call_info.conf_slot, 0);
+		pjsua_conf_connect(0, call_info.conf_slot);
 	}
 }

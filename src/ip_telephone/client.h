@@ -20,6 +20,8 @@ public:
 	// Callback called by the library when call's state has changed
 	void OnCallState(pjsua_call_id call_id, pjsip_event *e);
 
+	void OnCallMediaState(pjsua_call_id call_id);
+
 	void AnswerIncomingCall();
 	void MakeCall(std::string uri);
 	void InterruptCall();

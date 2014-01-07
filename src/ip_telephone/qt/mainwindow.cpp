@@ -49,7 +49,6 @@ void MainWindow::ShowIncomingCallPanel()
 // Callback for when the Stop button is clicked
 void MainWindow::on_pushButton_2_clicked()
 {
-    ui->widget->hide();
     _client->InterruptCall();
 }
 
@@ -57,23 +56,37 @@ void MainWindow::on_pushButton_2_clicked()
 // Callback for when the Answer button is clicked
 void MainWindow::on_pushButton_3_clicked()
 {
-    ui->widget->hide();
-    ui->widget_2->hide();
     _client->AnswerIncomingCall();
-    ui->widget_3->show();
 }
 
 // Callback for when the Decline button is clicked
 void MainWindow::on_pushButton_4_clicked()
 {
-    ui->widget->hide();
-    ui->widget_2->hide();
     _client->DeclineCall();
 }
 
 // Callback for when the Hang-Up button is clicked
 void MainWindow::on_pushButton_5_clicked()
 {
-    ui->widget_3->hide();
     _client->HangUpActiveCall();
+}
+
+void MainWindow::HideIncomingCallPanel()
+{
+    ui->widget_2->hide();
+}
+
+void MainWindow::HideActiveCallPanel()
+{
+	ui->widget_3->hide();
+}
+
+void MainWindow::HideCallingPanel()
+{
+	ui->widget->hide();
+}
+
+void MainWindow::ShowActiveCallPanel()
+{
+	ui->widget_3->show();
 }

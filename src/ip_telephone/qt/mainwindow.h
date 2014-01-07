@@ -20,6 +20,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 	void ShowIncomingCallPanel();
+	void HideActiveCallPanel();
+	void HideIncomingCallPanel();
+	void HideCallingPanel();
+	void ShowActiveCallPanel();
 
 private slots:
 

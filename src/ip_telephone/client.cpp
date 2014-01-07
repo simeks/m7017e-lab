@@ -60,7 +60,7 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	pjsua_call_get_info(call_id, &call_info);
 	
 	// Open incoming call dialog
-	_window->ShowIncomingCallDialog();
+    _window->ShowIncomingCallPanel();
 }
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {

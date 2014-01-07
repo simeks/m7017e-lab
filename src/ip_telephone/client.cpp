@@ -3,9 +3,9 @@
 #include "qt/mainwindow.h"
 #include <QDebug>
 
-#define SIP_DOMAIN	"iptel.org"
-#define SIP_USER	"joohanforsling"
-#define SIP_PASSWD	"hejhej"
+//#define SIP_DOMAIN	"iptel.org"
+//#define SIP_USER	"joohanforsling"
+//#define SIP_PASSWD	"hejhej"
 
 /// pjsip callbacks
 namespace
@@ -40,8 +40,86 @@ Client::Client(MainWindow* window) :
 {
 	g_client = this;
 
+}
+Client::~Client()
+{
+	g_client = NULL;
+}
 
-    // Create pjsua
+
+void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
+					pjsip_rx_data *rdata)
+{
+	pjsua_call_info call_info;
+
+	_call_id = call_id;
+
+	PJ_UNUSED_ARG(acc_id);
+	PJ_UNUSED_ARG(rdata);
+
+	pjsua_call_get_info(call_id, &call_info);
+	
+	// Open incoming call dialog
+	_window->ShowIncomingCallDialog();
+}
+void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
+{
+	pjsua_call_info call_info;
+	
+	PJ_UNUSED_ARG(e);
+
+	pjsua_call_get_info(call_id, &call_info);
+}
+
+void Client::AnswerIncomingCall()
+{
+	// Answer incoming calls with 200/OK
+	pjsua_call_answer(_call_id, 200, NULL, NULL);
+}
+
+void Client::MakeCall(std::string uri)
+{
+	pj_str_t _uri = pj_str((char*) uri.c_str());
+
+	status = pjsua_call_make_call(acc_id, &_uri, 0, NULL, NULL, NULL);
+	if (status != PJ_SUCCESS)
+	{
+		qDebug() << "Error making the call";
+	}
+	else
+	{
+		qDebug() << "Making the call SUCCESS";
+	}
+}
+
+void Client::InterruptCall()
+{
+	// Interrupt the call when the Caller clicks on the Stop button
+	pjsua_call_hangup(_call_id, NULL, NULL, NULL);
+}
+
+void Client::HangUpActiveCall()
+{
+	pjsua_call_hangup(_call_id, NULL, NULL, NULL);
+}
+
+void Client::DeclineCall()
+{
+	pjsua_call_hangup(_call_id, 0, NULL, NULL);
+}
+
+void Client::SetUser(std::string username, std::string password, std::string domain)
+{
+	_username = username;
+	_password = password;
+	_domain = domain;
+
+	InitializePJ();
+}
+
+void Client::InitializePJ()
+{
+	// Create pjsua
     status = pjsua_create();
     if (status != PJ_SUCCESS)
     {
@@ -88,7 +166,14 @@ Client::Client(MainWindow* window) :
 		qDebug() << "Starting pjsua SUCCESS";
 	}
 
+	AddTransportPJ();
 
+	CreateSipAccount();
+
+}
+
+void Client::AddTransportPJ()
+{
 	// Add UDP transport.
     pjsua_transport_config transport_cfg;
     pjsua_transport_config_default(&transport_cfg);
@@ -104,20 +189,29 @@ Client::Client(MainWindow* window) :
 	{
 		qDebug() << "Creating transport SUCCESS";
 	}
+}
 
-
+void Client::CreateSipAccount()
+{
 	/* Register to SIP server by creating SIP account. */
 	pjsua_acc_config acc_cfg;
 
 	pjsua_acc_config_default(&acc_cfg);
-	acc_cfg.id = pj_str("sip:" SIP_USER "@" SIP_DOMAIN);
-	acc_cfg.reg_uri = pj_str("sip:" SIP_DOMAIN);
+
+	std::string id("sip:" + _username + "@" + _domain);
+	acc_cfg.id = pj_str((char *) id.c_str());
+
+	std::string uri("sip:" + _domain);
+	acc_cfg.reg_uri = pj_str((char *) uri.c_str());
+
 	acc_cfg.cred_count = 1;
-	acc_cfg.cred_info[0].realm = pj_str(SIP_DOMAIN);
+	acc_cfg.cred_info[0].realm = pj_str((char *) _domain.c_str());
+
+
 	acc_cfg.cred_info[0].scheme = pj_str("digest");
-	acc_cfg.cred_info[0].username = pj_str(SIP_USER);
+	acc_cfg.cred_info[0].username = pj_str((char*) _username.c_str());
 	acc_cfg.cred_info[0].data_type = PJSIP_CRED_DATA_PLAIN_PASSWD;
-	acc_cfg.cred_info[0].data = pj_str(SIP_PASSWD);
+	acc_cfg.cred_info[0].data = pj_str((char *) _password.c_str());
 
 	status = pjsua_acc_add(&acc_cfg, PJ_TRUE, &acc_id);
 	if (status != PJ_SUCCESS)
@@ -129,104 +223,4 @@ Client::Client(MainWindow* window) :
 	{
 		qDebug() << "Adding account SUCCESS";
 	}
-
 }
-Client::~Client()
-{
-	g_client = NULL;
-}
-
-
-void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
-					pjsip_rx_data *rdata)
-{
-	pjsua_call_info call_info;
-
-	_call_id = call_id;
-
-	PJ_UNUSED_ARG(acc_id);
-	PJ_UNUSED_ARG(rdata);
-
-	pjsua_call_get_info(call_id, &call_info);
-	
-	// Open incoming call dialog
-	_window->ShowIncomingCallDialog();
-}
-void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
-{
-	pjsua_call_info call_info;
-	
-	PJ_UNUSED_ARG(e);
-
-	pjsua_call_get_info(call_id, &call_info);
-}
-
-void Client::AnswerIncomingCall()
-{
-	// Answer incoming calls with 200/OK
-	pjsua_call_answer(_call_id, 200, NULL, NULL);
-}
-
-void Client::MakeCall(std::string uri)
-{
-
-	char * c = new char[uri.size() + 1];
-	std::copy(uri.begin(), uri.end(), c);
-	c[uri.size()] = '\0';
-
-
-	pj_str_t _uri = pj_str(c);
-	status = pjsua_call_make_call(acc_id, &_uri, 0, NULL, NULL, NULL);
-	if (status != PJ_SUCCESS)
-	{
-		qDebug() << "Error making the call";
-	}
-	else
-	{
-		qDebug() << "Making the call SUCCESS";
-	}
-}
-
-void Client::InterruptCall()
-{
-	// Interrupt the call when the Caller clicks on the Stop button
-}
-
-void Client::HangUpActiveCall()
-{
-	pjsua_call_hangup(_call_id, NULL, NULL, NULL);
-}
-
-void Client::DeclineCall()
-{
-	pjsua_call_hangup(_call_id, 0, NULL, NULL);
-}
-
-void Client::SetUser(std::string username, std::string password, std::string domain)
-{
-
-}
-
-    /*
-
-    //Wait until user press "q" to quit.
-    for (;;) {
-    char option[10];
-
-    puts("Press 'h' to hangup all calls, 'q' to quit");
-    if (fgets(option, sizeof(option), stdin) == NULL) {
-        puts("EOF while reading stdin, will quit now..");
-        break;
-    }
-
-    if (option[0] == 'q')
-        break;
-
-    if (option[0] == 'h')
-        pjsua_call_hangup_all();
-    }
-
-    // Destroy pjsua
-    pjsua_destroy();
-
-	*/

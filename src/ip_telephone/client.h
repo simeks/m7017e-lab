@@ -26,6 +26,9 @@ public:
 	void HangUpActiveCall();
 	void DeclineCall();
 	void SetUser(std::string username, std::string password, std::string domain);
+	void InitializePJ();
+	void AddTransportPJ();
+	void CreateSipAccount();
 
 private:
 
@@ -33,6 +36,10 @@ private:
 	pjsua_call_id _call_id;
 	pjsua_acc_id acc_id;
     pj_status_t status;
+
+	std::string _username;
+	std::string _password;
+	std::string _domain;
 };
 
 #endif // CLIENT_H

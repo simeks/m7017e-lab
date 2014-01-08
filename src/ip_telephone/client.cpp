@@ -49,7 +49,7 @@ Client::Client(MainWindow* window) :
 {
 	g_client = this;
 	_call_id = 0;
-
+	_state = NOT_INITIALIZED;
 }
 Client::~Client()
 {
@@ -65,7 +65,7 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	pjsua_call_info prev_call_info;
 	pjsua_call_get_info(_call_id, &prev_call_info);
 
-	if(pjsua_call_is_active(_call_id))
+	if((_state != READY) && pjsua_call_is_active(_call_id))
 	{
 		// 486/Busy
 		pjsua_call_hangup(call_id, 486, NULL, NULL);
@@ -85,6 +85,8 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 
 	// Open incoming call dialog
 	_window->ShowIncomingCallPanel(uri);
+
+	_state = INCOMING_CALL;
 }
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {
@@ -100,35 +102,18 @@ void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 		_window->HideCallingPanel();
 		_window->ShowMainWindow();
 
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
+		_state = READY;
 	}
 
 	// When Answer button is clicked
 	if(call_info.last_status == 200 && call_info.state == PJSIP_INV_STATE_CONFIRMED)
 	{
-		qDebug() << call_info.last_status;
-		qDebug() << call_info.last_status;
-		qDebug() << call_info.last_status;
 		_window->ShowActiveCallPanel();
 		_window->HideCallingPanel();
 		_window->HideIncomingCallPanel();
-	}
 
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
+		_state = IN_CALL;
+	}
 }
 
 void Client::AnswerIncomingCall()
@@ -232,6 +217,7 @@ void Client::InitializePJ()
 
 	CreateSipAccount();
 
+	_state = READY;
 }
 
 void Client::AddTransportPJ()

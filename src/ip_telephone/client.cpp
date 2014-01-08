@@ -54,6 +54,8 @@ Client::Client(MainWindow* window) :
 Client::~Client()
 {
 	g_client = NULL;
+	pjsua_call_hangup_all();
+	pjsua_destroy();
 }
 
 

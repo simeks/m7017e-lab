@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     _settings_dialog(NULL)
 {
     ui->setupUi(this);
-
     // Hide the Calling panel
     ui->widget->hide();
 
@@ -30,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+	_client->~Client();
 }
 
 // Callback for when the Call button is clicked
@@ -49,6 +49,9 @@ void MainWindow::ShowIncomingCallPanel(std::string incoming_uri)
 {
 	ui->label_3->setText(QString::fromStdString(incoming_uri) + " is calling you");
     ui->widget_2->show();
+	// Hide Call button and sip-address textfield
+    ui->widget_4->hide();
+    ui->widget_5->hide();
 }
 
 // Callback for when the Stop button is clicked

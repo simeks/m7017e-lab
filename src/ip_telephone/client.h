@@ -51,6 +51,16 @@ public:
 	void CreateSipAccount();
 
 private:
+	enum State
+	{
+		NOT_INITIALIZED,
+		READY, // Ready for incoming calls
+		CALLING, // Currently calling
+		INCOMING_CALL, // Currently having an incoming call waiting
+		IN_CALL, // Currently in a call
+	};
+
+	State _state;
 
     MainWindow* _window;
 	pjsua_call_id _call_id;

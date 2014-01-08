@@ -45,7 +45,7 @@ Client::Client(MainWindow* window) :
 {
 	g_client = this;
 	_call_id = 0;
-
+	_state = NOT_INITIALIZED;
 }
 Client::~Client()
 {
@@ -62,8 +62,12 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	pjsua_call_info prev_call_info;
 	pjsua_call_get_info(_call_id, &prev_call_info);
 
+
 	// If the previous call is active, hang up with a 486 BUSY response
 	if(pjsua_call_is_active(_call_id))
+
+	if((_state != READY) && pjsua_call_is_active(_call_id))
+
 	{
 		// 486/Busy
 		pjsua_call_hangup(call_id, 486, NULL, NULL);
@@ -87,6 +91,8 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 
 	// Open incoming call dialog
 	_window->ShowIncomingCallPanel(uri);
+
+	_state = INCOMING_CALL;
 }
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {
@@ -104,6 +110,8 @@ void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 		_window->HideActiveCallPanel();
 		_window->HideCallingPanel();
 		_window->ShowMainWindow();
+
+		_state = READY;
 	}
 
 	// If Answer button is clicked
@@ -113,6 +121,12 @@ void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 		_window->ShowActiveCallPanel();
 		_window->HideCallingPanel();
 		_window->HideIncomingCallPanel();
+
+		_window->ShowActiveCallPanel();
+		_window->HideCallingPanel();
+		_window->HideIncomingCallPanel();
+
+		_state = IN_CALL;
 	}
 }
 
@@ -219,6 +233,7 @@ void Client::InitializePJ()
 
 	CreateSipAccount();
 
+	_state = READY;
 }
 
 void Client::AddTransportPJ()

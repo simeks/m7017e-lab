@@ -63,11 +63,12 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	pjsua_call_info prev_call_info;
 	pjsua_call_get_info(_call_id, &prev_call_info);
 
-	if(prev_call_info.state == PJSIP_INV_STATE_CONFIRMED) // eller kanske: if(pjsua_call_is_active(_call_id)
+	if(pjsua_call_is_active(_call_id))
 	{
 		// 486/Busy
 		pjsua_call_hangup(call_id, 486, NULL, NULL);
 		qDebug() << "Busy";
+		return;
 	}
 
 	_call_id = call_id;
@@ -77,8 +78,11 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	PJ_UNUSED_ARG(acc_id);
 	PJ_UNUSED_ARG(rdata);
 
+	pj_str_t incoming_uri = call_info.remote_info;
+	std::string uri(incoming_uri.ptr, incoming_uri.slen);
+
 	// Open incoming call dialog
-	_window->ShowIncomingCallPanel();
+	_window->ShowIncomingCallPanel(uri);
 }
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {

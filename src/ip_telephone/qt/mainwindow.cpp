@@ -45,8 +45,9 @@ void MainWindow::on_pushButton_clicked()
     ui->widget_5->hide();
 }
 
-void MainWindow::ShowIncomingCallPanel()
+void MainWindow::ShowIncomingCallPanel(std::string incoming_uri)
 {
+	ui->label_3->setText(QString::fromStdString(incoming_uri) + " is calling you");
     ui->widget_2->show();
 }
 

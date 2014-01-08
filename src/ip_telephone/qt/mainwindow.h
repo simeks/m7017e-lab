@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-	void ShowIncomingCallPanel();
+	void ShowIncomingCallPanel(std::string incoming_uri);
 	void HideActiveCallPanel();
 	void HideIncomingCallPanel();
 	void HideCallingPanel();

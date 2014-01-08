@@ -19,6 +19,7 @@ public:
     ~Settings_Dialog();
 
 private slots:
+	/// Callback for when the Save button is clicked
     void on_pushButton_clicked();
 
 private:

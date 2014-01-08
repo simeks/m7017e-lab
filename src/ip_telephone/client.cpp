@@ -3,16 +3,12 @@
 #include "qt/mainwindow.h"
 #include <QDebug>
 
-//#define SIP_DOMAIN	"iptel.org"
-//#define SIP_USER	"joohanforsling"
-//#define SIP_PASSWD	"hejhej"
-
 /// pjsip callbacks
 namespace
 {
 	Client* g_client;
 
-	// Callback called by the library upon receiving incoming call
+	// Callback called by the library when receiving incoming call
 	void on_incoming_call(pjsua_acc_id acc_id, pjsua_call_id call_id,
 		pjsip_rx_data *rdata)
 	{
@@ -62,9 +58,11 @@ Client::~Client()
 void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 							pjsip_rx_data *rdata)
 {
+	// Get info about the previous call
 	pjsua_call_info prev_call_info;
 	pjsua_call_get_info(_call_id, &prev_call_info);
 
+	// If the previous call is active, hang up with a 486 BUSY response
 	if(pjsua_call_is_active(_call_id))
 	{
 		// 486/Busy
@@ -73,13 +71,17 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 		return;
 	}
 
+	//  Save the call id
 	_call_id = call_id;
+
+	// Get info about the incoming call
 	pjsua_call_info call_info;
 	pjsua_call_get_info(call_id, &call_info);
 
 	PJ_UNUSED_ARG(acc_id);
 	PJ_UNUSED_ARG(rdata);
 
+	// Get the sip-address of the person who is calling
 	pj_str_t incoming_uri = call_info.remote_info;
 	std::string uri(incoming_uri.ptr, incoming_uri.slen);
 
@@ -89,46 +91,29 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 {
 	PJ_UNUSED_ARG(e);
+
+	// Get info about the call
 	pjsua_call_info call_info;
 	pjsua_call_get_info(call_id, &call_info);
 
-	// When Stop, Decline or Hang Up button is clicked
+	// If Stop, Decline or Hang Up button is clicked
 	if (call_info.state == PJSIP_INV_STATE_DISCONNECTED)
 	{
+		// Hide all panels and show sip-address textfield and Call button
 		_window->HideIncomingCallPanel();
 		_window->HideActiveCallPanel();
 		_window->HideCallingPanel();
 		_window->ShowMainWindow();
-
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
-		qDebug() << "DISCONNECTED";
 	}
 
-	// When Answer button is clicked
+	// If Answer button is clicked
 	if(call_info.last_status == 200 && call_info.state == PJSIP_INV_STATE_CONFIRMED)
 	{
-		qDebug() << call_info.last_status;
-		qDebug() << call_info.last_status;
-		qDebug() << call_info.last_status;
+		// Show the Active-call panel and hide the Calling panel and Incoming-call panel
 		_window->ShowActiveCallPanel();
 		_window->HideCallingPanel();
 		_window->HideIncomingCallPanel();
 	}
-
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
-	qDebug() << "CALL STATE CHANGED!!!" << call_info.state;
 }
 
 void Client::AnswerIncomingCall()
@@ -141,6 +126,7 @@ void Client::MakeCall(std::string uri)
 {
 	pj_str_t _uri = pj_str((char*) uri.c_str());
 
+	// Make the call
 	status = pjsua_call_make_call(acc_id, &_uri, 0, NULL, NULL, &_call_id);
 	if (status != PJ_SUCCESS)
 	{
@@ -160,15 +146,17 @@ void Client::InterruptCall()
 
 void Client::HangUpActiveCall()
 {
+	// Hang up the active call when the Hang Up button is clicked
 	pjsua_call_hangup(_call_id, NULL, NULL, NULL);
 }
 
 void Client::DeclineCall()
 {
-	// 603/Decline
+	// 603/Decline when the Decline button is clicked
 	pjsua_call_hangup(_call_id, 0, NULL, NULL);
 }
 
+// Get the sip-account details from the user
 void Client::SetUser(std::string username, std::string password, std::string domain)
 {
 	_username = username;
@@ -219,7 +207,6 @@ void Client::InitializePJ()
 	if (status != PJ_SUCCESS)
 	{
 		qDebug() << "Error starting pjsua";
-		// Error starting pjsua
 		pjsua_destroy();
 		return;
 	}
@@ -255,7 +242,7 @@ void Client::AddTransportPJ()
 
 void Client::CreateSipAccount()
 {
-	/* Register to SIP server by creating SIP account. */
+	// Create a SIP account and register to server
 	pjsua_acc_config acc_cfg;
 
 	pjsua_acc_config_default(&acc_cfg);
@@ -289,6 +276,7 @@ void Client::CreateSipAccount()
 
 void Client::OnCallMediaState(pjsua_call_id call_id)
 {
+	// Get info about the call
 	pjsua_call_info call_info;
 	pjsua_call_get_info(call_id, &call_info);
 

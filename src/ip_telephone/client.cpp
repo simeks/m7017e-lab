@@ -48,6 +48,7 @@ Client::Client(MainWindow* window) :
 	_window(window)
 {
 	g_client = this;
+	_call_id = 0;
 
 }
 Client::~Client()
@@ -62,7 +63,7 @@ void Client::OnIncomingCall(pjsua_acc_id acc_id, pjsua_call_id call_id,
 	pjsua_call_info prev_call_info;
 	pjsua_call_get_info(_call_id, &prev_call_info);
 
-	if(prev_call_info.state == PJSIP_INV_STATE_CONFIRMED)
+	if(prev_call_info.state == PJSIP_INV_STATE_CONFIRMED) // eller kanske: if(pjsua_call_is_active(_call_id)
 	{
 		// 486/Busy
 		pjsua_call_hangup(call_id, 486, NULL, NULL);
@@ -91,6 +92,7 @@ void Client::OnCallState(pjsua_call_id call_id, pjsip_event *e)
 		_window->HideIncomingCallPanel();
 		_window->HideActiveCallPanel();
 		_window->HideCallingPanel();
+		_window->ShowMainWindow();
 
 		qDebug() << "DISCONNECTED";
 		qDebug() << "DISCONNECTED";
@@ -133,7 +135,7 @@ void Client::MakeCall(std::string uri)
 {
 	pj_str_t _uri = pj_str((char*) uri.c_str());
 
-	status = pjsua_call_make_call(acc_id, &_uri, 0, NULL, NULL, NULL);
+	status = pjsua_call_make_call(acc_id, &_uri, 0, NULL, NULL, &_call_id);
 	if (status != PJ_SUCCESS)
 	{
 		qDebug() << "Error making the call";

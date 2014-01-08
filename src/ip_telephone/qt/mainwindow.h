@@ -24,6 +24,7 @@ public:
 	void HideIncomingCallPanel();
 	void HideCallingPanel();
 	void ShowActiveCallPanel();
+	void ShowMainWindow();
 
 private slots:
 

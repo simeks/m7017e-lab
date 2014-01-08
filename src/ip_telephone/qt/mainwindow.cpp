@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     _settings_dialog = new Settings_Dialog(_client, this);
 
-	ui->lineEdit->setText("sip:joohanforsling@iptel.org");
+    ui->lineEdit->setText("sip:m7017elab3@iptel.org");
 
     // Open the settings dialog when the application starts
     _settings_dialog->open();
@@ -39,6 +39,10 @@ void MainWindow::on_pushButton_clicked()
 	std::string _uri = uri.toStdString(); // convert from Qstring to std::string
 	_client->MakeCall(_uri);
     ui->widget->show();
+
+	// Hide Call button and sip-address textfield
+    ui->widget_4->hide();
+    ui->widget_5->hide();
 }
 
 void MainWindow::ShowIncomingCallPanel()
@@ -89,4 +93,10 @@ void MainWindow::HideCallingPanel()
 void MainWindow::ShowActiveCallPanel()
 {
 	ui->widget_3->show();
+}
+
+void MainWindow::ShowMainWindow()
+{
+	ui->widget_4->show();
+    ui->widget_5->show();
 }

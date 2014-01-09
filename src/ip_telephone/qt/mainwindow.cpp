@@ -136,6 +136,12 @@ void MainWindow::PlayIncomingCallSignal()
 
     // Start playing the ringtone
     _player->play();
+
+	qDebug() << "incoming call";
+	qDebug() << "incoming call";
+	qDebug() << "incoming call";
+	qDebug() << "incoming call";
+	qDebug() << "incoming call";
 }
 
 void MainWindow::PlayCallingSignal()

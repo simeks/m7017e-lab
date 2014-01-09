@@ -130,7 +130,7 @@ void MainWindow::ShowMainWindow()
 void MainWindow::PlayIncomingCallSignal()
 {
     // Select the audio file
-     _player->setMedia(QUrl::fromLocalFile(QFileInfo("IncomingCall.wav").absoluteFilePath()));
+     _player->setMedia(QUrl::fromLocalFile(QFileInfo("data/IncomingCall.wav").absoluteFilePath()));
 
     // Set the volume
     _player->setVolume(50);
@@ -142,7 +142,7 @@ void MainWindow::PlayIncomingCallSignal()
 void MainWindow::PlayCallingSignal()
 {
     // Select the audio file
-	_player->setMedia(QUrl::fromLocalFile(QFileInfo("Calling.wav").absoluteFilePath()));
+	_player->setMedia(QUrl::fromLocalFile(QFileInfo("data/Calling.wav").absoluteFilePath()));
 
     // Set the volume
     _player->setVolume(50);

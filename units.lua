@@ -57,6 +57,24 @@ DefRule {
 	end,
 }
 
+DefRule {
+	Name = "CopyFile",
+	Pass = "GenerateSources",
+	Command = "copy $(<) $(@)",
+
+	Blueprint = {
+		Input = { Required = true, Type = "string" },
+		Output = { Required = true, Type = "string" },
+	},
+
+	Setup = function (env, data)
+		local base_name = path.get_filename_dir(data.Input) 
+		return {
+			InputFiles    = { data.Input },
+			OutputFiles   = { data.Output },
+		}
+	end,
+}
 
 
 local function GenerateMocSources(sources)
@@ -300,7 +318,15 @@ Program {
 		GenerateQRC {
 			Input = "data/ip_telephone/application.qrc",
 			Output = "application.cpp"
-		}
+		},
+		CopyFile {
+			Input = "data/ip_telephone/IncomingCall.wav",
+			Output = "$(OBJECTDIR)/data/IncomingCall.wav",
+		},
+		CopyFile {
+			Input = "data/ip_telephone/Calling.wav",
+			Output = "$(OBJECTDIR)/data/Calling.wav",
+		},
 	},
 	Env = {	
 		CPPPATH = { 

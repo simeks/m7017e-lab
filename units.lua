@@ -312,7 +312,8 @@ Program {
 			"$(QT5_INCLUDE)/QtWidgets",
 			"$(QT5_INCLUDE)/QtGui",
 			"$(QT5_INCLUDE)/QtCore", 
-			"$(QT5_INCLUDE)/QtANGLE", 
+			"$(QT5_INCLUDE)/QtANGLE",
+			"$(QT5_INCLUDE)/QtMultimedia",			
 			"$(QT5_INCLUDE)",
 			"src",
 			"$(OBJECTDIR)/_generated/src/ip_telephone/qt",
@@ -337,7 +338,7 @@ Program {
 	Libs = { 
 		{ 	"kernel32.lib", "user32.lib", "gdi32.lib", "comdlg32.lib", "advapi32.lib", "Ole32.lib",
 			"gstreamer-0.10.lib", "glib-2.0.lib", "gobject-2.0.lib", "gstinterfaces-0.10.lib",
-			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "WS2_32.lib", 
+			"Qt5Core.lib", "Qt5Widgets.lib", "Qt5Gui.lib", "Qt5Network.lib", "Qt5Multimedia.lib", "WS2_32.lib", 
 			"pjsip-core-i386-Win32-vc8-Release-Static.lib", 
 			"pjsip-simple-i386-Win32-vc8-Release-Static.lib", 
 			"pjsua-lib-i386-Win32-vc8-Release-Static.lib", 

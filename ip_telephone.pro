@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,3 +22,6 @@ HEADERS  += src/ip_telephone/qt/mainwindow.h \
 
 FORMS    += src/ip_telephone/qt/mainwindow.ui \
     src/ip_telephone/qt/settings_dialog.ui
+
+RESOURCES += \
+    data/ip_telephone/application.qrc

@@ -1,13 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <../QtMultimedia/QMediaPlayer>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     _client(new Client(this)),
-    _settings_dialog(NULL)
+    _settings_dialog(NULL),
+    _player(NULL)
 {
     ui->setupUi(this);
+
+    // Create the media player
+    _player = new QMediaPlayer;
 
     // Hide the Calling panel
     ui->widget->hide();
@@ -32,6 +37,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 	_client->~Client();
+    delete _player;
 }
 
 // Callback for when the Call button is clicked
@@ -47,6 +53,9 @@ void MainWindow::on_pushButton_clicked()
 	// Hide Call button and sip-address textfield
     ui->widget_4->hide();
     ui->widget_5->hide();
+
+    // Play ringtone
+    PlayCallingSignal();
 }
 
 void MainWindow::ShowIncomingCallPanel(std::string incoming_uri)
@@ -67,7 +76,6 @@ void MainWindow::on_pushButton_2_clicked()
 {
     _client->InterruptCall();
 }
-
 
 // Callback for when the Answer button is clicked
 void MainWindow::on_pushButton_3_clicked()
@@ -116,4 +124,34 @@ void MainWindow::ShowMainWindow()
 	// Show the Call button and sip-address textfield
 	ui->widget_4->show();
     ui->widget_5->show();
+}
+
+void MainWindow::PlayIncomingCallSignal()
+{
+    // Select the audio file
+    _player->setMedia(QUrl::fromLocalFile("E:/M7017E/data/ip_telephone/IncomingCall.wav"));
+
+    // Set the volume
+    _player->setVolume(50);
+
+    // Start playing the ringtone
+    _player->play();
+}
+
+void MainWindow::PlayCallingSignal()
+{
+    // Select the audio file
+    _player->setMedia(QUrl::fromLocalFile("E:/M7017E/data/ip_telephone/Calling.wav"));
+
+    // Set the volume
+    _player->setVolume(50);
+
+    // Start playing the ringtone
+    _player->play();
+}
+
+void MainWindow::StopPlayingRingtones()
+{
+    // Stop playing the ringtones
+    _player->stop();
 }

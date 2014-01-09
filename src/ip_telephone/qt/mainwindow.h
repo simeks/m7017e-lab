@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "../client.h"
 #include "settings_dialog.h"
+#include "../QtMultimedia/qmediaplayer.h"
 
 namespace Ui {
 class MainWindow;
@@ -11,6 +12,7 @@ class MainWindow;
 
 class Client;
 class Settings_Dialog;
+class QMediaPlayer;
 
 class MainWindow : public QMainWindow
 {
@@ -38,6 +40,15 @@ public:
 	/// @brief Show the Call-button and sip-address textfield
 	void ShowMainWindow();
 
+    /// @brief Play the Calling ringtone when the user makes a call
+    void PlayCallingSignal();
+
+    /// @brief Play the Incoming-Call ringtone when the user gets an incoming call
+    void PlayIncomingCallSignal();
+
+    /// @brief Stop playing the ringtones when the call is interrupted, cancelled or answered
+    void StopPlayingRingtones();
+
 private slots:
 
 	/// @brief Callback for when the Call button is clicked
@@ -60,6 +71,7 @@ private:
 
     Client* _client;
     Settings_Dialog* _settings_dialog;
+    QMediaPlayer* _player;
 };
 
 #endif // MAINWINDOW_H

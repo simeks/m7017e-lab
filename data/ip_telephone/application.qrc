@@ -1,6 +1,1 @@
-<RCC>
-    <qresource prefix="/">
-        <file>IncomingCall.wav</file>
-        <file>Calling.wav</file>
-    </qresource>
-</RCC>
+<RCC/>

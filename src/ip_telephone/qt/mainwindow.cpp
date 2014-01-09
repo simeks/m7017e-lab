@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <../QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlayer>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -129,25 +130,19 @@ void MainWindow::ShowMainWindow()
 void MainWindow::PlayIncomingCallSignal()
 {
     // Select the audio file
-    _player->setMedia(QUrl::fromLocalFile("E:/M7017E/data/ip_telephone/IncomingCall.wav"));
+     _player->setMedia(QUrl::fromLocalFile(QFileInfo("IncomingCall.wav").absoluteFilePath()));
 
     // Set the volume
     _player->setVolume(50);
 
     // Start playing the ringtone
     _player->play();
-
-	qDebug() << "incoming call";
-	qDebug() << "incoming call";
-	qDebug() << "incoming call";
-	qDebug() << "incoming call";
-	qDebug() << "incoming call";
 }
 
 void MainWindow::PlayCallingSignal()
 {
     // Select the audio file
-    _player->setMedia(QUrl::fromLocalFile("E:/M7017E/data/ip_telephone/Calling.wav"));
+	_player->setMedia(QUrl::fromLocalFile(QFileInfo("Calling.wav").absoluteFilePath()));
 
     // Set the volume
     _player->setVolume(50);

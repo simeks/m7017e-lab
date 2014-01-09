@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QMediaPlaylist>
 #include <QFileInfo>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -130,7 +131,11 @@ void MainWindow::ShowMainWindow()
 void MainWindow::PlayIncomingCallSignal()
 {
     // Select the audio file
-     _player->setMedia(QUrl::fromLocalFile(QFileInfo("data/IncomingCall.wav").absoluteFilePath()));
+	QMediaPlaylist* playlist = new QMediaPlaylist;
+    playlist->addMedia(QUrl::fromLocalFile(QFileInfo("data/IncomingCall.wav").absoluteFilePath()));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+	_player->setPlaylist(playlist);
 
     // Set the volume
     _player->setVolume(50);
@@ -142,7 +147,11 @@ void MainWindow::PlayIncomingCallSignal()
 void MainWindow::PlayCallingSignal()
 {
     // Select the audio file
-	_player->setMedia(QUrl::fromLocalFile(QFileInfo("data/Calling.wav").absoluteFilePath()));
+	QMediaPlaylist* playlist = new QMediaPlaylist;
+    playlist->addMedia(QUrl::fromLocalFile(QFileInfo("data/Calling.wav").absoluteFilePath()));
+	playlist->setPlaybackMode(QMediaPlaylist::Loop);
+
+	_player->setPlaylist(playlist);
 
     // Set the volume
     _player->setVolume(50);

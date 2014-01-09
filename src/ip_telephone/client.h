@@ -6,6 +6,7 @@
 
 class MainWindow;
 
+/// @brief Class responsible for handling incoming and outgoing calls.
 class Client : public QObject
 {
     Q_OBJECT

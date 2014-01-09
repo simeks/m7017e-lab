@@ -14,6 +14,7 @@ class Client;
 class Settings_Dialog;
 class QMediaPlayer;
 
+/// @brief The main window of the application.
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

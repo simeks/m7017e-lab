@@ -4,6 +4,41 @@
 
 #include <sstream>
 
+#include <WinSock2.h>
+
+namespace socket_util
+{
+	void InitializeWinSock()
+	{
+		static bool s_initializd = false;
+		if(!s_initializd)
+		{
+			WSAData data;
+			WSAStartup(MAKEWORD(2,2), &data);
+
+			s_initializd = true;
+		}
+	}
+
+	SOCKET CreateSocket(int port)
+	{
+		InitializeWinSock();
+
+		sockaddr_in addr;
+		addr.sin_family = AF_INET;
+		addr.sin_addr.S_un.S_addr = inet_addr("0.0.0.0");
+		addr.sin_port = htons(port);
+
+		SOCKET s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		bind(s, (sockaddr*)&addr, sizeof(addr));
+
+		return s;
+	}
+
+
+};
+
+
 ChannelPipeline::ChannelPipeline(int udp_port)
 {
 	_pipeline = gst_pipeline_new("channel_pipeline");
@@ -12,16 +47,20 @@ ChannelPipeline::ChannelPipeline(int udp_port)
 	_bus = new Bus(bus);
 	_bus->SetListener(this);
 	
-	std::stringstream uri;
-	uri << "udp://localhost:" << udp_port;
+	
 	GstElement* udpsrc = gst_element_factory_make("udpsrc", NULL);
-	g_object_set(G_OBJECT(udpsrc), "uri", uri.str().c_str(), NULL);    
+
+	SOCKET recv_socket = socket_util::CreateSocket(udp_port);
+	g_object_set(G_OBJECT(udpsrc), "sockfd", (gint)recv_socket, NULL);    
 	
 	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44100, encoding-name=(string)SPEEX");
 	g_object_set(G_OBJECT(udpsrc), "caps", caps, NULL);
     gst_caps_unref (caps);
 
 	_udp_sink = gst_element_factory_make("multiudpsink", NULL);
+	
+	SOCKET send_socket = socket_util::CreateSocket(0);
+	g_object_set(G_OBJECT(_udp_sink), "sockfd", (gint)send_socket, NULL);   
 
 	// Add our elements to the pipeline (The sources will be added at a later time)
 	gst_bin_add_many(GST_BIN(_pipeline), udpsrc, _udp_sink, NULL);
@@ -80,7 +119,10 @@ void ChannelPipeline::UpdateReceivers()
 	std::stringstream ss;
 	for(std::vector<Receiver>::iterator it = _receivers.begin(); it != _receivers.end(); ++it)
 	{
-		ss << it->address << ":" << it->port;
+		if(it->address == "localhost")
+			ss << "127.0.0.1:" << it->port;
+		else
+			ss << it->address << ":" << it->port;
 		
 		if((it+1) != _receivers.end())
 			ss << ",";

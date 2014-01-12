@@ -3,6 +3,12 @@
 
 #include <sstream>
 
+#include <WinSock2.h>
+namespace socket_util
+{
+	SOCKET CreateSocket(int port);
+
+};
 
 // Called when there's a new pad that needs to be connected in our rtpbin
 void ReceiverPipeline::pad_added_cb(GstElement* , GstPad* new_pad, gpointer user_data)
@@ -100,14 +106,13 @@ ReceiverPipeline::ReceiverPipeline(int udp_port) : _pipeline(NULL), _bus(NULL), 
 {
     // Create the pipeline
     _pipeline = gst_pipeline_new ("receiver_pipeline");
-
-	std::stringstream rtp_uri;
-	rtp_uri << "udp://::1:" << udp_port;
 	
 	_rtpbin = gst_element_factory_make("gstrtpbin", NULL);
 	GstElement* queue = gst_element_factory_make("queue", NULL);
     GstElement* udpsrc = gst_element_factory_make("udpsrc", NULL);
-	g_object_set(G_OBJECT(udpsrc), "uri", rtp_uri.str().c_str(), NULL); 
+	
+	SOCKET recv_socket = socket_util::CreateSocket(udp_port);
+	g_object_set(G_OBJECT(udpsrc), "sockfd", (gint)recv_socket, NULL);    
 
 
 	GstCaps* caps = gst_caps_from_string("application/x-rtp, media=(string)audio, clock-rate=(int)44100, encoding-name=(string)SPEEX");

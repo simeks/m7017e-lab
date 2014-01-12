@@ -4,6 +4,39 @@
 
 #include <sstream>
 
+#include <WinSock2.h>
+namespace socket_util
+{
+
+	void InitializeWinSock()
+	{
+		static bool s_initializd = false;
+		if(!s_initializd)
+		{
+			WSAData data;
+			WSAStartup(MAKEWORD(2,2), &data);
+
+			s_initializd = true;
+		}
+	}
+
+	SOCKET CreateSocket(int port)
+	{
+		InitializeWinSock();
+
+		sockaddr_in addr;
+		addr.sin_family = AF_INET;
+		addr.sin_addr.S_un.S_addr = inet_addr("0.0.0.0");
+		addr.sin_port = htons(port);
+
+		SOCKET s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		bind(s, (sockaddr*)&addr, sizeof(addr));
+
+		return s;
+	}
+
+};
+
 // Called when there's a new pad that needs to be connected from our ssrc demuxer
 void SenderPipeline::new_ssrc_pad_cb(GstRtpSsrcDemux*, guint ssrc, GstPad *pad, gpointer user_data)
 {
@@ -12,6 +45,8 @@ void SenderPipeline::new_ssrc_pad_cb(GstRtpSsrcDemux*, guint ssrc, GstPad *pad, 
 
 	// Create a udp sink
     GstElement* udpsink = gst_element_factory_make("udpsink", NULL);
+	SOCKET send_socket = socket_util::CreateSocket(0);
+	g_object_set(G_OBJECT(udpsink), "sockfd", (gint)send_socket, NULL);   
 	// Set up udpsink
 	g_object_set(G_OBJECT(udpsink), "host", pipeline->_dest_host.c_str(), NULL);
 	g_object_set(G_OBJECT(udpsink), "port", pipeline->_dest_port, NULL);

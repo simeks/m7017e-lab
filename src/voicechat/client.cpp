@@ -289,7 +289,7 @@ void Client::OnUserDisconnected(const ConfigValue& msg_object)
 	{
 		std::string host = _socket->peerAddress().toString().toStdString();
 		if(_socket->peerAddress().isLoopback())
-			host = "localhost";
+			host = "127.0.0.1";
 
 		delete _sender_pipeline;
 		_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);
@@ -321,7 +321,7 @@ void Client::OnUserChangedChannel(const ConfigValue& msg_object)
 	{
 		std::string host = _socket->peerAddress().toString().toStdString();
 		if(_socket->peerAddress().isLoopback())
-			host = "localhost";
+			host = "127.0.0.1";
 
 		delete _sender_pipeline;
 		_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);
@@ -339,7 +339,7 @@ void Client::OnChannelInfo(const ConfigValue& msg_object)
 
 	std::string host = _socket->peerAddress().toString().toStdString();
 	if(_socket->peerAddress().isLoopback())
-		host = "localhost";
+		host = "127.0.0.1";
 	
 	_receiver_pipeline = new ReceiverPipeline(_listen_udp_port);
 	_sender_pipeline = new SenderPipeline(host, _channel_udp_port, _receiver_pipeline);

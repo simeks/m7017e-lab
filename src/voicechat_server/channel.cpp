@@ -24,7 +24,7 @@ void Channel::AddUser(User* user)
 {
 	std::string addr = user->Socket()->peerAddress().toString().toLocal8Bit().constData();
 	if(user->Socket()->peerAddress().isLoopback()) // 127.0.0.1 doesn't seem to be working with gstreamer so we need to change to localhost (Issues with ipv4 vs ipv6 maybe?)
-		addr = "localhost";
+		addr = "127.0.0.1";
 
 	_pipeline->AddReceiver(user->Id(), addr, _server->BaseUdpPort() + user->Id());
 }
